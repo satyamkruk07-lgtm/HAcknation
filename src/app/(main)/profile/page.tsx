@@ -10,6 +10,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useDoc } from '@/firebase/firestore/use-doc';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import Image from 'next/image';
 
 import {
   Card,
@@ -35,6 +36,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { UserAccount } from '@/lib/types';
 import { updateProfile } from 'firebase/auth';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -44,6 +46,8 @@ const profileFormSchema = z.object({
 });
 
 type ProfileFormData = z.infer<typeof profileFormSchema>;
+
+const profileBgImage = PlaceHolderImages.find(p => p.id === "profile-background");
 
 export default function ProfilePage() {
   const { user, auth, isUserLoading, mutate: mutateUser } = useUser();
@@ -81,7 +85,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (userProfile) {
       form.reset({
-        name: userProfile.name || '',
+        name: userProfile.name || user?.displayName || '',
         college: userProfile.college || '',
         skills: userProfile.skills?.join(', ') || '',
         bio: userProfile.bio || '',
@@ -104,7 +108,7 @@ export default function ProfilePage() {
     if (!event.target.files || event.target.files.length === 0) {
       return;
     }
-    if (!user || !storage || !auth.currentUser) {
+    if (!user || !storage || !auth.currentUser || !userDocRef) {
       toast({
         variant: "destructive",
         title: "Error",
@@ -122,11 +126,9 @@ export default function ProfilePage() {
       const photoURL = await getDownloadURL(snapshot.ref);
 
       await updateProfile(auth.currentUser, { photoURL });
-      
-      if(userDocRef) {
-        await setDoc(userDocRef, { photoURL }, { merge: true });
-      }
+      await setDoc(userDocRef, { photoURL }, { merge: true });
 
+      // Force re-fetch of both user and profile data
       await mutateUser();
       mutate();
 
@@ -146,7 +148,7 @@ export default function ProfilePage() {
   };
 
   const onSubmit = async (data: ProfileFormData) => {
-    if (!user || !firestore || !auth) {
+    if (!user || !userDocRef || !auth.currentUser) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -164,17 +166,14 @@ export default function ProfilePage() {
         bio: data.bio,
       };
 
-      if (userDocRef) {
-        await setDoc(userDocRef, updatedData, { merge: true });
-      }
+      await setDoc(userDocRef, updatedData, { merge: true });
 
-
-      if (auth.currentUser && auth.currentUser.displayName !== data.name) {
+      if (auth.currentUser.displayName !== data.name) {
         await updateProfile(auth.currentUser, { displayName: data.name });
       }
       
+      await mutateUser();
       mutate(); 
-      await mutateUser(); 
 
       toast({
         title: 'Success!',
@@ -201,7 +200,7 @@ export default function ProfilePage() {
 
   if (isUserLoading || isProfileLoading || !user) {
     return (
-      <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
+      <div className="bg-background min-h-[calc(100vh-3.5rem)]">
         <div className="container py-12">
           <Card className="mx-auto max-w-3xl">
             <CardHeader>
@@ -228,10 +227,17 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]" style={{
-        backgroundImage: 'radial-gradient(circle at 1px 1px, hsl(var(--border)) 1px, transparent 0)',
-        backgroundSize: '2rem 2rem'
-    }}>
+    <div className="relative min-h-[calc(100vh-3.5rem)]">
+        {profileBgImage && (
+            <Image
+                src={profileBgImage.imageUrl}
+                alt={profileBgImage.description}
+                fill
+                className="absolute inset-0 -z-10 h-full w-full object-cover brightness-50"
+                data-ai-hint={profileBgImage.imageHint}
+                priority
+            />
+        )}
       <div className="container py-12">
         <Card className="mx-auto max-w-3xl bg-background/80 backdrop-blur-sm overflow-hidden p-6">
             <div className="flex items-center gap-6">
@@ -249,7 +255,7 @@ export default function ProfilePage() {
                 </div>
                 <div>
                     <CardTitle className="font-headline text-3xl">{user.displayName || userProfile?.name}</CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-foreground/80">
                         {user.email}
                     </CardDescription>
                 </div>
@@ -331,3 +337,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    
