@@ -1,4 +1,4 @@
-import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical } from 'lucide-react';
+import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
 import type { Sponsor, Announcement, ScheduleEvent, Project, TeamMemberProfile, ProjectIdea } from './types';
 
 export const sponsors: Sponsor[] = [
@@ -11,6 +11,8 @@ export const sponsors: Sponsor[] = [
   { name: 'Server Systems', icon: <Server className="h-10 w-10 text-muted-foreground" /> },
   { name: 'CloudNet', icon: <Cloud className="h-10 w-10 text-muted-foreground" /> },
   { name: 'QuantumLeap', icon: <Atom className="h-10 w-10 text-muted-foreground" /> },
+  { name: 'TestWorks', icon: <TestTube className="h-10 w-10 text-muted-foreground" /> },
+  { name: 'AI Alchemists', icon: <BrainCircuit className="h-10 w-10 text-muted-foreground" /> },
 ];
 
 export const announcements: Announcement[] = [
@@ -300,3 +302,5 @@ export const projectIdeas: ProjectIdea[] = [
         technologies: ["WebSockets", "React", "Chart.js", "Firebase"]
     }
 ];
+
+    

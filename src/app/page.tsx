@@ -63,9 +63,9 @@ export default function Home() {
             </h2>
             <div className="grid grid-cols-3 gap-y-10 gap-x-6 items-center justify-items-center">
               {sponsors.map((sponsor) => (
-                <div key={sponsor.name} className="flex items-center space-x-4">
+                <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-3">
                   {sponsor.icon}
-                  <span className="text-base font-semibold">{sponsor.name}</span>
+                  <span className="text-base font-semibold text-muted-foreground">{sponsor.name}</span>
                 </div>
               ))}
             </div>
@@ -184,3 +184,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
