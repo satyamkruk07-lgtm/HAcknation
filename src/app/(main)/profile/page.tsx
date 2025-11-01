@@ -59,6 +59,7 @@ export default function ProfilePage() {
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
+    // Initialize with empty strings to prevent uncontrolled-to-controlled error
     defaultValues: {
       name: '',
       college: '',
@@ -74,6 +75,8 @@ export default function ProfilePage() {
   }, [user, isUserLoading, router]);
 
   useEffect(() => {
+    // When data is loaded, reset the form with the new values.
+    // Ensure all fields get a defined value (e.g., '' instead of undefined).
     if (userProfile) {
       form.reset({
         name: userProfile.name || '',
@@ -84,9 +87,12 @@ export default function ProfilePage() {
     } else if (user) {
       form.reset({
         name: user.displayName || '',
+        college: '',
+        skills: '',
+        bio: '',
       });
     }
-  }, [userProfile, user, form]);
+  }, [userProfile, user, form, isProfileLoading]);
 
   const onSubmit = async (data: ProfileFormData) => {
     if (!user || !firestore || !auth) {
