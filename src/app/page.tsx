@@ -51,7 +51,7 @@ export default function Home() {
             <div className="mt-6 flex items-center justify-center gap-6 text-lg text-primary-foreground">
                 <div className='flex items-center gap-2'>
                     <Calendar className='h-5 w-5 text-destructive' />
-                    <span>12<sup>th</sup> &amp; 13<sup>th</sup> Nov, 2025</span>
+                    <span>12<sup>th</sup> & 13<sup>th</sup> Nov, 2025</span>
                 </div>
                 <div className='flex items-center gap-2'>
                     <MapPin className='h-5 w-5 text-destructive' />
@@ -62,22 +62,6 @@ export default function Home() {
               <Button asChild size="lg">
                 <Link href="/register">Register Now</Link>
               </Button>
-            </div>
-          </div>
-        </section>
-
-        <section id="sponsors" className="py-16 bg-background">
-          <div className="container">
-            <h2 className="text-center text-3xl font-headline font-bold mb-12">
-              Our Sponsors
-            </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-10 gap-x-6 items-center justify-items-center">
-              {sponsors.map((sponsor) => (
-                <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-3">
-                  {sponsor.icon}
-                  <span className="text-base font-semibold text-muted-foreground">{sponsor.name}</span>
-                </div>
-              ))}
             </div>
           </div>
         </section>
@@ -189,6 +173,23 @@ export default function Home() {
             </div>
           </div>
         </section>
+        
+        <section id="sponsors" className="py-16 bg-background">
+          <div className="container">
+            <h2 className="text-center text-3xl font-headline font-bold mb-12">
+              Our Sponsors
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-10 gap-x-6 items-center justify-items-center">
+              {sponsors.map((sponsor) => (
+                <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-3">
+                  {sponsor.icon}
+                  <span className="text-base font-semibold text-muted-foreground">{sponsor.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
       </main>
       <Footer />
     </div>
