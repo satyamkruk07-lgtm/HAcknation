@@ -55,19 +55,16 @@ export default function TeamsPage() {
   }, [user, isUserLoading, router]);
   
   const usersCollectionQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    // Only create the query if the user is authenticated
+    if (!firestore || !user) return null;
     return query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'));
-  }, [firestore]);
+  }, [firestore, user]);
 
   const { data: teamProfiles, isLoading } = useCollection<UserAccount>(usersCollectionQuery);
 
   const filteredProfiles = teamProfiles?.filter(profile => {
     const namesToFilter = ['priyanshu singh', 'djlnac', 'grace'];
     if (profile.name && namesToFilter.includes(profile.name.toLowerCase())) {
-        return false;
-    }
-    // This will filter out the old Kalyani profile which doesn't have skills or bio.
-    if (profile.name?.toLowerCase() === 'kalyani kumari' && (!profile.skills || !profile.bio || profile.skills.length === 0)) {
         return false;
     }
     return true;
