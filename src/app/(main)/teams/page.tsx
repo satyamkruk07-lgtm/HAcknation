@@ -51,7 +51,7 @@ export default function TeamsPage() {
   const { data: teamProfiles, isLoading } = useCollection<UserAccount>(usersCollectionQuery);
 
   const filteredProfiles = teamProfiles?.filter(profile => {
-      const namesToFilter = ['djlnac', 'grace', 'Paramjeet sir'];
+      const namesToFilter = ['djlnac', 'grace'];
       return !namesToFilter.includes(profile.name);
   });
 
