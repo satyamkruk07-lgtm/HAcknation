@@ -50,6 +50,8 @@ export default function TeamsPage() {
 
   const { data: teamProfiles, isLoading } = useCollection<UserAccount>(usersCollectionQuery);
 
+  const filteredProfiles = teamProfiles?.filter(profile => profile.name !== 'djlnac');
+
   return (
     <div className="container py-12">
       <div className="text-center">
@@ -65,7 +67,7 @@ export default function TeamsPage() {
         </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {isLoading && Array.from({length: 6}).map((_, i) => <ProfileCardSkeleton key={i} />)}
-          {teamProfiles && teamProfiles.map((profile) => (
+          {filteredProfiles && filteredProfiles.map((profile) => (
             <Card key={profile.id} className="flex flex-col">
               <CardHeader className="flex flex-row items-center gap-4">
                 <Image
