@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "hero",
-      "description": "A dark, abstract image with lines of light, representing technology and innovation.",
-      "imageUrl": "https://images.unsplash.com/photo-1719847391781-5b8888dadd17?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0ZWNobm9sb2d5JTIwZXZlbnR8ZW58MHx8fHwxNzYyMDAwOTcxfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "technology event"
+      "description": "A laptop and a monitor displaying code in a dark room, representing a coding or hacking environment.",
+      "imageUrl": "https://images.unsplash.com/photo-1555066931-4365d1469c98?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb2Rpbmd8ZW58MHx8fHwxNzYyMDAwOTcxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "coding environment"
     },
     {
       "id": "avatar1",
