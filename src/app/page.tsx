@@ -54,7 +54,7 @@ export default function Home() {
                     <span>October 26-27, 2024</span>
                 </div>
                 <div className='flex items-center gap-2'>
-                    <MapPin className='h-5 w-5' />
+                    <MapPin className='h-5 w-5 text-destructive' />
                     <span>Shivalik College of Engineering,Dehradun</span>
                 </div>
             </div>
