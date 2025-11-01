@@ -1,0 +1,161 @@
+/**
+ * @file Firestore Security Rules for HackTrack
+ * @description This ruleset enforces a strict user-ownership model for user data and allows public read access to hackathon event information while restricting write access. Subcollections of hackathon events inherit the event's access control.
+ * @dataStructure
+ *   - `/users/{userId}`: Stores user account information; access is restricted to the owning user.
+ *   - `/hackathonEvents/{hackathonEventId}`: Stores hackathon event details; publicly readable, but write access is restricted.
+ *   - `/hackathonEvents/{hackathonEventId}/scheduleItems/{scheduleItemId}`: Stores schedule items, inheriting access from the parent event.
+ *   - `/hackathonEvents/{hackathonEventId}/announcements/{announcementId}`: Stores announcements, inheriting access from the parent event.
+ *   - `/hackathonEvents/{hackathonEventId}/projectSubmissions/{projectSubmissionId}`: Stores project submissions, inheriting access from the parent event.
+ *   - `/hackathonEvents/{hackathonEventId}/judgingCriteria/{judgingCriteriaId}`: Stores judging criteria, inheriting access from the parent event.
+ *   - `/hackathonEvents/{hackathonEventId}/teams/{teamId}`: Stores team data, inheriting access from the parent event. The `memberIds` array is used to store user ids of team members.
+ *   - `/judges/{judgeId}`: Stores judge information; write access is restricted.
+ *   - `/projectScores/{projectScoreId}`: Stores project scores; write access is restricted.
+ *   - `/skills/{skillId}`: Stores skill information; write access is restricted.
+ *   - `/userSkills/{userSkillId}`: Stores user skill information; write access is restricted.
+ * @keySecurityDecisions
+ *   - User data is strictly private; only the authenticated user can access their own data.
+ *   - Hackathon event data is publicly readable, allowing for open access to event information. Write access to event data is restricted and should be updated with appropriate role management.
+ *   - Listing of users is disallowed for privacy.
+ *   - Read and write access to subcollections under `/hackathonEvents/{hackathonEventId}` is implicitly granted to all for prototyping.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Checks if the request is authenticated.
+     * @return {boolean} True if the request is authenticated, false otherwise.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the authenticated user is the owner of the resource.
+     * @param {string} userId - The user ID to compare against the authenticated user's ID.
+     * @return {boolean} True if the user is the owner, false otherwise.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the authenticated user is the owner of the resource and the resource exists.
+     * @param {string} userId - The user ID to compare against the authenticated user's ID.
+     * @return {boolean} True if the user is the owner and the resource exists, false otherwise.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Rules for user accounts.
+     * @path /users/{userId}
+     * @allow (create) - Authenticated user with matching {userId} can create their own account.
+     * @allow (get, update, delete) - Authenticated user with matching {userId} can read, update and delete their own account.
+     * @deny (create) - Authenticated user cannot create an account with a mismatched {userId}.
+     * @deny (get, update, delete) - Authenticated user cannot read, update or delete another user's account.
+     * @principle Enforces document ownership for writes.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == request.auth.uid;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Rules for hackathon events.
+     * @path /hackathonEvents/{hackathonEventId}
+     * @allow (get, list) - Any user can read hackathon event data.
+     * @deny (create, update, delete) - Only authenticated users can create, update, or delete hackathon event data.  This should be updated with correct role based permissions.
+     * @principle Public read, owner-only writes (placeholder, needs implementation).
+     */
+    match /hackathonEvents/{hackathonEventId} {
+      allow get, list: if true;
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    }
+
+    /**
+     * @description Rules for schedule items within a hackathon event.
+     * @path /hackathonEvents/{hackathonEventId}/scheduleItems/{scheduleItemId}
+     */
+    match /hackathonEvents/{hackathonEventId}/scheduleItems/{scheduleItemId} {
+      allow get, list, create, update, delete: if true; // Assuming public for prototyping
+    }
+
+    /**
+     * @description Rules for announcements within a hackathon event.
+     * @path /hackathonEvents/{hackathonEventId}/announcements/{announcementId}
+     */
+    match /hackathonEvents/{hackathonEventId}/announcements/{announcementId} {
+      allow get, list, create, update, delete: if true; // Assuming public for prototyping
+    }
+
+    /**
+     * @description Rules for project submissions within a hackathon event.
+     * @path /hackathonEvents/{hackathonEventId}/projectSubmissions/{projectSubmissionId}
+     */
+    match /hackathonEvents/{hackathonEventId}/projectSubmissions/{projectSubmissionId} {
+      allow get, list, create, update, delete: if true; // Assuming public for prototyping
+    }
+
+    /**
+     * @description Rules for judging criteria within a hackathon event.
+     * @path /hackathonEvents/{hackathonEventId}/judgingCriteria/{judgingCriteriaId}
+     */
+    match /hackathonEvents/{hackathonEventId}/judgingCriteria/{judgingCriteriaId} {
+      allow get, list, create, update, delete: if true; // Assuming public for prototyping
+    }
+
+     /**
+      * @description Rules for teams within a hackathon event.
+      * @path /hackathonEvents/{hackathonEventId}/teams/{teamId}
+      */
+     match /hackathonEvents/{hackathonEventId}/teams/{teamId} {
+       allow get, list, create, update, delete: if true; // Assuming public for prototyping
+     }
+
+    /**
+     * @description Rules for judges.
+     * @path /judges/{judgeId}
+     */
+    match /judges/{judgeId} {
+      allow get: if true;
+      allow list: if true;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Rules for project scores.
+     * @path /projectScores/{projectScoreId}
+     */
+    match /projectScores/{projectScoreId} {
+      allow get: if true;
+      allow list: if true;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Rules for skills.
+     * @path /skills/{skillId}
+     */
+    match /skills/{skillId} {
+      allow get: if true;
+      allow list: if true;
+      allow create, update, delete: if false;
+    }
+
+    /**
+     * @description Rules for user skills.
+     * @path /userSkills/{userSkillId}
+     */
+    match /userSkills/{userSkillId} {
+      allow get: if true;
+      allow list: if true;
+      allow create, update, delete: if false;
+    }
+  }
+}
