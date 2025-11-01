@@ -133,7 +133,7 @@ export default function ProfilePage() {
       }
 
       // Force re-fetch of user data
-      mutateUser(); // re-fetch auth user
+      await mutateUser(); // re-fetch auth user
       mutate(); // re-fetch firestore doc
 
       toast({
@@ -181,7 +181,7 @@ export default function ProfilePage() {
       }
       
       mutate(); // re-fetch firestore doc after update
-      mutateUser(); // re-fetch user after update
+      await mutateUser(); // re-fetch user after update
 
       toast({
         title: 'Success!',
@@ -247,7 +247,7 @@ export default function ProfilePage() {
                <div className="flex items-center gap-6">
                 <div className="relative">
                   <Avatar className="h-24 w-24 cursor-pointer" onClick={handleAvatarClick}>
-                    <AvatarImage src={userProfile?.photoURL ?? user.photoURL ?? ''} />
+                    <AvatarImage src={user.photoURL ?? userProfile?.photoURL ?? ''} />
                     <AvatarFallback className="text-3xl">
                       {getInitials(userProfile?.name ?? user.displayName)}
                     </AvatarFallback>
@@ -334,4 +334,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-    
