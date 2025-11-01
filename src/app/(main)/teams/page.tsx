@@ -1,3 +1,6 @@
+
+'use client';
+
 import Image from 'next/image';
 import {
   Card,
@@ -12,10 +15,43 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { teamProfiles } from '@/lib/data.tsx';
+import { teamProfiles as initialTeamProfiles } from '@/lib/data.tsx';
 import { Mail } from 'lucide-react';
+import { useState } from 'react';
+import type { TeamMemberProfile } from '@/lib/types';
 
 export default function TeamsPage() {
+  const [teamProfiles, setTeamProfiles] = useState<TeamMemberProfile[]>(initialTeamProfiles);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [skills, setSkills] = useState('');
+  const [bio, setBio] = useState('');
+
+  const handleAddProfile = () => {
+    if (!name || !email || !skills || !bio) {
+      // Basic validation
+      alert('Please fill out all fields.');
+      return;
+    }
+
+    const newProfile: TeamMemberProfile = {
+      id: teamProfiles.length + 1,
+      name,
+      email,
+      skills: skills.split(',').map((skill) => skill.trim()),
+      bio,
+      avatarUrl: `https://picsum.photos/seed/avatar${teamProfiles.length + 1}/200/200`,
+    };
+
+    setTeamProfiles([newProfile, ...teamProfiles]);
+
+    // Clear form
+    setName('');
+    setEmail('');
+    setSkills('');
+    setBio('');
+  };
+
   return (
     <div className="container py-12">
       <div className="text-center">
@@ -77,30 +113,53 @@ export default function TeamsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form className="space-y-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" placeholder="Ada Lovelace" />
+                  <Input
+                    id="name"
+                    placeholder="Ada Lovelace"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="ada@example.com" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="ada@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="skills">Skills</Label>
-                  <Input id="skills" placeholder="React, Python, Figma..." />
+                  <Input
+                    id="skills"
+                    placeholder="React, Python, Figma..."
+                    value={skills}
+                    onChange={(e) => setSkills(e.target.value)}
+                  />
                   <p className="text-xs text-muted-foreground">
                     Comma-separated skills.
                   </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bio">Short Bio</Label>
-                  <Textarea id="bio" placeholder="Tell us about yourself." />
+                  <Textarea
+                    id="bio"
+                    placeholder="Tell us about yourself."
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                  />
                 </div>
-              </form>
+              </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full">Add My Profile</Button>
+              <Button className="w-full" onClick={handleAddProfile}>
+                Add My Profile
+              </Button>
             </CardFooter>
           </Card>
         </div>
