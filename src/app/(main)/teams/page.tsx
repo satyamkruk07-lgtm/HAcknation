@@ -66,7 +66,7 @@ export default function TeamsPage() {
     if (profile.email === 'kalyanikri1111@gmail.com') {
         return false;
     }
-    const namesToFilter = ['djlnac', 'grace', 'Kalyani kumari'];
+    const namesToFilter = ['djlnac', 'grace'];
     if (profile.name && namesToFilter.includes(profile.name)) {
         return false;
     }
