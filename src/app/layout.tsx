@@ -3,6 +3,19 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from '@/components/ui/toaster';
 import { FirebaseClientProvider } from '@/firebase';
+import { Inter, Space_Grotesk } from 'next/font/google';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-space-grotesk',
+});
 
 export const metadata: Metadata = {
   title: 'HackTrack',
@@ -15,10 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${spaceGrotesk.variable}`}>
       <head>
-        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
       </head>
       <body
         className={cn(
@@ -33,5 +44,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-    
