@@ -43,7 +43,7 @@ export type TeamMemberProfile = {
 export type UserAccount = {
   id: string;
   email: string;
-  name: string;
+  name:string;
   registrationDate: string;
   college?: string;
   skills?: string[];
@@ -52,4 +52,8 @@ export type UserAccount = {
   profileBannerUrl?: string;
 };
 
-    
+export type ProjectIdea = {
+  title: string;
+  description: string;
+  technologies: string[];
+};

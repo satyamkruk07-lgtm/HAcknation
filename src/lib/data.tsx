@@ -1,5 +1,5 @@
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench } from 'lucide-react';
-import type { Sponsor, Announcement, ScheduleEvent, Project, TeamMemberProfile } from './types';
+import type { Sponsor, Announcement, ScheduleEvent, Project, TeamMemberProfile, ProjectIdea } from './types';
 
 export const sponsors: Sponsor[] = [
   { name: 'Innovate Inc.', icon: <Briefcase className="h-8 w-8 text-muted-foreground" /> },
@@ -42,4 +42,57 @@ export const teamProfiles: TeamMemberProfile[] = [
   { id: 4, name: 'Diana', avatarUrl: 'https://picsum.photos/seed/avatar4/200/200', skills: ['Figma', 'User Research', 'Prototyping'], bio: 'UX designer focused on human-centered design principles.', email: 'diana@example.com' },
   { id: 5, name: 'Ethan', avatarUrl: 'https://picsum.photos/seed/avatar5/200/200', skills: ['Go', 'Kubernetes', 'Cloud'], bio: 'Cloud native enthusiast and DevOps specialist.', email: 'ethan@example.com' },
   { id: 6, name: 'Fiona', avatarUrl: 'https://picsum.photos/seed/avatar6/200/200', skills: ['Swift', 'iOS', 'Mobile Dev'], bio: 'Mobile developer crafting amazing experiences for iOS.', email: 'fiona@example.com' },
+];
+
+export const projectIdeas: ProjectIdea[] = [
+    {
+        title: "GreenThumb",
+        description: "An app that helps users identify plants, diagnose plant diseases, and get care instructions using their phone's camera.",
+        technologies: ["React Native", "Firebase", "Google Cloud Vision API", "Genkit"]
+    },
+    {
+        title: "CommuniCare",
+        description: "A platform for local communities to organize volunteer activities, from cleaning drives to helping the elderly.",
+        technologies: ["Next.js", "Firestore", "Google Maps API", "Tailwind CSS"]
+    },
+    {
+        title: "FitFlow",
+        description: "An AI-powered yoga and fitness instructor that provides real-time feedback on your poses and form using your webcam.",
+        technologies: ["TensorFlow.js", "Next.js", "WebRTC", "ShadCN UI"]
+    },
+    {
+        title: "CodeCollab",
+        description: "A real-time collaborative coding editor with integrated video chat and a shared terminal, built for pair programming.",
+        technologies: ["React", "Firebase Realtime Database", "WebRTC", "Monaco Editor"]
+    },
+    {
+        title: "StorySpark",
+        description: "A creative writing assistant that uses generative AI to help overcome writer's block by suggesting plot points, characters, and dialogue.",
+        technologies: ["Genkit", "Google AI", "Next.js", "TipTap Editor"]
+    },
+    {
+        title: "BudgetBuddy",
+        description: "A simple, intuitive budgeting app that uses Plaid to connect to bank accounts and automatically categorizes transactions.",
+        technologies: ["Plaid API", "React", "Node.js", "PostgreSQL"]
+    },
+    {
+        title: "EchoSafe",
+        description: "A personal safety app that can be activated by a voice command to send alerts with your location to pre-selected contacts.",
+        technologies: ["Web Speech API", "Geolocation API", "Twilio", "Firebase"]
+    },
+    {
+        title: "LocalLens",
+        description: "A travel app that helps you discover hidden gems and local experiences by creating personalized itineraries based on your interests.",
+        technologies: ["Google Maps API", "Foursquare API", "Next.js", "Tailwind CSS"]
+    },
+    {
+        title: "MindGarden",
+        description: "A mental wellness app that combines guided meditations, journaling, and a mood tracker to help users cultivate mindfulness.",
+        technologies: ["React Native", "Firestore", "D3.js", "Genkit"]
+    },
+    {
+        title: "ConnectEd",
+        description: "A peer-to-peer tutoring platform that connects students who need help with those who excel in specific subjects within a university.",
+        technologies: ["Next.js", "Firebase", "Stripe Connect", "WebRTC"]
+    }
 ];
