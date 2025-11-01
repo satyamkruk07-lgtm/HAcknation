@@ -18,9 +18,11 @@ export function Footer() {
             <Mail className="h-5 w-5" />
           </a>
           <a
-            href="#"
+            href="https://www.linkedin.com/in/kumar-satyam-055841394"
             className="text-muted-foreground hover:text-foreground"
             aria-label="LinkedIn"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <Linkedin className="h-5 w-5" />
           </a>
