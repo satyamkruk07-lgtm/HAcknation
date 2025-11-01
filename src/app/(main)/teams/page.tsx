@@ -51,8 +51,15 @@ export default function TeamsPage() {
   const { data: teamProfiles, isLoading } = useCollection<UserAccount>(usersCollectionQuery);
 
   const filteredProfiles = teamProfiles?.filter(profile => {
-      const namesToFilter = ['djlnac', 'grace'];
-      return !namesToFilter.includes(profile.name);
+    // Filter out the specific "Paramjeet sir" profile from "Shivalik college of Engineering"
+    if (profile.name === 'Paramjeet sir' && profile.college === 'Shivalik college of Engineering') {
+        return false;
+    }
+    // Filter out 'djlnac' and 'grace'
+    if (profile.name === 'djlnac' || profile.name === 'grace') {
+        return false;
+    }
+    return true;
   });
 
   return (
