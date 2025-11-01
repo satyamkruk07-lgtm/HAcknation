@@ -64,7 +64,7 @@ export default function SubmitPage() {
         description,
         githubUrl,
         demoUrl,
-        submittedBy: user.uid,
+        submittedBy: user.displayName,
         submissionDate: serverTimestamp(),
       });
 
