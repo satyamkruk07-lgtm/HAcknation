@@ -48,8 +48,8 @@ const features = [
 ];
 
 const nextEvent = schedule.find(
-  (e) => new Date(e.time.replace('Day 1 - ', '')) > new Date() || schedule[1]
-);
+  (e) => new Date(e.time.replace(/Day \d - /, '')) > new Date()
+) || schedule[1];
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
