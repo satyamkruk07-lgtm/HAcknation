@@ -132,9 +132,9 @@ export default function ProfilePage() {
         await setDoc(userDocRef, { photoURL }, { merge: true });
       }
 
-      // Force re-fetch of user data
-      await mutateUser(); // re-fetch auth user
-      mutate(); // re-fetch firestore doc
+      // Force re-fetch of user data for both auth state and firestore doc
+      await mutateUser();
+      mutate();
 
       toast({
         title: 'Success!',
