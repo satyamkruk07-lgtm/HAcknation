@@ -48,4 +48,5 @@ export type UserAccount = {
   college?: string;
   skills?: string[];
   bio?: string;
+  photoURL?: string;
 };

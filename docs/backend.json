@@ -80,6 +80,11 @@
         "bio": {
           "type": "string",
           "description": "A short biography of the user."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL of the user's profile picture.",
+          "format": "uri"
         }
       },
       "required": [
