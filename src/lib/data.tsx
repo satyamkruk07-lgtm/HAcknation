@@ -13,6 +13,7 @@ export const sponsors: Sponsor[] = [
   { name: 'QuantumLeap', icon: <Atom className="h-10 w-10 text-muted-foreground" /> },
   { name: 'TestWorks', icon: <TestTube className="h-10 w-10 text-muted-foreground" /> },
   { name: 'AI Alchemists', icon: <BrainCircuit className="h-10 w-10 text-muted-foreground" /> },
+  { name: 'SynthLabs', icon: <FlaskConical className="h-10 w-10 text-muted-foreground" /> },
 ];
 
 export const announcements: Announcement[] = [
