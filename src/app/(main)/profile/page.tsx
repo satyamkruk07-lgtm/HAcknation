@@ -5,11 +5,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useUser, useFirestore, useMemoFirebase, useStorage } from '@/firebase';
+import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useDoc } from '@/firebase/firestore/use-doc';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Image from 'next/image';
 
 import {
@@ -30,7 +29,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2, Rocket } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -50,12 +49,9 @@ type ProfileFormData = z.infer<typeof profileFormSchema>;
 export default function ProfilePage() {
   const { user, auth, isUserLoading, mutate: mutateUser } = useUser();
   const firestore = useFirestore();
-  const storage = useStorage();
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-  const avatarFileInputRef = useRef<HTMLInputElement>(null);
   
   const userDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null;
@@ -97,53 +93,6 @@ export default function ProfilePage() {
       });
     }
   }, [userProfile, user, form, isProfileLoading]);
-
-  const handleAvatarClick = () => {
-    avatarFileInputRef.current?.click();
-  };
-
-  const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || event.target.files.length === 0) {
-      return;
-    }
-    if (!user || !storage || !auth.currentUser || !userDocRef) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "You must be logged in to upload a picture.",
-      });
-      return;
-    }
-
-    const file = event.target.files[0];
-    const storageRef = ref(storage, `avatars/${user.uid}/${file.name}`);
-
-    setIsUploadingAvatar(true);
-    try {
-      const snapshot = await uploadBytes(storageRef, file);
-      const photoURL = await getDownloadURL(snapshot.ref);
-
-      await updateProfile(auth.currentUser, { photoURL });
-      await setDoc(userDocRef, { photoURL }, { merge: true });
-
-      // Force re-fetch of both user and profile data
-      await mutateUser();
-      mutate();
-
-      toast({
-        title: 'Success!',
-        description: 'Your profile picture has been updated.',
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: error.message || "Could not upload your picture.",
-      });
-    } finally {
-      setIsUploadingAvatar(false);
-    }
-  };
 
   const onSubmit = async (data: ProfileFormData) => {
     if (!user || !userDocRef || !auth.currentUser) {
@@ -188,14 +137,6 @@ export default function ProfilePage() {
     }
   };
 
-  const getInitials = (name?: string | null) => {
-    if (!name) return 'U';
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('');
-  };
-
   if (isUserLoading || isProfileLoading || !user) {
     return (
       <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
@@ -229,20 +170,13 @@ export default function ProfilePage() {
       <div className="container py-12">
         <Card className="mx-auto max-w-3xl overflow-hidden p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
             <div className="flex items-center gap-6">
-                <div className="relative h-32 w-32 group">
-                    <Avatar className="h-32 w-32 border-4 border-background" onClick={handleAvatarClick}>
-                    <AvatarImage src={user.photoURL ?? ''} />
-                    <AvatarFallback className="text-4xl">
-                        {getInitials(user.displayName)}
-                    </AvatarFallback>
-                    </Avatar>
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={handleAvatarClick}>
-                    {isUploadingAvatar ? <Loader2 className="h-10 w-10 animate-spin text-white" /> : <Upload className="h-10 w-10 text-white" />}
-                    </div>
-                    <input type="file" ref={avatarFileInputRef} onChange={handleAvatarFileChange} accept="image/*" className="hidden" />
+                <div className="relative h-32 w-32">
+                  <div className="flex h-32 w-32 items-center justify-center rounded-full bg-primary/10 border-4 border-background">
+                    <Rocket className="h-16 w-16 text-accent animate-pulse" />
+                  </div>
                 </div>
                 <div>
-                    <CardTitle className="font-headline text-3xl">{user.displayName || userProfile?.name}</CardTitle>
+                    <CardTitle className="font-headline text-3xl">{userProfile?.name || user.displayName}</CardTitle>
                     <CardDescription className="text-foreground/80">
                         {user.email}
                     </CardDescription>
