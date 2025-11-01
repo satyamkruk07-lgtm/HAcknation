@@ -13,9 +13,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Mail } from 'lucide-react';
 import type { UserAccount } from '@/lib/types';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 function ProfileCardSkeleton() {
     return (
@@ -43,6 +45,15 @@ function ProfileCardSkeleton() {
 
 export default function TeamsPage() {
   const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isUserLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, isUserLoading, router]);
+  
   const usersCollectionQuery = useMemoFirebase(() => {
     if (!firestore) return null;
     return query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'));
@@ -59,6 +70,27 @@ export default function TeamsPage() {
     return true;
   });
 
+  if (isUserLoading || isLoading || !user) {
+    return (
+        <div className="container py-12">
+            <div className="text-center">
+                <h1 className="font-headline text-4xl font-bold">Find Your Team</h1>
+                <p className="mt-2 text-lg text-muted-foreground">
+                Connect with other hackers and build your dream team.
+                </p>
+            </div>
+            <div className="mt-12">
+                <h2 className="mb-6 font-headline text-2xl font-bold">
+                Looking for a Team
+                </h2>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {Array.from({length: 6}).map((_, i) => <ProfileCardSkeleton key={i} />)}
+                </div>
+            </div>
+        </div>
+    )
+  }
+
   return (
     <div className="container py-12">
       <div className="text-center">
@@ -73,7 +105,6 @@ export default function TeamsPage() {
           Looking for a Team
         </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {isLoading && Array.from({length: 6}).map((_, i) => <ProfileCardSkeleton key={i} />)}
           {filteredProfiles && filteredProfiles.map((profile) => (
             <Card key={profile.id} className="flex flex-col">
               <CardHeader className="flex flex-row items-center gap-4">
