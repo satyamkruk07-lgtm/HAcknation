@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "hero",
-      "description": "A vibrant, abstract image representing innovation and technology at a hackathon.",
-      "imageUrl": "https://images.unsplash.com/photo-1698502744308-b187f6612ead?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxoYWNrYXRob24lMjBldmVudHxlbnwwfHx8fDE3NjE5Mjc2NzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "hackathon event"
+      "description": "A group of people collaborating on laptops in a hackathon setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxoYWNrYXRob258ZW58MHx8fHwxNzYyMDgzMDUwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hackathon collaboration"
     },
     {
       "id": "avatar1",
