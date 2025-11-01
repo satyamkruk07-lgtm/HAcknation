@@ -60,7 +60,7 @@ export default function SubmitPage() {
       const projectsCollection = collection(firestore, 'projects');
       await addDoc(projectsCollection, {
         name: projectName,
-        team: teamMembers.split(',').map(m => m.trim()),
+        studentNames: teamMembers.split(',').map((m) => m.trim()),
         description,
         githubUrl,
         demoUrl,
@@ -95,8 +95,8 @@ export default function SubmitPage() {
 
   return (
     <div className="container py-12">
+        <form onSubmit={handleSubmit}>
         <Card className="w-full max-w-2xl mx-auto">
-            <form onSubmit={handleSubmit}>
             <CardHeader>
                 <CardTitle className="font-headline text-2xl">
                 Submit Your Project
@@ -168,8 +168,8 @@ export default function SubmitPage() {
                   {isSubmitting ? 'Submitting...' : 'Submit for Judging'}
                 </Button>
             </CardFooter>
-            </form>
         </Card>
+        </form>
     </div>
   );
 }
