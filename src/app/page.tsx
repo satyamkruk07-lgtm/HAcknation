@@ -30,11 +30,21 @@ export default function Home() {
       </header>
       <main className="flex-1">
         <section className="relative py-20 md:py-32 bg-background">
-          <div className="container text-center">
-            <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
+        {heroImage && (
+            <Image
+              src={heroImage.imageUrl}
+              alt={heroImage.description}
+              fill
+              className="object-cover"
+              data-ai-hint={heroImage.imageHint}
+            />
+          )}
+          <div className="absolute inset-0 bg-black/60" />
+          <div className="container text-center relative">
+            <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl text-primary-foreground">
               HackTrack
             </h1>
-            <p className="mx-auto mt-4 max-w-[700px] text-lg md:text-xl text-muted-foreground">
+            <p className="mx-auto mt-4 max-w-[700px] text-lg md:text-xl text-primary-foreground/80">
               Innovate. Collaborate. Create. The future is in your hands.
             </p>
             <div className="mt-6 flex items-center justify-center gap-6 text-lg text-destructive">
