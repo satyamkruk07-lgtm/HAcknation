@@ -4,4 +4,3 @@ config();
 
 import '@/ai/flows/summarize-judging-feedback.ts';
 import '@/ai/flows/chat-flow.ts';
-import '@/ai/flows/sync-to-sheet-flow.ts';

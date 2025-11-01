@@ -3,7 +3,7 @@
 
 import { useUser } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,14 +17,10 @@ import {
   HeartHandshake,
   Megaphone,
   FileText,
-  Sheet,
-  Loader2,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { schedule, sponsors, announcements } from '@/lib/data.tsx';
 import { Badge } from '@/components/ui/badge';
-import { syncDataToSheet } from '@/lib/actions';
-import { useToast } from '@/hooks/use-toast';
 
 const features = [
   {
@@ -58,41 +54,12 @@ const nextEvent = schedule.find((e) => e.id === 2) ?? schedule[0];
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
-  const { toast } = useToast();
-  const [isSyncing, setIsSyncing] = useState(false);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/login');
     }
   }, [user, isUserLoading, router]);
-
-  const handleSync = async () => {
-    setIsSyncing(true);
-    toast({
-      title: 'Syncing Data...',
-      description: 'Syncing Firestore users to Google Sheet. This may take a moment.',
-    });
-    try {
-      const result = await syncDataToSheet();
-      if (result.error) {
-        throw new Error(result.error);
-      }
-      toast({
-        title: 'Sync Complete!',
-        description: `${result.rowsAdded} user(s) successfully synced to your Google Sheet.`,
-      });
-    } catch (error: any) {
-       toast({
-        variant: 'destructive',
-        title: 'Uh oh! Sync failed.',
-        description: 'Could not sync data. Make sure your Google Sheet ID and permissions are set correctly on the server.',
-      });
-      console.error(error);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
 
   if (isUserLoading || !user) {
     return (
@@ -119,7 +86,7 @@ export default function DashboardPage() {
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
         {/* Header */}
-        <div className="mb-12 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-12">
           <div>
             <h1 className="font-headline text-4xl font-bold">
               Welcome, {user.displayName || 'Hacker'}!
@@ -128,14 +95,6 @@ export default function DashboardPage() {
               Your HackTrack journey starts here. Let&apos;s get building!
             </p>
           </div>
-          <Button onClick={handleSync} disabled={isSyncing}>
-            {isSyncing ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Sheet className="mr-2 h-4 w-4" />
-            )}
-            Sync to Google Sheet
-          </Button>
         </div>
 
         {/* Main Grid */}
