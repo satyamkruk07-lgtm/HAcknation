@@ -1,4 +1,4 @@
-import { schedule } from '@/lib/data';
+import { schedule } from '@/lib/data.tsx';
 
 export default function SchedulePage() {
   return (

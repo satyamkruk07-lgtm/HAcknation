@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { projects } from '@/lib/data';
+import { projects } from '@/lib/data.tsx';
 import { ArrowRight, Github } from 'lucide-react';
 
 export default function JudgingPage() {

@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { teamProfiles } from '@/lib/data';
+import { teamProfiles } from '@/lib/data.tsx';
 import { Mail } from 'lucide-react';
 
 export default function TeamsPage() {
