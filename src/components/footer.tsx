@@ -1,4 +1,4 @@
-import { Github, Twitter, Linkedin } from 'lucide-react';
+import { Github, Twitter, Linkedin, Mail } from 'lucide-react';
 import { Logo } from './logo';
 
 export function Footer() {
@@ -11,11 +11,11 @@ export function Footer() {
         </p>
         <div className="flex items-center gap-4">
           <a
-            href="#"
+            href="mailto:contact@hacktrack.com"
             className="text-muted-foreground hover:text-foreground"
-            aria-label="Twitter"
+            aria-label="Mail"
           >
-            <Twitter className="h-5 w-5" />
+            <Mail className="h-5 w-5" />
           </a>
           <a
             href="#"
