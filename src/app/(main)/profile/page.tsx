@@ -89,7 +89,7 @@ export default function ProfilePage() {
   }, [userProfile, user, form]);
 
   const onSubmit = async (data: ProfileFormData) => {
-    if (!user || !firestore) {
+    if (!user || !firestore || !auth) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -107,7 +107,10 @@ export default function ProfilePage() {
         bio: data.bio,
       };
 
-      await setDoc(userDocRef, updatedData, { merge: true });
+      if (userDocRef) {
+        await setDoc(userDocRef, updatedData, { merge: true });
+      }
+
 
       if (auth.currentUser && auth.currentUser.displayName !== data.name) {
         await updateProfile(auth.currentUser, { displayName: data.name });
