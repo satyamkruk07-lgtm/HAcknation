@@ -108,41 +108,47 @@ export default function TeamsPage() {
           Looking for a Team
         </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredProfiles && filteredProfiles.map((profile) => (
-            <Card key={profile.id} className="flex flex-col">
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Image
-                  src={profile.photoURL || `https://picsum.photos/seed/${profile.id}/200/200`}
-                  alt={profile.name}
-                  width={64}
-                  height={64}
-                  className="rounded-full"
-                  data-ai-hint="person portrait"
-                />
-                <div>
-                  <CardTitle>{profile.name}</CardTitle>
-                  <CardDescription>{profile.college || 'Hacker'}</CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent className="flex-1 space-y-4">
-                 <p className='text-sm text-muted-foreground line-clamp-2 min-h-[40px]'>{profile.bio}</p>
-                 <div className="flex flex-wrap gap-2">
-                  {(profile.skills || []).map((skill) => (
-                    <Badge key={skill} variant="secondary">
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button asChild className="w-full">
-                  <a href={`mailto:${profile.email}`}>
-                    <Mail className="mr-2 h-4 w-4" /> Connect
-                  </a>
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
+          {filteredProfiles && filteredProfiles.map((profile) => {
+            const imageUrl = profile.email === 'kalyanikri1111@gmail.com' 
+              ? 'https://images.unsplash.com/photo-1748636271716-472728fdb86f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyMHx8c3RhdHVlJTIwb2YlMjBsaWJ8ZW58MHx8fHwxNzYyMDI4MTM3fDA&ixlib=rb-4.1.0&q=80&w=1080' 
+              : profile.photoURL || `https://picsum.photos/seed/${profile.id}/200/200`;
+
+            return (
+              <Card key={profile.id} className="flex flex-col">
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <Image
+                    src={imageUrl}
+                    alt={profile.name}
+                    width={64}
+                    height={64}
+                    className="rounded-full"
+                    data-ai-hint="person portrait"
+                  />
+                  <div>
+                    <CardTitle>{profile.name}</CardTitle>
+                    <CardDescription>{profile.college || 'Hacker'}</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 space-y-4">
+                  <p className='text-sm text-muted-foreground line-clamp-2 min-h-[40px]'>{profile.bio}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {(profile.skills || []).map((skill) => (
+                      <Badge key={skill} variant="secondary">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button asChild className="w-full">
+                    <a href={`mailto:${profile.email}`}>
+                      <Mail className="mr-2 h-4 w-4" /> Connect
+                    </a>
+                  </Button>
+                </CardFooter>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>
