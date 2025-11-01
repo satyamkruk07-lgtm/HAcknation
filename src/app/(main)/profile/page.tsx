@@ -119,8 +119,7 @@ export default function ProfilePage() {
       mutateUserProfile(); 
 
       toast({
-        title: 'Success!',
-        description: 'Your profile has been updated.',
+        title: 'Successfully updated',
       });
     } catch (error: any) {
       toast({
