@@ -1,3 +1,8 @@
+'use client';
+
+import { useState } from 'react';
+import { useFirestore, useUser } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -10,83 +15,161 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function SubmitPage() {
+  const firestore = useFirestore();
+  const { user } = useUser();
+  const { toast } = useToast();
+  const router = useRouter();
+
+  const [projectName, setProjectName] = useState('');
+  const [teamMembers, setTeamMembers] = useState('');
+  const [description, setDescription] = useState('');
+  const [githubUrl, setGithubUrl] = useState('');
+  const [demoUrl, setDemoUrl] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!user) {
+      toast({
+        variant: 'destructive',
+        title: 'Authentication Error',
+        description: 'You must be logged in to submit a project.',
+      });
+      router.push('/login');
+      return;
+    }
+
+    if (!firestore) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Database connection not found.',
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const projectsCollection = collection(firestore, 'projects');
+      await addDoc(projectsCollection, {
+        name: projectName,
+        team: teamMembers.split(',').map(m => m.trim()),
+        description,
+        githubUrl,
+        demoUrl,
+        submittedBy: user.uid,
+        submissionDate: serverTimestamp(),
+      });
+
+      toast({
+        title: 'Project Submitted!',
+        description: 'Your project has been successfully submitted for judging. Good luck!',
+      });
+
+      // Reset form
+      setProjectName('');
+      setTeamMembers('');
+      setDescription('');
+      setGithubUrl('');
+      setDemoUrl('');
+      
+      router.push('/dashboard');
+
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Submission Failed',
+        description: error.message || 'An unknown error occurred.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div className="flex items-center justify-center py-12">
-      <Card className="w-full max-w-2xl">
-        <form>
-          <CardHeader>
-            <CardTitle className="font-headline text-2xl">
-              Submit Your Project
-            </CardTitle>
-            <CardDescription>
-              Fill out the form below to submit your project for judging. Good
-              luck!
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="project-name">Project Name</Label>
-                <Input id="project-name" placeholder="e.g., EcoTrack" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="team-members">Team Members</Label>
-                <Input
-                  id="team-members"
-                  placeholder="John Doe, Jane Smith..."
-                  required
-                />
-                <p className="text-xs text-muted-foreground">
-                  Please enter full names, separated by commas.
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Project Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Describe your project in a few sentences."
-                  className="min-h-[120px]"
-                  required
-                />
-              </div>
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div className="container py-12">
+        <Card className="w-full max-w-2xl mx-auto">
+            <form onSubmit={handleSubmit}>
+            <CardHeader>
+                <CardTitle className="font-headline text-2xl">
+                Submit Your Project
+                </CardTitle>
+                <CardDescription>
+                Fill out the form below to submit your project for judging. Good
+                luck!
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="github-url">GitHub Repository URL</Label>
-                  <Input
-                    id="github-url"
-                    type="url"
-                    placeholder="https://github.com/..."
-                    required
-                  />
+                    <Label htmlFor="project-name">Project Name</Label>
+                    <Input id="project-name" placeholder="e.g., EcoTrack" required value={projectName} onChange={(e) => setProjectName(e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="demo-url">Live Demo URL</Label>
-                  <Input
-                    id="demo-url"
-                    type="url"
-                    placeholder="https://yourapp.com"
+                    <Label htmlFor="team-members">Team Members</Label>
+                    <Input
+                    id="team-members"
+                    placeholder="John Doe, Jane Smith..."
                     required
-                  />
+                    value={teamMembers}
+                    onChange={(e) => setTeamMembers(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                    Please enter full names, separated by commas.
+                    </p>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="presentation">Presentation File</Label>
-                <Input id="presentation" type="file" required />
-                <p className="text-xs text-muted-foreground">
-                  Upload a PDF or PowerPoint file.
-                </p>
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button type="submit" className="w-full sm:w-auto">
-              Submit for Judging
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
+                <div className="space-y-2">
+                    <Label htmlFor="description">Project Description</Label>
+                    <Textarea
+                    id="description"
+                    placeholder="Describe your project in a few sentences."
+                    className="min-h-[120px]"
+                    required
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    />
+                </div>
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                    <div className="space-y-2">
+                    <Label htmlFor="github-url">GitHub Repository URL</Label>
+                    <Input
+                        id="github-url"
+                        type="url"
+                        placeholder="https://github.com/..."
+                        required
+                        value={githubUrl}
+                        onChange={(e) => setGithubUrl(e.target.value)}
+                    />
+                    </div>
+                    <div className="space-y-2">
+                    <Label htmlFor="demo-url">Live Demo URL</Label>
+                    <Input
+                        id="demo-url"
+                        type="url"
+                        placeholder="https://yourapp.com"
+                        required
+                        value={demoUrl}
+                        onChange={(e) => setDemoUrl(e.target.value)}
+                    />
+                    </div>
+                </div>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
+                  {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSubmitting ? 'Submitting...' : 'Submit for Judging'}
+                </Button>
+            </CardFooter>
+            </form>
+        </Card>
     </div>
   );
 }
