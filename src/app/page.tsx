@@ -7,6 +7,8 @@ import {
   Rocket,
   Users,
   Code,
+  Calendar,
+  MapPin,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -45,6 +47,16 @@ export default function Home() {
             <p className="mx-auto mt-4 max-w-[700px] text-lg md:text-xl">
               Innovate. Collaborate. Create. The future is in your hands.
             </p>
+            <div className="mt-6 flex items-center justify-center gap-6 text-lg">
+                <div className='flex items-center gap-2'>
+                    <Calendar className='h-5 w-5' />
+                    <span>October 26-27, 2024</span>
+                </div>
+                <div className='flex items-center gap-2'>
+                    <MapPin className='h-5 w-5' />
+                    <span>Innovation Hub, Bangalore</span>
+                </div>
+            </div>
             <div className="mt-8 flex justify-center gap-4">
               <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
                 <Link href="/register">Register Now</Link>
@@ -61,7 +73,7 @@ export default function Home() {
             <h2 className="text-center text-3xl font-headline font-bold mb-12">
               Our Sponsors
             </h2>
-            <div className="grid grid-cols-3 gap-y-10 gap-x-6 items-center justify-items-center">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-10 gap-x-6 items-center justify-items-center">
               {sponsors.map((sponsor) => (
                 <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-3">
                   {sponsor.icon}
@@ -184,5 +196,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
