@@ -43,7 +43,7 @@ const profileFormSchema = z.object({
 type ProfileFormData = z.infer<typeof profileFormSchema>;
 
 export default function ProfilePage() {
-  const { user, auth, isUserLoading, mutate } = useUser();
+  const { user, auth, isUserLoading, mutate: mutateUser } = useUser();
   const firestore = useFirestore();
   const router = useRouter();
   const { toast } = useToast();
@@ -115,7 +115,7 @@ export default function ProfilePage() {
         await updateProfile(auth.currentUser, { displayName: data.name });
       }
       
-      await mutate();
+      await mutateUser();
       mutateUserProfile(); 
 
       toast({
