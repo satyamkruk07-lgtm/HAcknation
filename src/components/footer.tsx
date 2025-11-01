@@ -1,4 +1,4 @@
-import { Github, Instagram, Linkedin, Mail } from 'lucide-react';
+import { Instagram, Linkedin, Mail } from 'lucide-react';
 import { Logo } from './logo';
 
 export function Footer() {
@@ -16,13 +16,6 @@ export function Footer() {
             aria-label="Mail"
           >
             <Mail className="h-5 w-5" />
-          </a>
-          <a
-            href="#"
-            className="text-muted-foreground hover:text-foreground"
-            aria-label="GitHub"
-          >
-            <Github className="h-5 w-5" />
           </a>
           <a
             href="#"
