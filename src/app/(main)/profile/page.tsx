@@ -10,7 +10,6 @@ import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useDoc } from '@/firebase/firestore/use-doc';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import Image from 'next/image';
 
 import {
   Card,
@@ -30,13 +29,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Loader2, Upload, Pencil } from 'lucide-react';
+import { Loader2, Upload } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { UserAccount } from '@/lib/types';
 import { updateProfile } from 'firebase/auth';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -55,12 +53,8 @@ export default function ProfilePage() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
   const avatarFileInputRef = useRef<HTMLInputElement>(null);
-  const bannerFileInputRef = useRef<HTMLInputElement>(null);
   
-  const defaultBannerImage = PlaceHolderImages.find(p => p.id === "profile-banner");
-
   const userDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null;
     return doc(firestore, 'users', user.uid);
@@ -104,10 +98,6 @@ export default function ProfilePage() {
 
   const handleAvatarClick = () => {
     avatarFileInputRef.current?.click();
-  };
-
-  const handleBannerClick = () => {
-    bannerFileInputRef.current?.click();
   };
 
   const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,43 +144,6 @@ export default function ProfilePage() {
       setIsUploadingAvatar(false);
     }
   };
-
-  const handleBannerFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || event.target.files.length === 0) {
-      return;
-    }
-    if (!user || !storage || !userDocRef) {
-       toast({
-        variant: "destructive",
-        title: "Error",
-        description: "You must be logged in to upload an image.",
-      });
-      return;
-    }
-
-    const file = event.target.files[0];
-    const storageRef = ref(storage, `banners/${user.uid}/${file.name}`);
-    setIsUploadingBanner(true);
-    try {
-      const snapshot = await uploadBytes(storageRef, file);
-      const bannerUrl = await getDownloadURL(snapshot.ref);
-      await setDoc(userDocRef, { profileBannerUrl: bannerUrl }, { merge: true });
-      mutate();
-      toast({
-        title: "Success!",
-        description: "Your banner image has been updated.",
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: error.message || "Could not upload banner image.",
-      });
-    } finally {
-      setIsUploadingBanner(false);
-    }
-  };
-
 
   const onSubmit = async (data: ProfileFormData) => {
     if (!user || !firestore || !auth) {
@@ -274,49 +227,34 @@ export default function ProfilePage() {
     );
   }
 
-  const bannerImageUrl = userProfile?.profileBannerUrl || defaultBannerImage?.imageUrl;
-
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]" style={{
         backgroundImage: 'radial-gradient(circle at 1px 1px, hsl(var(--border)) 1px, transparent 0)',
         backgroundSize: '2rem 2rem'
     }}>
       <div className="container py-12">
-        <Card className="mx-auto max-w-3xl bg-background/80 backdrop-blur-sm overflow-hidden">
-          {bannerImageUrl && (
-            <div className="relative h-52 w-full group">
-              <Image
-                src={bannerImageUrl}
-                alt={userProfile?.name || "Profile banner"}
-                fill
-                className="object-cover"
-                data-ai-hint={defaultBannerImage?.imageHint}
-              />
-              <input type="file" ref={bannerFileInputRef} onChange={handleBannerFileChange} accept="image/*" className="hidden" />
-            </div>
-          )}
-          <div className='relative p-6'>
-            <div className="absolute -top-16 left-6">
-              <div className="relative h-32 w-32 group">
-                <Avatar className="h-32 w-32 border-4 border-background" onClick={handleAvatarClick}>
-                  <AvatarImage src={user.photoURL ?? ''} />
-                  <AvatarFallback className="text-4xl">
-                    {getInitials(user.displayName)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={handleAvatarClick}>
-                  {isUploadingAvatar ? <Loader2 className="h-10 w-10 animate-spin text-white" /> : <Upload className="h-10 w-10 text-white" />}
+        <Card className="mx-auto max-w-3xl bg-background/80 backdrop-blur-sm overflow-hidden p-6">
+            <div className="flex items-center gap-6">
+                <div className="relative h-32 w-32 group">
+                    <Avatar className="h-32 w-32 border-4 border-background" onClick={handleAvatarClick}>
+                    <AvatarImage src={user.photoURL ?? ''} />
+                    <AvatarFallback className="text-4xl">
+                        {getInitials(user.displayName)}
+                    </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={handleAvatarClick}>
+                    {isUploadingAvatar ? <Loader2 className="h-10 w-10 animate-spin text-white" /> : <Upload className="h-10 w-10 text-white" />}
+                    </div>
+                    <input type="file" ref={avatarFileInputRef} onChange={handleAvatarFileChange} accept="image/*" className="hidden" />
                 </div>
-                <input type="file" ref={avatarFileInputRef} onChange={handleAvatarFileChange} accept="image/*" className="hidden" />
-              </div>
-            </div>
-             <div className="pt-20">
-                <CardHeader className="p-0 mb-6">
+                <div>
                     <CardTitle className="font-headline text-3xl">{user.displayName || userProfile?.name}</CardTitle>
                     <CardDescription>
                         {user.email}
                     </CardDescription>
-                </CardHeader>
+                </div>
+            </div>
+             <div className="pt-8">
                 <CardContent className="p-0">
                     <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -388,7 +326,6 @@ export default function ProfilePage() {
                     </Form>
                 </CardContent>
              </div>
-          </div>
         </Card>
       </div>
     </div>
