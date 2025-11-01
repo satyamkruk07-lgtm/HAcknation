@@ -7,7 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { useAuth } from '@/firebase';
+import { doc, setDoc } from 'firebase/firestore';
+import { useAuth, useFirestore } from '@/firebase';
 
 import {
   Card,
@@ -47,6 +48,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function RegisterPage() {
   const auth = useAuth();
+  const firestore = useFirestore();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,13 +66,29 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setError(null);
+    if (!firestore) {
+        setError("Firestore is not initialized");
+        setIsSubmitting(false);
+        return;
+    }
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         data.email,
         data.password
       );
-      await updateProfile(userCredential.user, { displayName: data.name });
+      const user = userCredential.user;
+      await updateProfile(user, { displayName: data.name });
+
+      // Save user data to Firestore
+      const userDocRef = doc(firestore, 'users', user.uid);
+      await setDoc(userDocRef, {
+        id: user.uid,
+        email: data.email,
+        name: data.name,
+        registrationDate: new Date().toISOString(),
+      });
+
       router.push('/dashboard');
     } catch (error: any) {
       setError(error.message);
