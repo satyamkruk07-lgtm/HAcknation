@@ -132,9 +132,9 @@ export default function ProfilePage() {
         await setDoc(userDocRef, { photoURL }, { merge: true });
       }
 
-      // Force re-fetch of user data for both auth state and firestore doc
-      await mutateUser();
-      mutate();
+      // **CRITICAL FIX**: Force re-fetch of user data for both auth state and firestore doc
+      await mutateUser(); // This refreshes the `useUser` hook data
+      mutate(); // This refreshes the `useDoc` hook data
 
       toast({
         title: 'Success!',
@@ -247,9 +247,9 @@ export default function ProfilePage() {
                <div className="flex items-center gap-6">
                 <div className="relative">
                   <Avatar className="h-24 w-24 cursor-pointer" onClick={handleAvatarClick}>
-                    <AvatarImage src={user.photoURL ?? userProfile?.photoURL ?? ''} />
+                    <AvatarImage src={user.photoURL ?? ''} />
                     <AvatarFallback className="text-3xl">
-                      {getInitials(userProfile?.name ?? user.displayName)}
+                      {getInitials(user.displayName)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 hover:opacity-100 transition-opacity" onClick={handleAvatarClick}>
@@ -258,7 +258,7 @@ export default function ProfilePage() {
                   <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">{userProfile?.name ?? user.displayName}</h2>
+                  <h2 className="text-2xl font-bold">{user.displayName}</h2>
                   <p className="text-muted-foreground">{user.email}</p>
                 </div>
               </div>
@@ -334,3 +334,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    
