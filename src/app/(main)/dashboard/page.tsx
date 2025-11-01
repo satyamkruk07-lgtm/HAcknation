@@ -14,11 +14,10 @@ import {
   Code,
   Users,
   Clock,
-  UserCheck,
+  HeartHandshake,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Progress } from '@/components/ui/progress';
-import { schedule } from '@/lib/data.tsx';
+import { schedule, sponsors } from '@/lib/data.tsx';
 
 const features = [
   {
@@ -81,8 +80,6 @@ export default function DashboardPage() {
       </div>
     );
   }
-
-  const profileCompletion = 75; // Dummy data
 
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
@@ -157,27 +154,22 @@ export default function DashboardPage() {
           {/* Right Column */}
           <div className="space-y-8">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 font-headline">
-                  <UserCheck className="h-6 w-6 text-accent" />
-                  <span>Your Profile</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-sm text-muted-foreground mb-2">
-                    <span>Profile Completion</span>
-                    <span>{profileCompletion}%</span>
-                  </div>
-                  <Progress value={profileCompletion} />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Complete your profile to find better teammates!
-                  </p>
-                </div>
-                <Button className="w-full" asChild>
-                  <Link href="/teams">Complete Profile</Link>
-                </Button>
-              </CardContent>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-3 font-headline">
+                    <HeartHandshake className="h-6 w-6 text-accent" />
+                    <span>Our Sponsors</span>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="flex flex-wrap gap-6">
+                    {sponsors.map((sponsor) => (
+                        <div key={sponsor.name} className="flex items-center space-x-3">
+                        {sponsor.icon}
+                        <span className="font-semibold">{sponsor.name}</span>
+                        </div>
+                    ))}
+                    </div>
+                </CardContent>
             </Card>
           </div>
         </div>
