@@ -12,9 +12,6 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { teamProfiles as initialTeamProfiles } from '@/lib/data.tsx';
 import { Mail } from 'lucide-react';
 import { useState } from 'react';
@@ -22,35 +19,6 @@ import type { TeamMemberProfile } from '@/lib/types';
 
 export default function TeamsPage() {
   const [teamProfiles, setTeamProfiles] = useState<TeamMemberProfile[]>(initialTeamProfiles);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [skills, setSkills] = useState('');
-  const [bio, setBio] = useState('');
-
-  const handleAddProfile = () => {
-    if (!name || !email || !skills || !bio) {
-      // Basic validation
-      alert('Please fill out all fields.');
-      return;
-    }
-
-    const newProfile: TeamMemberProfile = {
-      id: teamProfiles.length + 1,
-      name,
-      email,
-      skills: skills.split(',').map((skill) => skill.trim()),
-      bio,
-      avatarUrl: `https://picsum.photos/seed/avatar${teamProfiles.length + 1}/200/200`,
-    };
-
-    setTeamProfiles([newProfile, ...teamProfiles]);
-
-    // Clear form
-    setName('');
-    setEmail('');
-    setSkills('');
-    setBio('');
-  };
 
   return (
     <div className="container py-12">
@@ -61,107 +29,45 @@ export default function TeamsPage() {
         </p>
       </div>
 
-      <div className="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <h2 className="mb-6 font-headline text-2xl font-bold">
-            Looking for a Team
-          </h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            {teamProfiles.map((profile) => (
-              <Card key={profile.id} className="flex flex-col">
-                <CardHeader className="flex flex-row items-center gap-4">
-                  <Image
-                    src={profile.avatarUrl}
-                    alt={profile.name}
-                    width={64}
-                    height={64}
-                    className="rounded-full"
-                    data-ai-hint="person portrait"
-                  />
-                  <div>
-                    <CardTitle>{profile.name}</CardTitle>
-                    <CardDescription>{profile.bio}</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1">
-                  <div className="flex flex-wrap gap-2">
-                    {profile.skills.map((skill) => (
-                      <Badge key={skill} variant="secondary">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button asChild className="w-full">
-                    <a href={`mailto:${profile.email}`}>
-                      <Mail className="mr-2 h-4 w-4" /> Connect
-                    </a>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Join the Board</CardTitle>
-              <CardDescription>
-                Add your profile to find a team.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input
-                    id="name"
-                    placeholder="Ada Lovelace"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
+      <div className="mt-12">
+        <h2 className="mb-6 font-headline text-2xl font-bold">
+          Looking for a Team
+        </h2>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {teamProfiles.map((profile) => (
+            <Card key={profile.id} className="flex flex-col">
+              <CardHeader className="flex flex-row items-center gap-4">
+                <Image
+                  src={profile.avatarUrl}
+                  alt={profile.name}
+                  width={64}
+                  height={64}
+                  className="rounded-full"
+                  data-ai-hint="person portrait"
+                />
+                <div>
+                  <CardTitle>{profile.name}</CardTitle>
+                  <CardDescription>{profile.bio}</CardDescription>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="ada@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+              </CardHeader>
+              <CardContent className="flex-1">
+                <div className="flex flex-wrap gap-2">
+                  {profile.skills.map((skill) => (
+                    <Badge key={skill} variant="secondary">
+                      {skill}
+                    </Badge>
+                  ))}
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="skills">Skills</Label>
-                  <Input
-                    id="skills"
-                    placeholder="React, Python, Figma..."
-                    value={skills}
-                    onChange={(e) => setSkills(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Comma-separated skills.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Short Bio</Label>
-                  <Textarea
-                    id="bio"
-                    placeholder="Tell us about yourself."
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                  />
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full" onClick={handleAddProfile}>
-                Add My Profile
-              </Button>
-            </CardFooter>
-          </Card>
+              </CardContent>
+              <CardFooter>
+                <Button asChild className="w-full">
+                  <a href={`mailto:${profile.email}`}>
+                    <Mail className="mr-2 h-4 w-4" /> Connect
+                  </a>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
         </div>
       </div>
     </div>
