@@ -37,10 +37,30 @@ export function MainNav() {
       .join('');
   };
 
+  const navLinks = [
+    { href: '/#about', label: 'About' },
+    { href: '/schedule', label: 'Schedule' },
+    { href: '/teams', label: 'Team Up' },
+  ];
+
   return (
     <div className="flex w-full items-center justify-between">
       <div className="flex items-center gap-6">
         <Logo />
+        <nav className="hidden items-center gap-6 text-sm md:flex">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                'transition-colors hover:text-foreground/80',
+                pathname === link.href ? 'text-foreground' : 'text-foreground/60'
+              )}
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
       </div>
       <div className="flex items-center gap-4">
         {isUserLoading ? (
