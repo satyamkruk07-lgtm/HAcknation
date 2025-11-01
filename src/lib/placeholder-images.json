@@ -3,8 +3,8 @@
     {
       "id": "hero",
       "description": "An abstract background with a futuristic, technological feel.",
-      "imageUrl": "https://images.unsplash.com/photo-1687603858673-a08a2dc2302c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxibGFjayUyMGNvZGluZ3xlbnwwfHx8fDE3NjIwMTEwNjl8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "black coding"
+      "imageUrl": "https://images.unsplash.com/photo-1550745165-9bc0b252726a?ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhYnN0cmFjdCUyMHRlY2hub2xvZ3l8ZW58MHx8fHwxNzYyMDAwMDAwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract technology"
     },
     {
       "id": "avatar1",
