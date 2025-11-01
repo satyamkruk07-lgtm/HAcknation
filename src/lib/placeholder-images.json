@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "hero",
-      "description": "A group of people collaborating on laptops in a hackathon setting.",
-      "imageUrl": "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxoYWNrYXRob258ZW58MHx8fHwxNzYyMDgzMDUwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "hackathon collaboration"
+      "description": "Dark background with code on a screen, providing good contrast for text.",
+      "imageUrl": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb2RlfGVufDB8fHx8MTc2MjI0NzE4N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "dark code"
     },
     {
       "id": "avatar1",
