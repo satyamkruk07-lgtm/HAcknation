@@ -40,7 +40,6 @@ export function MainNav() {
   const navLinks = [
     { href: '/#about', label: 'About' },
     { href: '/schedule', label: 'Schedule' },
-    { href: '/teams', label: 'Team Up' },
   ];
 
   return (
