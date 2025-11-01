@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuth } from '@/firebase';
 
 import {
@@ -18,11 +18,9 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -32,21 +30,14 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
-const formSchema = z
-  .object({
-    name: z.string().min(1, 'Name is required'),
-    email: z.string().email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  });
+const formSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
+});
 
 type FormData = z.infer<typeof formSchema>;
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const auth = useAuth();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -55,10 +46,8 @@ export default function RegisterPage() {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
       email: '',
       password: '',
-      confirmPassword: '',
     },
   });
 
@@ -66,12 +55,7 @@ export default function RegisterPage() {
     setIsSubmitting(true);
     setError(null);
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password
-      );
-      await updateProfile(userCredential.user, { displayName: data.name });
+      await signInWithEmailAndPassword(auth, data.email, data.password);
       router.push('/');
     } catch (error: any) {
       setError(error.message);
@@ -85,10 +69,10 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">
-            Register for HackTrack
+            Welcome Back
           </CardTitle>
           <CardDescription>
-            Join the best and brightest. Your journey starts here.
+            Log in to your HackTrack account to continue.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -96,23 +80,10 @@ export default function RegisterPage() {
             <CardContent className="space-y-4">
               {error && (
                 <Alert variant="destructive">
-                  <AlertTitle>Registration Failed</AlertTitle>
+                  <AlertTitle>Login Failed</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Grace Hopper" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name="email"
@@ -143,34 +114,21 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </CardContent>
             <CardFooter className="flex flex-col items-stretch gap-4">
               <Button type="submit" disabled={isSubmitting} className="w-full">
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Create Account
+                Log In
               </Button>
               <p className="text-center text-sm text-muted-foreground">
-                Already have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <Link
-                  href="/login"
+                  href="/register"
                   className="font-medium text-primary hover:underline"
                 >
-                  Log in
+                  Register
                 </Link>
               </p>
             </CardFooter>
