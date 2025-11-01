@@ -55,7 +55,7 @@ export default function ProfilePage() {
     return doc(firestore, 'users', user.uid);
   }, [firestore, user?.uid]);
 
-  const { data: userProfile, isLoading: isProfileLoading, mutate } = useDoc<UserAccount>(userDocRef);
+  const { data: userProfile, isLoading: isProfileLoading, mutate: mutateUserProfile } = useDoc<UserAccount>(userDocRef);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
@@ -117,7 +117,7 @@ export default function ProfilePage() {
       }
       
       await mutateUser();
-      mutate(); 
+      mutateUserProfile(); 
 
       toast({
         title: 'Success!',
