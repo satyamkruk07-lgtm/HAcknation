@@ -1,161 +1,215 @@
 /**
- * @file Firestore Security Rules for HackTrack
- * @description This ruleset enforces a strict user-ownership model for user data and allows public read access to hackathon event information while restricting write access. Subcollections of hackathon events inherit the event's access control.
- * @dataStructure
- *   - `/users/{userId}`: Stores user account information; access is restricted to the owning user.
- *   - `/hackathonEvents/{hackathonEventId}`: Stores hackathon event details; publicly readable, but write access is restricted.
- *   - `/hackathonEvents/{hackathonEventId}/scheduleItems/{scheduleItemId}`: Stores schedule items, inheriting access from the parent event.
- *   - `/hackathonEvents/{hackathonEventId}/announcements/{announcementId}`: Stores announcements, inheriting access from the parent event.
- *   - `/hackathonEvents/{hackathonEventId}/projectSubmissions/{projectSubmissionId}`: Stores project submissions, inheriting access from the parent event.
- *   - `/hackathonEvents/{hackathonEventId}/judgingCriteria/{judgingCriteriaId}`: Stores judging criteria, inheriting access from the parent event.
- *   - `/hackathonEvents/{hackathonEventId}/teams/{teamId}`: Stores team data, inheriting access from the parent event. The `memberIds` array is used to store user ids of team members.
- *   - `/judges/{judgeId}`: Stores judge information; write access is restricted.
- *   - `/projectScores/{projectScoreId}`: Stores project scores; write access is restricted.
- *   - `/skills/{skillId}`: Stores skill information; write access is restricted.
- *   - `/userSkills/{userSkillId}`: Stores user skill information; write access is restricted.
- * @keySecurityDecisions
- *   - User data is strictly private; only the authenticated user can access their own data.
- *   - Hackathon event data is publicly readable, allowing for open access to event information. Write access to event data is restricted and should be updated with appropriate role management.
- *   - Listing of users is disallowed for privacy.
- *   - Read and write access to subcollections under `/hackathonEvents/{hackathonEventId}` is implicitly granted to all for prototyping.
+ * @file Firebase Security Rules for HackTrack Firestore Database
+ *
+ * Core Philosophy:
+ * This ruleset enforces a user-ownership model for personal data and a role-based model for administrative tasks.
+ * Public read access is granted to certain collections like 'events' and 'announcements', but write access is strictly controlled.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores personal user profiles; access is restricted to the owner.
+ * - /events/{eventId}: Stores event details; publicly readable.
+ * - /events/{eventId}/scheduleItems/{scheduleItemId}: Stores schedule items for events; publicly readable.
+ * - /events/{eventId}/announcements/{announcementId}: Stores announcements for events; publicly readable.
+ * - /teams/{teamId}: Stores team data, with memberIDs for authorization.
+ * - /projects/{projectId}: Stores project submissions associated with teams.
+ * - /judgingAssignments/{judgingAssignmentId}: Stores judge assignments and scores.
+ * - /judgingCriteria/{judgingCriteriaId}: Stores criteria used for judging.
+ * - /judges/{judgeId}: Stores judge information.
+ * - /roles_event_admin/{userId}: Collection to store event administrator roles; existence of document indicates admin role.
+ *
+ * Key Security Decisions:
+ * - User listing is disallowed to protect privacy.
+ * - Public read access is granted to 'events', 'scheduleItems', and 'announcements'.
+ * - Only team members can access the team projects.
+ * - Roles for Event Admins are determined by presence of a document in `/roles_event_admin/{uid}`.
+ *
+ * Denormalization for Authorization:
+ * - The 'teams' collection relies on the 'memberIDs' array within each document to authorize access to team-related resources.
+ * - Event-related data (schedule items, announcements) are stored in subcollections under `/events/{eventId}`, with the `eventID` field in each document ensuring association with the correct event.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Checks if the request is authenticated.
-     * @return {boolean} True if the request is authenticated, false otherwise.
-     */
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    /**
-     * @description Checks if the authenticated user is the owner of the resource.
-     * @param {string} userId - The user ID to compare against the authenticated user's ID.
-     * @return {boolean} True if the user is the owner, false otherwise.
-     */
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    /**
-     * @description Checks if the authenticated user is the owner of the resource and the resource exists.
-     * @param {string} userId - The user ID to compare against the authenticated user's ID.
-     * @return {boolean} True if the user is the owner and the resource exists, false otherwise.
-     */
-    function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
-    }
-
-    /**
-     * @description Rules for user accounts.
-     * @path /users/{userId}
-     * @allow (create) - Authenticated user with matching {userId} can create their own account.
-     * @allow (get, update, delete) - Authenticated user with matching {userId} can read, update and delete their own account.
-     * @deny (create) - Authenticated user cannot create an account with a mismatched {userId}.
-     * @deny (get, update, delete) - Authenticated user cannot read, update or delete another user's account.
-     * @principle Enforces document ownership for writes.
+     * @description: Secure user profiles; only the owner can read or write their own profile.
+     * @path: /users/{userId}
+     * @allow: (create) User 'user123' can create /users/user123.
+     * @deny: (create) User 'user456' cannot create /users/user123.
+     * @principle: Enforces document ownership for all operations.
      */
     match /users/{userId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      function isOwner(userId) {
+        return isSignedIn() && request.auth.uid == userId;
+      }
+
       allow get: if isOwner(userId);
-      allow list: if false;
-      allow create: if isOwner(userId) && request.resource.data.id == request.auth.uid;
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+      allow list: if false; // User listing is not allowed.
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) && request.resource.data.id == resource.data.id; // Enforce immutability
+      allow delete: if isOwner(userId) && resource != null; // Check document existence before deletion.
     }
 
     /**
-     * @description Rules for hackathon events.
-     * @path /hackathonEvents/{hackathonEventId}
-     * @allow (get, list) - Any user can read hackathon event data.
-     * @deny (create, update, delete) - Only authenticated users can create, update, or delete hackathon event data.  This should be updated with correct role based permissions.
-     * @principle Public read, owner-only writes (placeholder, needs implementation).
+     * @description: Allow public read access to events; restrict write access.
+     * @path: /events/{eventId}
+     * @allow: (get) Any user can read event details.
+     * @deny: (create) Non-admin user cannot create events.
+     * @principle: Public read access with restricted write access.
      */
-    match /hackathonEvents/{hackathonEventId} {
+    match /events/{eventId} {
       allow get, list: if true;
-      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow create: if isAdmin();
+      allow update: if isAdmin() && resource != null; // Check document existence before update.
+      allow delete: if isAdmin() && resource != null; // Check document existence before deletion.
     }
 
     /**
-     * @description Rules for schedule items within a hackathon event.
-     * @path /hackathonEvents/{hackathonEventId}/scheduleItems/{scheduleItemId}
+     * @description: Allow public read access to schedule items; restrict write access to admins.
+     * @path: /events/{eventId}/scheduleItems/{scheduleItemId}
+     * @allow: (get) Any user can read schedule items.
+     * @deny: (create) Non-admin user cannot create schedule items.
+     * @principle: Public read access with restricted write access.
      */
-    match /hackathonEvents/{hackathonEventId}/scheduleItems/{scheduleItemId} {
-      allow get, list, create, update, delete: if true; // Assuming public for prototyping
+    match /events/{eventId}/scheduleItems/{scheduleItemId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin() && resource != null; // Check document existence before update.
+      allow delete: if isAdmin() && resource != null; // Check document existence before deletion.
     }
 
     /**
-     * @description Rules for announcements within a hackathon event.
-     * @path /hackathonEvents/{hackathonEventId}/announcements/{announcementId}
+     * @description: Allow public read access to announcements; restrict write access to admins.
+     * @path: /events/{eventId}/announcements/{announcementId}
+     * @allow: (get) Any user can read announcements.
+     * @deny: (create) Non-admin user cannot create announcements.
+     * @principle: Public read access with restricted write access.
      */
-    match /hackathonEvents/{hackathonEventId}/announcements/{announcementId} {
-      allow get, list, create, update, delete: if true; // Assuming public for prototyping
+    match /events/{eventId}/announcements/{announcementId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin() && resource != null; // Check document existence before update.
+      allow delete: if isAdmin() && resource != null; // Check document existence before deletion.
     }
 
     /**
-     * @description Rules for project submissions within a hackathon event.
-     * @path /hackathonEvents/{hackathonEventId}/projectSubmissions/{projectSubmissionId}
+     * @description: Secure team data; only team members can read or write team data.
+     * @path: /teams/{teamId}
+     * @allow: (get) Team member 'user123' can read team details.
+     * @deny: (get) Non-team member 'user456' cannot read team details.
+     * @principle: Enforces shared access based on team membership.
      */
-    match /hackathonEvents/{hackathonEventId}/projectSubmissions/{projectSubmissionId} {
-      allow get, list, create, update, delete: if true; // Assuming public for prototyping
+    match /teams/{teamId} {
+        function isSignedIn() {
+            return request.auth != null;
+        }
+
+        function isTeamMember(teamId) {
+            return isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/teams/$(teamId)).data.memberIDs;
+        }
+
+        allow get, list: if isTeamMember(teamId);
+        allow create: if isSignedIn(); // Any signed-in user can create a team
+        allow update: if isTeamMember(teamId) && resource != null; // Check document existence before update.
+        allow delete: if isTeamMember(teamId) && resource != null; // Check document existence before deletion.
     }
 
     /**
-     * @description Rules for judging criteria within a hackathon event.
-     * @path /hackathonEvents/{hackathonEventId}/judgingCriteria/{judgingCriteriaId}
+     * @description: Secure project submissions; only team members can access project details.
+     * @path: /projects/{projectId}
+     * @allow: (get) Team member 'user123' can read project details.
+     * @deny: (get) Non-team member 'user456' cannot read project details.
+     * @principle: Enforces shared access based on team membership.
      */
-    match /hackathonEvents/{hackathonEventId}/judgingCriteria/{judgingCriteriaId} {
-      allow get, list, create, update, delete: if true; // Assuming public for prototyping
+    match /projects/{projectId} {
+        function isSignedIn() {
+            return request.auth != null;
+        }
+
+       function getTeamIdForProject(projectId) {
+            return get(/databases/$(database)/documents/projects/$(projectId)).data.teamID;
+        }
+
+        function isTeamMember(teamId) {
+            return isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/teams/$(teamId)).data.memberIDs;
+        }
+
+        allow get, list: if isSignedIn() && isTeamMember(getTeamIdForProject(projectId));
+        allow create: if isSignedIn(); // Any signed-in user can create a project.
+        allow update: if isSignedIn() && isTeamMember(getTeamIdForProject(projectId)) && resource != null; // Check document existence before update.
+        allow delete: if isSignedIn() && isTeamMember(getTeamIdForProject(projectId)) && resource != null; // Check document existence before deletion.
+    }
+
+    /**
+     * @description: Secure judging assignments; only judges can access judging assignments.
+     * @path: /judgingAssignments/{judgingAssignmentId}
+     * @allow: (get) Judge 'judge123' can read their judging assignments.
+     * @deny: (get) Non-judge 'user456' cannot read judging assignments.
+     */
+    match /judgingAssignments/{judgingAssignmentId} {
+        function isSignedIn() {
+            return request.auth != null;
+        }
+
+        function isJudge(judgeId) {
+            return isSignedIn() && request.auth.uid == get(/databases/$(database)/documents/judges/$(judgeId)).data.id;
+        }
+
+        function getJudgeIdForAssignment(judgingAssignmentId) {
+            return get(/databases/$(database)/documents/judgingAssignments/$(judgingAssignmentId)).data.judgeID;
+        }
+        allow get, list: if isSignedIn() && isJudge(getJudgeIdForAssignment(judgingAssignmentId));
+        allow create: if isSignedIn();
+        allow update: if isSignedIn() && isJudge(getJudgeIdForAssignment(judgingAssignmentId)) && resource != null; // Check document existence before update.
+        allow delete: if isSignedIn() && isJudge(getJudgeIdForAssignment(judgingAssignmentId)) && resource != null; // Check document existence before deletion.
+    }
+
+    /**
+     * @description: Allow public read access to judging criteria; restrict write access to admins.
+     * @path: /judgingCriteria/{judgingCriteriaId}
+     * @allow: (get) Any user can read judging criteria.
+     * @deny: (create) Non-admin user cannot create judging criteria.
+     * @principle: Public read access with restricted write access.
+     */
+    match /judgingCriteria/{judgingCriteriaId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin() && resource != null; // Check document existence before update.
+      allow delete: if isAdmin() && resource != null; // Check document existence before deletion.
+    }
+
+    /**
+     * @description: Secure judge data; restrict access to admins.
+     * @path: /judges/{judgeId}
+     */
+    match /judges/{judgeId} {
+      allow get, list: if isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin() && resource != null; // Check document existence before update.
+      allow delete: if isAdmin() && resource != null; // Check document existence before deletion.
     }
 
      /**
-      * @description Rules for teams within a hackathon event.
-      * @path /hackathonEvents/{hackathonEventId}/teams/{teamId}
+      * @description: Secure event admin role assignment; only admins can assign event admin roles.
+      * @path: /roles_event_admin/{userId}
       */
-     match /hackathonEvents/{hackathonEventId}/teams/{teamId} {
-       allow get, list, create, update, delete: if true; // Assuming public for prototyping
+     match /roles_event_admin/{userId} {
+        allow get: if isAdmin();
+        allow list: if false; // Prevent listing of event admins
+        allow create: if isAdmin();
+        allow update: if false; // Prevent updates
+        allow delete: if isAdmin() && resource != null; // Check document existence before deletion.
      }
 
-    /**
-     * @description Rules for judges.
-     * @path /judges/{judgeId}
-     */
-    match /judges/{judgeId} {
-      allow get: if true;
-      allow list: if true;
-      allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Rules for project scores.
-     * @path /projectScores/{projectScoreId}
-     */
-    match /projectScores/{projectScoreId} {
-      allow get: if true;
-      allow list: if true;
-      allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Rules for skills.
-     * @path /skills/{skillId}
-     */
-    match /skills/{skillId} {
-      allow get: if true;
-      allow list: if true;
-      allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Rules for user skills.
-     * @path /userSkills/{userSkillId}
-     */
-    match /userSkills/{userSkillId} {
-      allow get: if true;
-      allow list: if true;
-      allow create, update, delete: if false;
+     /**
+      * @description: Check if the user is an admin.
+      */
+    function isAdmin() {
+       return exists(/databases/$(database)/documents/roles_event_admin/$(request.auth.uid));
     }
   }
 }

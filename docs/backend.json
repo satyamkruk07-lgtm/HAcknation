@@ -1,18 +1,22 @@
 {
   "entities": {
-    "HackathonEvent": {
+    "Event": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "HackathonEvent",
+      "title": "Event",
       "type": "object",
-      "description": "Represents a hackathon event.",
+      "description": "Represents a Hackathon event.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the HackathonEvent entity."
+          "description": "Unique identifier for the event."
         },
         "name": {
           "type": "string",
-          "description": "Name of the hackathon event."
+          "description": "Name of the event."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the event."
         },
         "startDate": {
           "type": "string",
@@ -26,191 +30,136 @@
         },
         "location": {
           "type": "string",
-          "description": "Location of the hackathon event."
+          "description": "Location of the event."
         },
-        "description": {
+        "websiteUrl": {
           "type": "string",
-          "description": "Description of the hackathon event."
+          "description": "URL of the event website.",
+          "format": "uri"
         }
       },
       "required": [
         "id",
         "name",
+        "description",
         "startDate",
         "endDate",
         "location",
-        "description"
+        "websiteUrl"
       ]
     },
-    "UserAccount": {
+    "User": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "UserAccount",
+      "title": "User",
       "type": "object",
-      "description": "Represents a user account for the HackTrack platform.",
+      "description": "Represents a user participating in the hackathon.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the UserAccount entity."
+          "description": "Unique identifier for the user."
         },
         "email": {
           "type": "string",
           "description": "Email address of the user.",
           "format": "email"
         },
-        "name": {
+        "firstName": {
           "type": "string",
-          "description": "Name of the user."
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
         },
         "registrationDate": {
           "type": "string",
           "description": "Date the user registered.",
           "format": "date-time"
         },
-        "college": {
+        "skillset": {
           "type": "string",
-          "description": "The college or university the user attends."
-        },
-        "skills": {
-          "type": "array",
-          "description": "A list of the user's skills.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "bio": {
-          "type": "string",
-          "description": "A short biography of the user."
-        },
-        "photoURL": {
-          "type": "string",
-          "description": "URL of the user's profile picture.",
-          "format": "uri"
-        },
-        "profileBannerUrl": {
-          "type": "string",
-          "description": "URL of the user's profile banner image.",
-          "format": "uri"
+          "description": "User skillset"
         }
       },
       "required": [
         "id",
         "email",
-        "name",
+        "firstName",
+        "lastName",
         "registrationDate"
       ]
     },
-    "ScheduleItem": {
+    "Team": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ScheduleItem",
+      "title": "Team",
       "type": "object",
-      "description": "Represents an item in the hackathon schedule.",
+      "description": "Represents a team participating in the hackathon.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the ScheduleItem entity."
+          "description": "Unique identifier for the team."
         },
-        "hackathonEventId": {
+        "name": {
           "type": "string",
-          "description": "Reference to HackathonEvent. (Relationship: HackathonEvent 1:N ScheduleItem)"
+          "description": "Name of the team."
         },
-        "title": {
+        "eventID": {
           "type": "string",
-          "description": "Title of the schedule item."
+          "description": "Reference to Event. (Relationship: Event 1:N Team)"
         },
-        "startTime": {
-          "type": "string",
-          "description": "Start time of the schedule item.",
-          "format": "date-time"
-        },
-        "endTime": {
-          "type": "string",
-          "description": "End time of the schedule item.",
-          "format": "date-time"
-        },
-        "description": {
-          "type": "string",
-          "description": "Description of the schedule item."
+        "memberIDs": {
+          "type": "array",
+          "description": "References to Users. (Relationship: Team N:N User)",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
         "id",
-        "hackathonEventId",
-        "title",
-        "startTime",
-        "endTime",
-        "description"
+        "name",
+        "eventID",
+        "memberIDs"
       ]
     },
-    "Announcement": {
+    "Project": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Announcement",
+      "title": "Project",
       "type": "object",
-      "description": "Represents an announcement for the hackathon event.",
+      "description": "Represents a project submitted during the hackathon.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Announcement entity."
+          "description": "Unique identifier for the project."
         },
-        "hackathonEventId": {
+        "teamID": {
           "type": "string",
-          "description": "Reference to HackathonEvent. (Relationship: HackathonEvent 1:N Announcement)"
+          "description": "Reference to Team. (Relationship: Team 1:N Project)"
         },
-        "timestamp": {
+        "name": {
           "type": "string",
-          "description": "Timestamp of when the announcement was made.",
-          "format": "date-time"
-        },
-        "content": {
-          "type": "string",
-          "description": "Content of the announcement."
-        }
-      },
-      "required": [
-        "id",
-        "hackathonEventId",
-        "timestamp",
-        "content"
-      ]
-    },
-    "ProjectSubmission": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ProjectSubmission",
-      "type": "object",
-      "description": "Represents a project submission by a team.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the ProjectSubmission entity."
-        },
-        "hackathonEventId": {
-          "type": "string",
-          "description": "Reference to HackathonEvent. (Relationship: HackathonEvent 1:N ProjectSubmission)"
-        },
-        "teamId": {
-          "type": "string",
-          "description": "Reference to Team. (Relationship: Team 1:N ProjectSubmission)"
-        },
-        "submissionTime": {
-          "type": "string",
-          "description": "Time the project was submitted.",
-          "format": "date-time"
+          "description": "Name of the project."
         },
         "description": {
           "type": "string",
           "description": "Description of the project."
         },
+        "submissionDate": {
+          "type": "string",
+          "description": "Date and time the project was submitted.",
+          "format": "date-time"
+        },
         "link": {
           "type": "string",
-          "description": "Link to the project (e.g., GitHub repository, live demo).",
-          "format": "uri"
+          "description": "Link to the project."
         }
       },
       "required": [
         "id",
-        "hackathonEventId",
-        "teamId",
-        "submissionTime",
+        "teamID",
+        "name",
         "description",
+        "submissionDate",
         "link"
       ]
     },
@@ -222,185 +171,181 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the JudgingCriteria entity."
-        },
-        "hackathonEventId": {
-          "type": "string",
-          "description": "Reference to HackathonEvent. (Relationship: HackathonEvent 1:N JudgingCriteria)"
+          "description": "Unique identifier for the criteria."
         },
         "name": {
           "type": "string",
           "description": "Name of the judging criteria (e.g., Innovation, Technical Difficulty)."
         },
-        "weight": {
-          "type": "number",
-          "description": "Weight or importance of this criteria in the overall score."
-        },
         "description": {
           "type": "string",
           "description": "Description of the judging criteria."
+        },
+        "maxScore": {
+          "type": "number",
+          "description": "Maximum score possible for this criteria."
         }
       },
       "required": [
         "id",
-        "hackathonEventId",
         "name",
-        "weight",
-        "description"
+        "description",
+        "maxScore"
       ]
     },
     "Judge": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Judge",
       "type": "object",
-      "description": "Represents a judge for the hackathon.",
+      "description": "Represents a judge evaluating the projects.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Judge entity."
+          "description": "Unique identifier for the judge."
         },
-        "userAccountId": {
+        "email": {
           "type": "string",
-          "description": "Reference to UserAccount. (Relationship: UserAccount 1:1 Judge)"
+          "description": "Email address of the judge.",
+          "format": "email"
         },
-        "name": {
+        "firstName": {
           "type": "string",
-          "description": "Name of the judge."
+          "description": "First name of the judge."
         },
-        "affiliation": {
+        "lastName": {
           "type": "string",
-          "description": "Affiliation of the judge (e.g., company, university)."
+          "description": "Last name of the judge."
         }
       },
       "required": [
         "id",
-        "userAccountId",
-        "name",
-        "affiliation"
+        "email",
+        "firstName",
+        "lastName"
       ]
     },
-    "ProjectScore": {
+    "JudgingAssignment": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "ProjectScore",
+      "title": "JudgingAssignment",
       "type": "object",
-      "description": "Represents a score given to a project by a judge for a specific criteria.",
+      "description": "Represents an assignment of a judge to a project.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the ProjectScore entity."
+          "description": "Unique identifier for the judging assignment."
         },
-        "judgeId": {
+        "judgeID": {
           "type": "string",
-          "description": "Reference to Judge. (Relationship: Judge 1:N ProjectScore)"
+          "description": "Reference to Judge. (Relationship: Judge 1:N JudgingAssignment)"
         },
-        "projectSubmissionId": {
+        "projectID": {
           "type": "string",
-          "description": "Reference to ProjectSubmission. (Relationship: ProjectSubmission 1:N ProjectScore)"
-        },
-        "judgingCriteriaId": {
-          "type": "string",
-          "description": "Reference to JudgingCriteria. (Relationship: JudgingCriteria 1:N ProjectScore)"
+          "description": "Reference to Project. (Relationship: Project 1:N JudgingAssignment)"
         },
         "score": {
           "type": "number",
-          "description": "Score given by the judge for this criteria."
+          "description": "The score given by the judge for this project."
         },
         "feedback": {
           "type": "string",
-          "description": "Feedback given by the judge for this criteria."
+          "description": "Feedback given by the judge for this project."
         }
       },
       "required": [
         "id",
-        "judgeId",
-        "projectSubmissionId",
-        "judgingCriteriaId",
+        "judgeID",
+        "projectID",
         "score",
         "feedback"
       ]
     },
-    "Team": {
+    "ScheduleItem": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Team",
+      "title": "ScheduleItem",
       "type": "object",
-      "description": "Represents a team participating in the hackathon.",
+      "description": "Represents an item in the event schedule.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Team entity."
+          "description": "Unique identifier for the schedule item."
         },
-        "hackathonEventId": {
+        "eventID": {
           "type": "string",
-          "description": "Reference to HackathonEvent. (Relationship: HackathonEvent 1:N Team)"
+          "description": "Reference to Event. (Relationship: Event 1:N ScheduleItem)"
         },
-        "name": {
+        "title": {
           "type": "string",
-          "description": "Name of the team."
+          "description": "Title of the schedule item."
         },
-        "memberIds": {
-          "type": "array",
-          "description": "References to UserAccounts. (Relationship: UserAccount N:N Team)",
-          "items": {
-            "type": "string"
-          }
+        "description": {
+          "type": "string",
+          "description": "Description of the schedule item."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Start time of the schedule item.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "End time of the schedule item.",
+          "format": "date-time"
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of the schedule item."
         }
       },
       "required": [
         "id",
-        "hackathonEventId",
-        "name",
-        "memberIds"
+        "eventID",
+        "title",
+        "description",
+        "startTime",
+        "endTime",
+        "location"
       ]
     },
-    "Skill": {
+    "Announcement": {
       "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Skill",
+      "title": "Announcement",
       "type": "object",
-      "description": "Represents a skill that a user may possess.",
+      "description": "Represents an announcement made during the event.",
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique identifier for the Skill entity."
+          "description": "Unique identifier for the announcement."
         },
-        "name": {
+        "eventID": {
           "type": "string",
-          "description": "Name of the skill (e.g., Python, JavaScript, UI Design)."
+          "description": "Reference to Event. (Relationship: Event 1:N Announcement)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the announcement."
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the announcement."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Timestamp of the announcement.",
+          "format": "date-time"
         }
       },
       "required": [
         "id",
-        "name"
-      ]
-    },
-    "UserSkill": {
-      "$schema": "http://json-schema.org/draft_07/schema#",
-      "title": "UserSkill",
-      "type": "object",
-      "description": "Represents the skills possessed by a user.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the UserSkill entity."
-        },
-        "userAccountId": {
-          "type": "string",
-          "description": "Reference to UserAccount. (Relationship: UserAccount 1:N UserSkill)"
-        },
-        "skillId": {
-          "type": "string",
-          "description": "Reference to Skill. (Relationship: Skill 1:N UserSkill)"
-        }
-      },
-      "required": [
-        "id",
-        "userAccountId",
-        "skillId"
+        "eventID",
+        "title",
+        "content",
+        "timestamp"
       ]
     }
   },
   "auth": {
     "providers": [
-      "email",
+      "password",
       "anonymous"
     ]
   },
@@ -409,111 +354,135 @@
       {
         "path": "/users/{userId}",
         "definition": {
-          "entityName": "UserAccount",
+          "entityName": "User",
           "schema": {
-            "$ref": "#/backend/entities/UserAccount"
+            "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user account information. Path-based ownership ensures only the user can access their data.",
+          "description": "Stores user profile data. Path-based ownership ensures only the user can access their own profile.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier for the user."
+              "description": "The unique identifier of the user."
             }
           ]
         }
       },
       {
-        "path": "/hackathonEvents/{hackathonEventId}",
+        "path": "/events/{eventId}",
         "definition": {
-          "entityName": "HackathonEvent",
+          "entityName": "Event",
           "schema": {
-            "$ref": "#/backend/entities/HackathonEvent"
+            "$ref": "#/backend/entities/Event"
           },
-          "description": "Stores hackathon event details.",
+          "description": "Stores event details. Events are publicly accessible, but creation/modification might be restricted to admins.",
           "params": [
             {
-              "name": "hackathonEventId",
-              "description": "The unique identifier for the hackathon event."
+              "name": "eventId",
+              "description": "The unique identifier of the event."
             }
           ]
         }
       },
       {
-        "path": "/hackathonEvents/{hackathonEventId}/scheduleItems/{scheduleItemId}",
+        "path": "/events/{eventId}/scheduleItems/{scheduleItemId}",
         "definition": {
           "entityName": "ScheduleItem",
           "schema": {
             "$ref": "#/backend/entities/ScheduleItem"
           },
-          "description": "Stores schedule items for a specific hackathon event. Includes denormalized 'hackathonEventId' for authorization independence.",
+          "description": "Stores schedule items associated with an event.  Includes denormalized 'eventId' for authorization independence.",
           "params": [
             {
-              "name": "hackathonEventId",
-              "description": "The unique identifier for the hackathon event."
+              "name": "eventId",
+              "description": "The unique identifier of the event."
             },
             {
               "name": "scheduleItemId",
-              "description": "The unique identifier for the schedule item."
+              "description": "The unique identifier of the schedule item."
             }
           ]
         }
       },
       {
-        "path": "/hackathonEvents/{hackathonEventId}/announcements/{announcementId}",
+        "path": "/events/{eventId}/announcements/{announcementId}",
         "definition": {
           "entityName": "Announcement",
           "schema": {
             "$ref": "#/backend/entities/Announcement"
           },
-          "description": "Stores announcements for a specific hackathon event. Includes denormalized 'hackathonEventId' for authorization independence.",
+          "description": "Stores announcements related to an event.  Includes denormalized 'eventId' for authorization independence.",
           "params": [
             {
-              "name": "hackathonEventId",
-              "description": "The unique identifier for the hackathon event."
+              "name": "eventId",
+              "description": "The unique identifier of the event."
             },
             {
               "name": "announcementId",
-              "description": "The unique identifier for the announcement."
+              "description": "The unique identifier of the announcement."
             }
           ]
         }
       },
       {
-        "path": "/hackathonEvents/{hackathonEventId}/projectSubmissions/{projectSubmissionId}",
+        "path": "/teams/{teamId}",
         "definition": {
-          "entityName": "ProjectSubmission",
+          "entityName": "Team",
           "schema": {
-            "$ref": "#/backend/entities/ProjectSubmission"
+            "$ref": "#/backend/entities/Team"
           },
-          "description": "Stores project submissions for a specific hackathon event. Includes denormalized 'hackathonEventId' for authorization independence.",
+          "description": "Stores team information. Includes the 'memberIDs' array for managing team membership and access control.",
           "params": [
             {
-              "name": "hackathonEventId",
-              "description": "The unique identifier for the hackathon event."
-            },
-            {
-              "name": "projectSubmissionId",
-              "description": "The unique identifier for the project submission."
+              "name": "teamId",
+              "description": "The unique identifier of the team."
             }
           ]
         }
       },
       {
-        "path": "/hackathonEvents/{hackathonEventId}/judgingCriteria/{judgingCriteriaId}",
+        "path": "/projects/{projectId}",
+        "definition": {
+          "entityName": "Project",
+          "schema": {
+            "$ref": "#/backend/entities/Project"
+          },
+          "description": "Stores project submissions. Each project is associated with a team.",
+          "params": [
+            {
+              "name": "projectId",
+              "description": "The unique identifier of the project."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/judgingAssignments/{judgingAssignmentId}",
+        "definition": {
+          "entityName": "JudgingAssignment",
+          "schema": {
+            "$ref": "#/backend/entities/JudgingAssignment"
+          },
+          "description": "Stores judging assignments, linking judges to projects and recording scores and feedback.",
+          "params": [
+            {
+              "name": "judgingAssignmentId",
+              "description": "The unique identifier of the judging assignment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/judgingCriteria/{judgingCriteriaId}",
         "definition": {
           "entityName": "JudgingCriteria",
           "schema": {
             "$ref": "#/backend/entities/JudgingCriteria"
           },
-          "description": "Stores judging criteria for a specific hackathon event. Includes denormalized 'hackathonEventId' for authorization independence.",
+          "description": "Stores the criteria used for judging projects.",
           "params": [
             {
-              "name": "hackathonEventId",
-              "description": "The unique identifier for the hackathon event."
-            },
-            {
               "name": "judgingCriteriaId",
-              "description": "The unique identifier for the judging criteria."
+              "description": "The unique identifier of the judging criteria."
             }
           ]
         }
@@ -529,82 +498,28 @@
           "params": [
             {
               "name": "judgeId",
-              "description": "The unique identifier for the judge."
+              "description": "The unique identifier of the judge."
             }
           ]
         }
       },
       {
-        "path": "/projectScores/{projectScoreId}",
+        "path": "/roles_event_admin/{userId}",
         "definition": {
-          "entityName": "ProjectScore",
+          "entityName": "roles_event_admin",
           "schema": {
-            "$ref": "#/backend/entities/ProjectScore"
+            "$ref": "#/backend/entities/User"
           },
-          "description": "Stores project scores given by judges.",
+          "description": "Collection to store event administrator roles. Existence of document indicates admin role.",
           "params": [
             {
-              "name": "projectScoreId",
-              "description": "The unique identifier for the project score."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/hackathonEvents/{hackathonEventId}/teams/{teamId}",
-        "definition": {
-          "entityName": "Team",
-          "schema": {
-            "$ref": "#/backend/entities/Team"
-          },
-          "description": "Stores team information for a specific hackathon event. Includes denormalized 'hackathonEventId' for authorization independence.",
-          "params": [
-            {
-              "name": "hackathonEventId",
-              "description": "The unique identifier for the hackathon event."
-            },
-            {
-              "name": "teamId",
-              "description": "The unique identifier for the team."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/skills/{skillId}",
-        "definition": {
-          "entityName": "Skill",
-          "schema": {
-            "$ref": "#/backend/entities/Skill"
-          },
-          "description": "Stores skill information.",
-          "params": [
-            {
-              "name": "skillId",
-              "description": "The unique identifier for the skill."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/userSkills/{userSkillId}",
-        "definition": {
-          "entityName": "UserSkill",
-          "schema": {
-            "$ref": "#/backend/entities/UserSkill"
-          },
-          "description": "Stores user skill information.",
-          "params": [
-            {
-              "name": "userSkillId",
-              "description": "The unique identifier for the user skill."
+              "name": "userId",
+              "description": "The unique identifier of the user."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to support the HackTrack application, focusing on a national-level hackathon. The structure prioritizes authorization independence through denormalization, clarity, and QAPs.\n\nUser accounts are stored in `/users/{userId}`, ensuring clear ownership. Hackathon events are stored in `/hackathonEvents/{hackathonEventId}`.\n\nSubcollections like `/hackathonEvents/{hackathonEventId}/scheduleItems/{scheduleItemId}`, `/hackathonEvents/{hackathonEventId}/announcements/{announcementId}`, `/hackathonEvents/{hackathonEventId}/projectSubmissions/{projectSubmissionId}`, `/hackathonEvents/{hackathonEventId}/judgingCriteria/{judgingCriteriaId}`, and `/hackathonEvents/{hackathonEventId}/teams/{teamId}` are used to manage event-specific data. For authorization independence, the `hackathonEventId` is duplicated in each document within these subcollections.  This eliminates the need for `get()` calls in security rules to verify the parent event.  The team `memberIds` array is used to store user ids of team members.\n\nJudges are stored in the `/judges/{judgeId}` collection, linked to user accounts via the `userAccountId` field. Project scores are stored in `/projectScores/{projectScoreId}`, referencing judges, project submissions, and judging criteria. User skills are stored in `/userSkills/{userSkillId}`, linking users to skills.\n\nThis structure allows for efficient and secure data access, with clear ownership and role-based permissions. The design supports the core features of the HackTrack application, including event schedules, registration, live updates, submission platform, judging system, and team formation."
+    "reasoning": "The Firestore structure is designed to support the HackTrack application's core features, including event schedules, user registration, live updates, project submissions, judging, and team formation. The design emphasizes security, scalability, and debuggability by adhering to the principles of Authorization Independence, Structural Segregation, and Access Modeling. \n\n**Authorization Independence:**\nTo ensure authorization independence, the design denormalizes authorization-related data where necessary. For example, access control lists for events or teams are embedded within the documents or subcollections to avoid `get()` calls in security rules.\n\n**Structural Segregation:**\nThe structure segregates data based on access requirements. User profiles are stored in private user-specific collections (`/users/{userId}`), while event data and public announcements are stored in separate top-level collections.\n\n**Access Modeling:**\n*   **User-Owned Data:** User profiles are stored under `/users/{userId}`, providing simple path-based ownership for private data.\n*   **Collaborative Data:** The `/teams` collection utilizes a membership map (`memberIDs` within the Team document) to manage team membership. This map is used for authorization rules related to team resources.\n*   **Event-Related Data:** Event-related data (schedule items, announcements) are stored in subcollections under `/events/{eventId}`, with the `eventID` field in each document ensuring association with the correct event. Roles for Event Admins can be handled via collection `/roles_event_admin/{uid}`.\n\n**QAPs (Rules are not Filters):**\nThe structure supports secure `list` operations by using structural segregation and explicit authorization models. For example:\n*   Listing events: Only authorized users (e.g., admins or registered users) can list event details.\n*   Listing announcements: Any user can list public announcements.\n*   Listing projects: Only team members and judges assigned to a project can access project details."
   }
 }
-
-    
