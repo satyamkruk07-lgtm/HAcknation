@@ -54,7 +54,7 @@ export default function ProfilePage() {
     return doc(firestore, 'users', user.uid);
   }, [firestore, user?.uid]);
 
-  const { data: userProfile, isLoading: isProfileLoading, mutate: mutateUserProfile } = useDoc<UserAccount>(userDocRef);
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserAccount>(userDocRef);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
@@ -109,17 +109,18 @@ export default function ProfilePage() {
         bio: data.bio,
       };
 
+      // The useDoc hook will automatically update on its own after this setDoc call.
       await setDoc(userDocRef, updatedData, { merge: true });
 
       if (auth.currentUser.displayName !== data.name) {
         await updateProfile(auth.currentUser, { displayName: data.name });
       }
       
+      // We manually call mutateUser to refresh the auth state from useUser hook
       await mutateUser();
-      mutateUserProfile(); 
 
       toast({
-        title: 'Successfully updated',
+        title: 'Profile updated successfully!',
       });
     } catch (error: any) {
       toast({
