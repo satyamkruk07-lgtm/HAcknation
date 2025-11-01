@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,7 +9,6 @@ import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useDoc } from '@/firebase/firestore/use-doc';
-import Image from 'next/image';
 
 import {
   Card,
@@ -29,13 +28,11 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Loader2, Rocket } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Loader2, Cpu } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { UserAccount } from '@/lib/types';
 import { updateProfile } from 'firebase/auth';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -172,7 +169,7 @@ export default function ProfilePage() {
             <div className="flex items-center gap-6">
                 <div className="relative h-32 w-32">
                   <div className="flex h-32 w-32 items-center justify-center rounded-full bg-primary/10 border-4 border-background">
-                    <Rocket className="h-16 w-16 text-accent animate-pulse" />
+                    <Cpu className="h-16 w-16 text-accent animate-pulse" />
                   </div>
                 </div>
                 <div>
