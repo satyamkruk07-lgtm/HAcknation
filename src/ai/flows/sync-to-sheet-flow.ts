@@ -69,14 +69,14 @@ const syncToSheetFlow = ai.defineFlow(
       console.log(`Found ${users.length} users in Firestore.`);
       
       // 2. Prepare data for Google Sheets
-      const headerRow = ['id', 'name', 'email', 'registrationDate', 'college', 'skills', 'bio'];
+      const headerRow = ['id', 'email', 'name', 'registrationDate', 'college', 'skills', 'bio'];
       const rows = users.map(user => [
         user.id || '',
-        user.name || '',
         user.email || '',
+        user.name || '',
         user.registrationDate || '',
         user.college || '',
-        Array.isArray(user.skills) ? user.skills.join(', ') : '',
+        Array.isArray(user.skills) ? user.skills.join(', ') : (user.skills || ''),
         user.bio || '',
       ]);
 
@@ -85,14 +85,7 @@ const syncToSheetFlow = ai.defineFlow(
       // 3. Write data to Google Sheets
       const sheets = await getGoogleSheetsClient();
       
-      // Clear the sheet first to avoid duplicate data
-      await sheets.spreadsheets.values.clear({
-        spreadsheetId: SPREADSHEET_ID,
-        range: SHEET_NAME,
-      });
-      console.log('Cleared existing data from sheet.');
-
-
+      // Overwrite the data starting from A1. This is better than clearing the whole sheet.
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
         range: RANGE,
