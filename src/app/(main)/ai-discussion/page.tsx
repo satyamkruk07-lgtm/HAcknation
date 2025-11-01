@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -6,120 +5,110 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { BrainCircuit, Loader2, Send } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Lightbulb, Loader2, Sparkles, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { cn } from '@/lib/utils';
-import { chatWithAI } from '@/lib/actions';
-import type { Message } from '@/ai/flows/chat-flow';
+import { Badge } from '@/components/ui/badge';
+import { generateIdeasAction } from '@/lib/actions';
+import type { ProjectIdea } from '@/ai/flows/generate-project-ideas-flow';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function AiDiscussionPage() {
-  const [messages, setMessages] = useState<Message[]>([
-    { text: 'Hello! How can I help you with your hackathon project today?', isUser: false },
-  ]);
-  const [input, setInput] = useState('');
+  const [ideas, setIdeas] = useState<ProjectIdea[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSend = async () => {
-    if (input.trim()) {
-      const newMessages: Message[] = [...messages, { text: input, isUser: true }];
-      setMessages(newMessages);
-      setInput('');
-      setIsLoading(true);
-
-      try {
-        const result = await chatWithAI(newMessages);
-        if (result.response) {
-            setMessages(prev => [...prev, { text: result.response, isUser: false }]);
-        } else {
-            // Handle error case, maybe show a toast
-            setMessages(prev => [...prev, { text: "Sorry, I couldn't get a response. Please try again.", isUser: false }]);
-        }
-      } catch (error) {
-        setMessages(prev => [...prev, { text: "An error occurred. Please try again later.", isUser: false }]);
-      } finally {
-        setIsLoading(false);
+  const handleGenerateIdeas = async () => {
+    setIsLoading(true);
+    setError(null);
+    setIdeas([]);
+    try {
+      const result = await generateIdeasAction();
+      if (result.ideas) {
+        setIdeas(result.ideas);
+      } else {
+        setError(
+          result.error || "Sorry, I couldn't come up with ideas. Please try again."
+        );
       }
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again later.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="container py-12">
-      <div className="mx-auto max-w-2xl">
-        <Card className="h-[70vh] flex flex-col">
-          <CardHeader className="text-center">
+      <div className="mx-auto max-w-4xl">
+        <Card className="text-center">
+          <CardHeader>
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
-              <BrainCircuit className="h-10 w-10 text-primary" />
+              <Sparkles className="h-10 w-10 text-primary" />
             </div>
             <CardTitle className="font-headline text-3xl">
-              AI Project Discussion
+              AI Project Idea Generator
             </CardTitle>
             <CardDescription className="text-lg">
-              Brainstorm and refine your hackathon ideas with an AI partner.
+              Feeling stuck? Let our AI mentor brainstorm some project ideas for you.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={cn(
-                  'flex items-start gap-3',
-                  message.isUser ? 'justify-end' : 'justify-start'
-                )}
-              >
-                {!message.isUser && (
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>AI</AvatarFallback>
-                  </Avatar>
-                )}
-                <div
-                  className={cn(
-                    'max-w-xs rounded-lg p-3 text-sm',
-                    message.isUser
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  )}
-                >
-                  {message.text}
-                </div>
-                 {message.isUser && (
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback>U</AvatarFallback>
-                  </Avatar>
-                )}
-              </div>
-            ))}
-             {isLoading && (
-              <div className="flex items-start gap-3 justify-start">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback>AI</AvatarFallback>
-                </Avatar>
-                <div className="bg-muted rounded-lg p-3 text-sm flex items-center">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                </div>
-              </div>
-            )}
+          <CardContent>
+            <Button onClick={handleGenerateIdeas} disabled={isLoading} size="lg">
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Wand2 className="mr-2 h-5 w-5" />
+                  Generate New Ideas
+                </>
+              )}
+            </Button>
           </CardContent>
-          <CardFooter className="p-4 border-t">
-            <div className="flex w-full items-center space-x-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSend()}
-                placeholder="Ask a question about your project..."
-                disabled={isLoading}
-              />
-              <Button onClick={handleSend} disabled={isLoading}>
-                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              </Button>
-            </div>
-          </CardFooter>
         </Card>
+
+        {error && (
+            <Alert variant="destructive" className="mt-8">
+                <AlertTitle>Error Generating Ideas</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        )}
+
+        {ideas.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold text-center font-headline mb-8">
+                Here are a few ideas to get you started:
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {ideas.map((idea, index) => (
+                <Card key={index} className="flex flex-col">
+                  <CardHeader>
+                    <CardTitle className="flex items-start gap-3">
+                        <Lightbulb className="h-6 w-6 mt-1 text-accent" />
+                        <span>{idea.title}</span>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-1">
+                    <p className="text-muted-foreground">{idea.description}</p>
+                  </CardContent>
+                  <CardContent>
+                     <h4 className="font-semibold text-sm mb-3">Suggested Tech:</h4>
+                     <div className="flex flex-wrap gap-2">
+                        {idea.technologies.map(tech => (
+                            <Badge key={tech} variant="secondary">{tech}</Badge>
+                        ))}
+                     </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
