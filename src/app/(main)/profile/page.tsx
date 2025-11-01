@@ -292,19 +292,6 @@ export default function ProfilePage() {
                 className="object-cover"
                 data-ai-hint={defaultBannerImage?.imageHint}
               />
-              <div 
-                className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                onClick={handleBannerClick}
-              >
-                {isUploadingBanner ? (
-                  <Loader2 className="h-8 w-8 animate-spin text-white" />
-                ) : (
-                  <Button variant="outline" className="bg-transparent text-white border-white hover:bg-white hover:text-black">
-                    <Pencil className="mr-2 h-4 w-4" /> Edit Banner
-                  </Button>
-                )}
-                
-              </div>
               <input type="file" ref={bannerFileInputRef} onChange={handleBannerFileChange} accept="image/*" className="hidden" />
             </div>
           )}
@@ -407,6 +394,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-
-    
