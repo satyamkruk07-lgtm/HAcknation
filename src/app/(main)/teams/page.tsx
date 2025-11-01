@@ -62,7 +62,10 @@ export default function TeamsPage() {
   const { data: teamProfiles, isLoading } = useCollection<UserAccount>(usersCollectionQuery);
 
   const filteredProfiles = teamProfiles?.filter(profile => {
-    // Filter out specific users by name
+    // Filter out specific users by email or name
+    if (profile.email === 'kalyanikri1111@gmail.com') {
+        return false;
+    }
     const namesToFilter = ['djlnac', 'grace', 'Kalyani kumari'];
     if (profile.name && namesToFilter.includes(profile.name)) {
         return false;
