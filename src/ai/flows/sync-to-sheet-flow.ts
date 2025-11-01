@@ -6,7 +6,7 @@
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 import * as admin from 'firebase-admin';
 import { google } from 'googleapis';
 
@@ -24,7 +24,7 @@ if (admin.apps.length === 0) {
 const db = admin.firestore();
 
 // IMPORTANT: Replace with your actual Google Sheet ID and range
-const SPREADSHEET_ID = 'YOUR_SPREADSHEET_ID';
+const SPREADSHEET_ID = '1r4kxtq2bSMzsvgYyOzLu4ha-dAXe_vPIVFMAxD6-FwE';
 const SHEET_NAME = 'Users'; // e.g., 'Sheet1'
 const RANGE = `${SHEET_NAME}!A1`;
 
