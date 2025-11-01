@@ -31,15 +31,6 @@ export type Project = {
   demoUrl: string;
 };
 
-export type TeamMemberProfile = {
-  id: number;
-  name: string;
-  avatarUrl: string;
-  skills: string[];
-  bio: string;
-  email: string;
-};
-
 export type UserAccount = {
   id: string;
   email: string;

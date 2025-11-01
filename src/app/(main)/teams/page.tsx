@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -12,13 +11,44 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { teamProfiles as initialTeamProfiles } from '@/lib/data.tsx';
 import { Mail } from 'lucide-react';
-import { useState } from 'react';
-import type { TeamMemberProfile } from '@/lib/types';
+import type { UserAccount } from '@/lib/types';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, query, orderBy } from 'firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function ProfileCardSkeleton() {
+    return (
+        <Card className="flex flex-col">
+            <CardHeader className="flex flex-row items-center gap-4">
+                <Skeleton className="h-16 w-16 rounded-full" />
+                <div className='space-y-2'>
+                    <Skeleton className="h-6 w-24" />
+                    <Skeleton className="h-4 w-32" />
+                </div>
+            </CardHeader>
+            <CardContent className="flex-1">
+                <div className="flex flex-wrap gap-2">
+                    <Skeleton className="h-6 w-16" />
+                    <Skeleton className="h-6 w-20" />
+                    <Skeleton className="h-6 w-14" />
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Skeleton className="h-10 w-full" />
+            </CardFooter>
+        </Card>
+    )
+}
 
 export default function TeamsPage() {
-  const [teamProfiles, setTeamProfiles] = useState<TeamMemberProfile[]>(initialTeamProfiles);
+  const firestore = useFirestore();
+  const usersCollectionQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'));
+  }, [firestore]);
+
+  const { data: teamProfiles, isLoading } = useCollection<UserAccount>(usersCollectionQuery);
 
   return (
     <div className="container py-12">
@@ -34,11 +64,12 @@ export default function TeamsPage() {
           Looking for a Team
         </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {teamProfiles.map((profile) => (
+          {isLoading && Array.from({length: 6}).map((_, i) => <ProfileCardSkeleton key={i} />)}
+          {teamProfiles && teamProfiles.map((profile) => (
             <Card key={profile.id} className="flex flex-col">
               <CardHeader className="flex flex-row items-center gap-4">
                 <Image
-                  src={profile.avatarUrl}
+                  src={profile.photoURL || `https://picsum.photos/seed/${profile.id}/200/200`}
                   alt={profile.name}
                   width={64}
                   height={64}
@@ -47,12 +78,13 @@ export default function TeamsPage() {
                 />
                 <div>
                   <CardTitle>{profile.name}</CardTitle>
-                  <CardDescription>{profile.bio}</CardDescription>
+                  <CardDescription>{profile.college || 'Hacker'}</CardDescription>
                 </div>
               </CardHeader>
-              <CardContent className="flex-1">
-                <div className="flex flex-wrap gap-2">
-                  {profile.skills.map((skill) => (
+              <CardContent className="flex-1 space-y-4">
+                 <p className='text-sm text-muted-foreground line-clamp-2 min-h-[40px]'>{profile.bio}</p>
+                 <div className="flex flex-wrap gap-2">
+                  {(profile.skills || []).map((skill) => (
                     <Badge key={skill} variant="secondary">
                       {skill}
                     </Badge>

@@ -1,5 +1,5 @@
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
-import type { Sponsor, Announcement, ScheduleEvent, Project, TeamMemberProfile, ProjectIdea } from './types';
+import type { Sponsor, Announcement, ScheduleEvent, Project, ProjectIdea } from './types';
 
 export const sponsors: Sponsor[] = [
   { name: 'Innovate Inc.', icon: <Briefcase className="h-10 w-10 text-muted-foreground" /> },
@@ -40,15 +40,6 @@ export const projects: Project[] = [
   { id: '2', name: 'HealthConnect', team: ['Charlie', 'Dana'], description: 'A platform connecting rural patients with urban doctors via telemedicine.', githubUrl: '#', demoUrl: '#' },
   { id: '3', name: 'LearnSphere', team: ['Eve', 'Frank'], description: 'An AI-powered personalized learning platform for students.', githubUrl: '#', demoUrl: '#' },
   { id: '4', name: 'SafeRoute', team: ['Grace', 'Heidi'], description: 'A navigation app that suggests safer routes for pedestrians based on crime data.', githubUrl: '#', demoUrl: '#' },
-];
-
-export const teamProfiles: TeamMemberProfile[] = [
-  { id: 1, name: 'Alex', avatarUrl: 'https://picsum.photos/seed/avatar1/200/200', skills: ['React', 'Node.js', 'UI/UX'], bio: 'Frontend developer passionate about creating beautiful and intuitive user interfaces.', email: 'alex@example.com' },
-  { id: 2, name: 'Brenda', avatarUrl: 'https://picsum.photos/seed/avatar2/200/200', skills: ['Python', 'Machine Learning', 'Data Science'], bio: 'Data scientist with a knack for finding stories in complex datasets.', email: 'brenda@example.com' },
-  { id: 3, name: 'Carlos', avatarUrl: 'https://picsum.photos/seed/avatar3/200/200', skills: ['Java', 'Spring Boot', 'DevOps'], bio: 'Backend engineer who loves building robust and scalable systems.', email: 'carlos@example.com' },
-  { id: 4, name: 'Diana', avatarUrl: 'https://picsum.photos/seed/avatar4/200/200', skills: ['Figma', 'User Research', 'Prototyping'], bio: 'UX designer focused on human-centered design principles.', email: 'diana@example.com' },
-  { id: 5, name: 'Ethan', avatarUrl: 'https://picsum.photos/seed/avatar5/200/200', skills: ['Go', 'Kubernetes', 'Cloud'], bio: 'Cloud native enthusiast and DevOps specialist.', email: 'ethan@example.com' },
-  { id: 6, name: 'Fiona', avatarUrl: 'https://picsum.photos/seed/avatar6/200/200', skills: ['Swift', 'iOS', 'Mobile Dev'], bio: 'Mobile developer crafting amazing experiences for iOS.', email: 'fiona@example.com' },
 ];
 
 export const projectIdeas: ProjectIdea[] = [
