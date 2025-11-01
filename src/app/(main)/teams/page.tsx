@@ -66,9 +66,9 @@ export default function TeamsPage() {
     if (profile.name && namesToFilter.includes(profile.name.toLowerCase())) {
         return false;
     }
-    // This will filter out the old profile and keep the new one.
-    if (profile.email && profile.email === 'kalyanikri1111@gmail.com') {
-      return false;
+    // This will filter out the old Kalyani profile which doesn't have skills or bio.
+    if (profile.name?.toLowerCase() === 'kalyani kumari' && (!profile.skills || !profile.bio || profile.skills.length === 0)) {
+        return false;
     }
     return true;
   });
