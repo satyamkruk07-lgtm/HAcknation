@@ -85,7 +85,13 @@ const syncToSheetFlow = ai.defineFlow(
       // 3. Write data to Google Sheets
       const sheets = await getGoogleSheetsClient();
       
-      // Overwrite the data starting from A1. This is better than clearing the whole sheet.
+      // Clear the sheet first to remove old data
+      await sheets.spreadsheets.values.clear({
+        spreadsheetId: SPREADSHEET_ID,
+        range: SHEET_NAME, // Clear the entire sheet
+      });
+      
+      // Now, write the new data starting from A1
       await sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
         range: RANGE,
