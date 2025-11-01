@@ -248,7 +248,7 @@ export default function ProfilePage() {
                <div className="flex items-center gap-6">
                 <div className="relative">
                   <Avatar className="h-24 w-24 cursor-pointer" onClick={handleAvatarClick}>
-                    <AvatarImage src={user.photoURL ?? ''} />
+                    <AvatarImage src={userProfile?.photoURL ?? user.photoURL ?? ''} />
                     <AvatarFallback className="text-3xl">
                       {getInitials(userProfile?.name ?? user.displayName)}
                     </AvatarFallback>
@@ -335,5 +335,6 @@ export default function ProfilePage() {
     </div>
   );
 }
+    
 
     
