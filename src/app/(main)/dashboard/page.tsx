@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import {
   ArrowRight,
-  BrainCircuit,
+  Lightbulb,
   Calendar,
   Code,
   Users,
@@ -40,10 +40,10 @@ const features = [
     icon: Code,
   },
   {
-    name: 'AI Project Discussion',
-    description: 'Discuss your project idea with an AI.',
+    name: 'Project Ideas',
+    description: 'Get inspired with project ideas.',
     href: '/ai-discussion',
-    icon: BrainCircuit,
+    icon: Lightbulb,
   },
 ];
 
