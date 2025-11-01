@@ -47,8 +47,6 @@ const profileFormSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileFormSchema>;
 
-const profileBgImage = PlaceHolderImages.find(p => p.id === "profile-background");
-
 export default function ProfilePage() {
   const { user, auth, isUserLoading, mutate: mutateUser } = useUser();
   const firestore = useFirestore();
@@ -227,19 +225,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="relative min-h-[calc(100vh-3.5rem)]">
-        {profileBgImage && (
-            <Image
-                src={profileBgImage.imageUrl}
-                alt={profileBgImage.description}
-                fill
-                className="absolute inset-0 -z-10 h-full w-full object-cover"
-                data-ai-hint={profileBgImage.imageHint}
-                priority
-            />
-        )}
+    <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
-        <Card className="mx-auto max-w-3xl bg-background/90 backdrop-blur-sm overflow-hidden p-6">
+        <Card className="mx-auto max-w-3xl overflow-hidden p-6">
             <div className="flex items-center gap-6">
                 <div className="relative h-32 w-32 group">
                     <Avatar className="h-32 w-32 border-4 border-background" onClick={handleAvatarClick}>
