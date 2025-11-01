@@ -10,32 +10,41 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { BrainCircuit, Send } from 'lucide-react';
+import { BrainCircuit, Loader2, Send } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-
-interface Message {
-  text: string;
-  isUser: boolean;
-}
+import { chatWithAI } from '@/lib/actions';
+import type { Message } from '@/ai/flows/chat-flow';
 
 export default function AiDiscussionPage() {
   const [messages, setMessages] = useState<Message[]>([
     { text: 'Hello! How can I help you with your hackathon project today?', isUser: false },
   ]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim()) {
-      setMessages([...messages, { text: input, isUser: true }]);
-      // Here you would typically call an AI service
-      // For now, we'll just simulate a response
-      setTimeout(() => {
-        setMessages(prev => [...prev, { text: 'That sounds like an interesting idea! Tell me more.', isUser: false }])
-      }, 1000);
+      const newMessages: Message[] = [...messages, { text: input, isUser: true }];
+      setMessages(newMessages);
       setInput('');
+      setIsLoading(true);
+
+      try {
+        const result = await chatWithAI(newMessages);
+        if (result.response) {
+            setMessages(prev => [...prev, { text: result.response, isUser: false }]);
+        } else {
+            // Handle error case, maybe show a toast
+            setMessages(prev => [...prev, { text: "Sorry, I couldn't get a response. Please try again.", isUser: false }]);
+        }
+      } catch (error) {
+        setMessages(prev => [...prev, { text: "An error occurred. Please try again later.", isUser: false }]);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -85,17 +94,28 @@ export default function AiDiscussionPage() {
                 )}
               </div>
             ))}
+             {isLoading && (
+              <div className="flex items-start gap-3 justify-start">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>AI</AvatarFallback>
+                </Avatar>
+                <div className="bg-muted rounded-lg p-3 text-sm flex items-center">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                </div>
+              </div>
+            )}
           </CardContent>
           <CardFooter className="p-4 border-t">
             <div className="flex w-full items-center space-x-2">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                onKeyDown={(e) => e.key === 'Enter' && !isLoading && handleSend()}
                 placeholder="Ask a question about your project..."
+                disabled={isLoading}
               />
-              <Button onClick={handleSend}>
-                <Send className="h-4 w-4" />
+              <Button onClick={handleSend} disabled={isLoading}>
+                {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </Button>
             </div>
           </CardFooter>
