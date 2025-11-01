@@ -66,6 +66,7 @@ export default function TeamsPage() {
     if (profile.name && namesToFilter.includes(profile.name.toLowerCase())) {
         return false;
     }
+    // This will filter out the old profile and keep the new one.
     if (profile.email && profile.email === 'kalyanikri1111@gmail.com') {
       return false;
     }
