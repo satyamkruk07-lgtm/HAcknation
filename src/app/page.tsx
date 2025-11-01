@@ -21,7 +21,7 @@ const heroImage = PlaceHolderImages.find(p => p.id === "hero");
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/20 backdrop-blur-md">
         <div className="container flex h-14 items-center">
           <MainNav />
         </div>
