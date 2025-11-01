@@ -28,7 +28,7 @@ export interface FirebaseContextState {
   user: User | null;
   isUserLoading: boolean;
   userError: Error | null;
-  mutateUser: () => Promise<void>;
+  mutate: () => Promise<void>;
 }
 
 export interface FirebaseServicesAndUser {
@@ -93,7 +93,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       user: userAuthState.user,
       isUserLoading: userAuthState.isUserLoading,
       userError: userAuthState.userError,
-      mutateUser: forceUserReload,
+      mutate: forceUserReload,
     };
   }, [firebaseApp, firestore, auth, userAuthState]);
 
@@ -123,7 +123,7 @@ export const useFirebase = (): FirebaseServicesAndUser => {
     user: context.user,
     isUserLoading: context.isUserLoading,
     userError: context.userError,
-    mutate: context.mutateUser,
+    mutate: context.mutate,
   };
 };
 
@@ -157,7 +157,7 @@ export function useMemoFirebase<T>(factory: () => T, deps: DependencyList): T | 
 }
 
 export const useUser = (): UserHookResult => {
-  const { user, isUserLoading, userError, auth, mutateUser } = useFirebase();
+  const { user, isUserLoading, userError, auth, mutate } = useFirebase();
   if (!auth) throw new Error("Auth service is not available for useUser.");
-  return { user, isUserLoading, userError, auth, mutate: mutateUser };
+  return { user, isUserLoading, userError, auth, mutate };
 };
