@@ -47,13 +47,13 @@ export default function Home() {
             <p className="mx-auto mt-4 max-w-[700px] text-lg md:text-xl">
               Innovate. Collaborate. Create. The future is in your hands.
             </p>
-            <div className="mt-6 flex items-center justify-center gap-6 text-lg">
+            <div className="mt-6 flex items-center justify-center gap-6 text-lg text-destructive">
                 <div className='flex items-center gap-2'>
-                    <Calendar className='h-5 w-5 text-destructive' />
+                    <Calendar className='h-5 w-5' />
                     <span>October 26-27, 2024</span>
                 </div>
                 <div className='flex items-center gap-2'>
-                    <MapPin className='h-5 w-5 text-destructive' />
+                    <MapPin className='h-5 w-5' />
                     <span>Shivalik College of Engineering,Dehradun</span>
                 </div>
             </div>
