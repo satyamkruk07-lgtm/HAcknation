@@ -2,9 +2,9 @@
   "placeholderImages": [
     {
       "id": "hero",
-      "description": "A laptop and a monitor displaying code in a dark room, representing a coding or hacking environment.",
-      "imageUrl": "https://images.unsplash.com/photo-1555066931-4365d1469c98?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb2Rpbmd8ZW58MHx8fHwxNzYyMDAwOTcxfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "coding environment"
+      "description": "A vibrant, abstract image representing innovation and technology at a hackathon.",
+      "imageUrl": "https://images.unsplash.com/photo-1698502744308-b187f6612ead?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxoYWNrYXRob24lMjBldmVudHxlbnwwfHx8fDE3NjE5Mjc2NzN8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "hackathon event"
     },
     {
       "id": "avatar1",
