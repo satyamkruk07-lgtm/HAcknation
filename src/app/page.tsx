@@ -49,11 +49,11 @@ export default function Home() {
             </p>
             <div className="mt-6 flex items-center justify-center gap-6 text-lg">
                 <div className='flex items-center gap-2'>
-                    <Calendar className='h-5 w-5 text-primary-foreground' />
+                    <Calendar className='h-5 w-5 text-destructive' />
                     <span>October 26-27, 2024</span>
                 </div>
                 <div className='flex items-center gap-2'>
-                    <MapPin className='h-5 w-5 text-primary-foreground' />
+                    <MapPin className='h-5 w-5 text-destructive' />
                     <span>Innovation Hub, Bangalore</span>
                 </div>
             </div>
