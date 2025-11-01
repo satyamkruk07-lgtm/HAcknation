@@ -208,131 +208,136 @@ export default function ProfilePage() {
 
   if (isUserLoading || isProfileLoading || !user) {
     return (
-      <div className="container py-12">
-        <Card className="mx-auto max-w-3xl">
-          <CardHeader>
-            <Skeleton className="h-8 w-48" />
-            <Skeleton className="h-4 w-64" />
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-20 w-20 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-6 w-32" />
-                <Skeleton className="h-4 w-48" />
+      <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
+        <div className="container py-12">
+          <Card className="mx-auto max-w-3xl">
+            <CardHeader>
+              <Skeleton className="h-8 w-48" />
+              <Skeleton className="h-4 w-64" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center gap-4">
+                <Skeleton className="h-20 w-20 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-32" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
               </div>
-            </div>
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-24 w-full" />
-            <Skeleton className="h-10 w-32" />
-          </CardContent>
-        </Card>
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-10 w-32" />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="container py-12">
-      <Card className="mx-auto max-w-3xl">
-        <CardHeader>
-          <CardTitle className="font-headline text-3xl">Your Profile</CardTitle>
-          <CardDescription>
-            Keep your information up to date to connect with others.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-               <div className="flex items-center gap-6">
-                <div className="relative">
-                  <Avatar className="h-24 w-24 cursor-pointer" onClick={handleAvatarClick}>
-                    <AvatarImage src={user.photoURL ?? ''} />
-                    <AvatarFallback className="text-3xl">
-                      {getInitials(user.displayName)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 hover:opacity-100 transition-opacity" onClick={handleAvatarClick}>
-                    {isUploading ? <Loader2 className="h-8 w-8 animate-spin text-white" /> : <Upload className="h-8 w-8 text-white" />}
+    <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]" style={{
+        backgroundImage: 'radial-gradient(circle at 1px 1px, hsl(var(--border)) 1px, transparent 0)',
+        backgroundSize: '2rem 2rem'
+    }}>
+      <div className="container py-12">
+        <Card className="mx-auto max-w-3xl bg-background/80 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle className="font-headline text-3xl">Your Profile</CardTitle>
+            <CardDescription>
+              Keep your information up to date to connect with others.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                 <div className="flex items-center gap-6">
+                  <div className="relative">
+                    <Avatar className="h-24 w-24 cursor-pointer" onClick={handleAvatarClick}>
+                      <AvatarImage src={user.photoURL ?? ''} />
+                      <AvatarFallback className="text-3xl">
+                        {getInitials(user.displayName)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 hover:opacity-100 transition-opacity" onClick={handleAvatarClick}>
+                      {isUploading ? <Loader2 className="h-8 w-8 animate-spin text-white" /> : <Upload className="h-8 w-8 text-white" />}
+                    </div>
+                    <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
                   </div>
-                  <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+                  <div>
+                    <h2 className="text-2xl font-bold">{user.displayName || userProfile?.name}</h2>
+                    <p className="text-muted-foreground">{user.email}</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-2xl font-bold">{user.displayName}</h2>
-                  <p className="text-muted-foreground">{user.email}</p>
-                </div>
-              </div>
 
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Full Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Grace Hopper" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="college"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>College/University</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Vassar College" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="skills"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Skills</FormLabel>
-                    <FormControl>
-                      <Input placeholder="React, Python, Figma..." {...field} />
-                    </FormControl>
-                    <p className="text-xs text-muted-foreground">
-                      Enter your skills, separated by commas.
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="bio"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Short Bio</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Tell us a little bit about yourself."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                Update Profile
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Full Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Grace Hopper" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="college"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>College/University</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Vassar College" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="skills"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Skills</FormLabel>
+                      <FormControl>
+                        <Input placeholder="React, Python, Figma..." {...field} />
+                      </FormControl>
+                      <p className="text-xs text-muted-foreground">
+                        Enter your skills, separated by commas.
+                      </p>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="bio"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Short Bio</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Tell us a little bit about yourself."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Update Profile
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
-
-    
