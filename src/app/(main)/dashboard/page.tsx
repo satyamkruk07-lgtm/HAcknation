@@ -46,7 +46,7 @@ const features = [
   },
 ];
 
-const nextEvent = schedule.length > 1 ? schedule[1] : schedule[0];
+const nextEvent = schedule.length > 1 ? schedule.find(e => e.id === 2) : schedule.find(e => e.id === 1);
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
@@ -161,9 +161,9 @@ export default function DashboardPage() {
                 <CardContent>
                     <div className="grid grid-cols-3 gap-6">
                     {sponsors.map((sponsor) => (
-                        <div key={sponsor.name} className="flex items-center space-x-3">
+                        <div key={sponsor.name} className="flex items-center space-x-4">
                         {sponsor.icon}
-                        <span className="font-semibold text-sm">{sponsor.name}</span>
+                        <span className="font-semibold text-base">{sponsor.name}</span>
                         </div>
                     ))}
                     </div>
