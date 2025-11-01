@@ -67,6 +67,12 @@ export function MainNav() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/teams">
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </Link>
+              </DropdownMenuItem>
                <DropdownMenuItem asChild>
                 <Link href="/dashboard">
                   <LayoutGrid className="mr-2 h-4 w-4" />
