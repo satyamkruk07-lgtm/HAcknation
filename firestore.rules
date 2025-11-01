@@ -6,7 +6,7 @@
  * Public read access is granted to certain collections like 'events' and 'announcements', but write access is strictly controlled.
  *
  * Data Structure:
- * - /users/{userId}: Stores personal user profiles; access is restricted to the owner.
+ * - /users/{userId}: Stores personal user profiles; access is restricted to the owner for writes, but readable by any signed-in user for team-finding purposes.
  * - /events/{eventId}: Stores event details; publicly readable.
  * - /events/{eventId}/scheduleItems/{scheduleItemId}: Stores schedule items for events; publicly readable.
  * - /events/{eventId}/announcements/{announcementId}: Stores announcements for events; publicly readable.
@@ -18,7 +18,7 @@
  * - /roles_event_admin/{userId}: Collection to store event administrator roles; existence of document indicates admin role.
  *
  * Key Security Decisions:
- * - User listing is disallowed to protect privacy.
+ * - User listing is allowed for any authenticated user to facilitate team formation.
  * - Public read access is granted to 'events', 'scheduleItems', and 'announcements'.
  * - Only team members can access the team projects.
  * - Roles for Event Admins are determined by presence of a document in `/roles_event_admin/{uid}`.
@@ -48,7 +48,7 @@ service cloud.firestore {
       }
 
       allow get: if isOwner(userId);
-      allow list: if false; // User listing is not allowed.
+      allow list: if isSignedIn(); // Allow authenticated users to list profiles for team building.
       allow create: if isOwner(userId);
       allow update: if isOwner(userId) && request.resource.data.id == resource.data.id; // Enforce immutability
       allow delete: if isOwner(userId) && resource != null; // Check document existence before deletion.
@@ -213,3 +213,4 @@ service cloud.firestore {
     }
   }
 }
+    
