@@ -11,7 +11,7 @@ export function Footer() {
         </p>
         <div className="flex items-center gap-4">
           <a
-            href="mailto:contact@hacktrack.com"
+            href="mailto:satyamkruk07@gmail.com"
             className="text-muted-foreground hover:text-foreground"
             aria-label="Mail"
           >
