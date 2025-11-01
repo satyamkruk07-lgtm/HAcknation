@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -45,7 +46,7 @@ const profileFormSchema = z.object({
 type ProfileFormData = z.infer<typeof profileFormSchema>;
 
 export default function ProfilePage() {
-  const { user, auth, isUserLoading } = useUser();
+  const { user, auth, isUserLoading, mutate: mutateUser } = useUser();
   const firestore = useFirestore();
   const storage = useStorage();
   const router = useRouter();
@@ -133,6 +134,7 @@ export default function ProfilePage() {
 
       // Force re-fetch of user data
       await auth.currentUser.reload();
+      mutateUser(); // re-fetch auth user
       mutate(); // re-fetch firestore doc
 
       toast({
@@ -178,6 +180,9 @@ export default function ProfilePage() {
       if (auth.currentUser && auth.currentUser.displayName !== data.name) {
         await updateProfile(auth.currentUser, { displayName: data.name });
       }
+      
+      mutate(); // re-fetch firestore doc after update
+      mutateUser(); // re-fetch user after update
 
       toast({
         title: 'Success!',
@@ -254,7 +259,7 @@ export default function ProfilePage() {
                   <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">{userProfile?.name}</h2>
+                  <h2 className="text-2xl font-bold">{userProfile?.name ?? user.displayName}</h2>
                   <p className="text-muted-foreground">{user.email}</p>
                 </div>
               </div>
@@ -330,3 +335,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    
