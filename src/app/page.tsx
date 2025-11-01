@@ -54,7 +54,7 @@ export default function Home() {
                 </div>
                 <div className='flex items-center gap-2'>
                     <MapPin className='h-5 w-5 text-destructive' />
-                    <span>Innovation Hub, Bangalore</span>
+                    <span>Shivalik College of Engineering</span>
                 </div>
             </div>
             <div className="mt-8 flex justify-center gap-4">
