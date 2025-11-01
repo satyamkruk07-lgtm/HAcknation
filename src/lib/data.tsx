@@ -94,5 +94,205 @@ export const projectIdeas: ProjectIdea[] = [
         title: "ConnectEd",
         description: "A peer-to-peer tutoring platform that connects students who need help with those who excel in specific subjects within a university.",
         technologies: ["Next.js", "Firebase", "Stripe Connect", "WebRTC"]
+    },
+    {
+        title: "WasteNot",
+        description: "A platform connecting restaurants with surplus food to NGOs and individuals in need, reducing food waste and hunger.",
+        technologies: ["Flutter", "Firebase", "Google Maps API", "Stripe"]
+    },
+    {
+        title: "Artify",
+        description: "An AI-powered tool that transforms your photos into different art styles (e.g., Van Gogh, Picasso) using style transfer.",
+        technologies: ["Python", "PyTorch", "Next.js", "Genkit"]
+    },
+    {
+        title: "ElderLink",
+        description: "A simple video-calling app with a clean UI, designed to help elderly individuals stay connected with their families.",
+        technologies: ["WebRTC", "React", "Firebase", "Tailwind CSS"]
+    },
+    {
+        title: "AR Navigator",
+        description: "An augmented reality navigation app for large indoor venues like malls or airports, overlaying directions onto the real world.",
+        technologies: ["ARCore/ARKit", "Unity/React Native", "Google Maps Indoor API"]
+    },
+    {
+        title: "FakeNews Detector",
+        description: "A browser extension that uses natural language processing (NLP) to analyze news articles and flag potential misinformation.",
+        technologies: ["Python", "NLTK/SpaCy", "Browser Extension API", "Flask"]
+    },
+    {
+        title: "Sign-to-Speech",
+        description: "A mobile app that translates sign language gestures into spoken words in real-time using machine learning and computer vision.",
+        technologies: ["TensorFlow Lite", "OpenCV", "Android/iOS", "Text-to-Speech API"]
+    },
+    {
+        title: "AquaCheck",
+        description: "A smart water monitoring system using IoT devices to test water quality in real-time and alert authorities about pollutants.",
+        technologies: ["Arduino/Raspberry Pi", "MQTT", "Firebase", "React"]
+    },
+    {
+        title: "VR Museum Tour",
+        description: "A virtual reality experience that allows users to explore famous museums from around the world from the comfort of their homes.",
+        technologies: ["Unity/Unreal Engine", "Oculus SDK", "3D Modeling", "Photogrammetry"]
+    },
+    {
+        title: "CrowdSource Reporter",
+        description: "A platform for citizen journalism where users can report local news and events, with a system for verifying information.",
+        technologies: ["Next.js", "Firebase", "Geolocation API", "WebSockets"]
+    },
+    {
+        title: "Gamer's Hub",
+        description: "A social network for gamers to find teammates, schedule gaming sessions, and track their stats across different games.",
+        technologies: ["Discord API", "Steam API", "React", "Node.js", "MongoDB"]
+    },
+    {
+        title: "SmartPlanter",
+        description: "An automated indoor gardening system that uses sensors to monitor soil moisture, light, and temperature, and waters plants automatically.",
+        technologies: ["IoT", "Raspberry Pi", "Python", "Firebase", "Next.js"]
+    },
+    {
+        title: "MusicMood",
+        description: "An AI that creates personalized playlists based on your current mood, analyzed from your facial expression or text input.",
+        technologies: ["Genkit", "Spotify API", "OpenCV.js", "React"]
+    },
+    {
+        title: "TravelPal",
+        description: "An all-in-one travel app that helps with itinerary planning, budget tracking, and real-time language translation.",
+        technologies: ["Google Maps API", "Google Translate API", "Next.js", "Firebase"]
+    },
+    {
+        title: "PantryChef",
+        description: "An app that suggests recipes based on the ingredients you already have in your pantry, helping to reduce food waste.",
+        technologies: ["React Native", "Spoonacular API", "Firebase"]
+    },
+    {
+        title: "SkillSwap",
+        description: "A platform where users can trade skills with each other (e.g., I'll teach you guitar if you teach me how to code).",
+        technologies: ["Next.js", "Firebase", "WebRTC"]
+    },
+    {
+        title: "ParkRight",
+        description: "A smart parking solution that uses sensors and a mobile app to guide drivers to available parking spots in real-time.",
+        technologies: ["IoT", "Flutter", "Firebase", "Google Maps"]
+    },
+    {
+        title: "MedAlert",
+        description: "A medication reminder app that also tracks adherence and can notify family members if a dose is missed.",
+        technologies: ["React Native", "Firebase Firestore", "Push Notifications"]
+    },
+    {
+        title: "CharityChain",
+        description: "A transparent donation platform built on blockchain, allowing donors to track exactly how their contributions are used.",
+        technologies: ["Solidity", "Ethereum", "Next.js", "IPFS"]
+    },
+    {
+        title: "DreamScape",
+        description: "An app that generates unique, beautiful artwork from a user's text descriptions using generative AI models like DALL-E or Midjourney.",
+        technologies: ["Genkit", "Next.js", "Firebase Storage"]
+    },
+    {
+        title: "CodeTutorAI",
+        description: "An AI-powered coding tutor that provides hints, explains concepts, and debugs code for beginners.",
+        technologies: ["Genkit", "Monaco Editor", "React", "Next.js"]
+    },
+    {
+        title: "TheraBot",
+        description: "A compassionate AI chatbot designed to provide a safe space for users to talk about their mental health and practice CBT techniques.",
+        technologies: ["Genkit", "Next.js", "Firebase"]
+    },
+    {
+        title: "EventHive",
+        description: "A decentralized platform for event ticketing that eliminates scalping and fraud using NFTs for tickets.",
+        technologies: ["Solidity", "IPFS", "Next.js", "Thirdweb"]
+    },
+    {
+        title: "LegalEase",
+        description: "An AI tool that simplifies complex legal documents (like terms of service) into plain, easy-to-understand language.",
+        technologies: ["Genkit", "Next.js", "PDF.js"]
+    },
+    {
+        title: "DriveSafe",
+        description: "A mobile app that monitors driving behavior using phone sensors and provides feedback to encourage safer driving habits.",
+        technologies: ["React Native", "Core Motion/SensorManager", "Firebase"]
+    },
+    {
+        title: "StudyBuddy",
+        description: "A platform that uses AI to create flashcards, summaries, and quizzes from a user's uploaded lecture notes or textbooks.",
+        technologies: ["Genkit", "OCR (Tesseract.js)", "Next.js", "Firebase"]
+    },
+    {
+        title: "TradeUp",
+        description: "A local bartering platform where users can trade items and services without using money.",
+        technologies: ["React Native", "Firebase", "Geolocation"]
+    },
+    {
+        title: "InterviewPro",
+        description: "An AI-powered mock interview simulator that asks you questions and provides feedback on your answers and body language.",
+        technologies: ["Genkit", "WebRTC", "OpenCV.js", "Next.js"]
+    },
+    {
+        title: "AllergyAlert",
+        description: "A mobile app that lets you scan food barcodes to instantly check if the product contains any of your specified allergens.",
+        technologies: ["React Native", "OpenFoodFacts API", "Barcode Scanner"]
+    },
+    {
+        title: "HomeSecure",
+        description: "A DIY home security system using Raspberry Pis, webcams, and motion sensors that sends alerts to your phone.",
+        technologies: ["Python", "Raspberry Pi", "OpenCV", "Firebase Cloud Messaging"]
+    },
+    {
+        title: "RecycleRight",
+        description: "An app that uses image recognition to tell you whether an item is recyclable and how to dispose of it properly in your local area.",
+        technologies: ["TensorFlow.js", "Next.js", "Geolocation API"]
+    },
+    {
+        title: "CultureConnect",
+        description: "A language exchange platform that connects you with native speakers for conversation practice via video chat.",
+        technologies: ["WebRTC", "Next.js", "Firebase", "Socket.io"]
+    },
+    {
+        title: "NoiseReducer",
+        description: "An AI-powered desktop app that removes background noise from your microphone in real-time during calls or recordings.",
+        technologies: ["Python", "Krisp/NVIDIA Maxine SDK", "Electron"]
+    },
+    {
+        title: "BookWorm",
+        description: "A social platform for book lovers to track their reading, write reviews, and get personalized recommendations from an AI.",
+        technologies: ["Genkit", "Google Books API", "Next.js", "Firebase"]
+    },
+    {
+        title: "PetAdopter",
+        description: "A platform that aggregates pet adoption listings from various local shelters into one searchable interface.",
+        technologies: ["React", "Node.js", "Web Scraping (Beautiful Soup/Puppeteer)", "Firebase"]
+    },
+    {
+        title: "AccessibilityChecker",
+        description: "A web tool that automatically scans websites and reports accessibility issues (WCAG compliance) to help developers make sites more inclusive.",
+        technologies: ["Axe-core", "Puppeteer", "Next.js"]
+    },
+    {
+        title: "Workout-DJ",
+        description: "An app that creates high-energy music playlists that match the tempo of your run or workout in real-time.",
+        technologies: ["Spotify API", "React Native", "Accelerometer"]
+    },
+    {
+        title: "DeepFake-Detector",
+        description: "An AI tool that analyzes videos to detect signs of deepfake manipulation, helping to combat misinformation.",
+        technologies: ["Python", "TensorFlow/PyTorch", "OpenCV", "Flask"]
+    },
+    {
+        title: "Smart-Home-Dash",
+        description: "A universal dashboard to control all your smart home devices (lights, thermostat, etc.) from different brands in one place.",
+        technologies: ["Home Assistant API", "Next.js", "WebSockets"]
+    },
+    {
+        title: "Finance-for-Teens",
+        description: "An educational app that teaches teenagers about personal finance and investing through interactive games and simulations.",
+        technologies: ["Flutter/React Native", "Firebase", "Lottie"]
+    },
+    {
+        title: "Poll-Everywhere-Clone",
+        description: "A real-time polling tool for presentations and classrooms, where the audience can respond via their phones and see live results.",
+        technologies: ["WebSockets", "React", "Chart.js", "Firebase"]
     }
 ];
