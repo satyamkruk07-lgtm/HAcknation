@@ -133,7 +133,6 @@ export default function ProfilePage() {
       }
 
       // Force re-fetch of user data
-      await auth.currentUser.reload();
       mutateUser(); // re-fetch auth user
       mutate(); // re-fetch firestore doc
 
@@ -335,6 +334,4 @@ export default function ProfilePage() {
     </div>
   );
 }
-    
-
     
