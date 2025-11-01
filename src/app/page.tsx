@@ -58,14 +58,14 @@ export default function Home() {
 
         <section id="sponsors" className="py-16 bg-background">
           <div className="container">
-            <h2 className="text-center text-3xl font-headline font-bold mb-8">
+            <h2 className="text-center text-3xl font-headline font-bold mb-12">
               Our Sponsors
             </h2>
-            <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-8 gap-y-10 items-center justify-items-center">
               {sponsors.map((sponsor) => (
-                <div key={sponsor.name} className="flex items-center space-x-3">
+                <div key={sponsor.name} className="flex items-center space-x-4">
                   {sponsor.icon}
-                  <span className="text-xl font-semibold">{sponsor.name}</span>
+                  <span className="text-lg font-semibold">{sponsor.name}</span>
                 </div>
               ))}
             </div>
