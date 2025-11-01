@@ -9,9 +9,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import {
   ArrowRight,
+  BrainCircuit,
   Calendar,
   Code,
-  GanttChartSquare,
   Users,
   Clock,
   UserCheck,
@@ -40,10 +40,10 @@ const features = [
     icon: Code,
   },
   {
-    name: 'Judging',
-    description: 'Access the judging dashboard.',
-    href: '/judging',
-    icon: GanttChartSquare,
+    name: 'AI Project Discussion',
+    description: 'Discuss your project idea with an AI.',
+    href: '/ai-discussion',
+    icon: BrainCircuit,
   },
 ];
 
