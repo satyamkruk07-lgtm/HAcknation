@@ -233,13 +233,13 @@ export default function ProfilePage() {
                 src={profileBgImage.imageUrl}
                 alt={profileBgImage.description}
                 fill
-                className="absolute inset-0 -z-10 h-full w-full object-cover brightness-50"
+                className="absolute inset-0 -z-10 h-full w-full object-cover"
                 data-ai-hint={profileBgImage.imageHint}
                 priority
             />
         )}
       <div className="container py-12">
-        <Card className="mx-auto max-w-3xl bg-background/80 backdrop-blur-sm overflow-hidden p-6">
+        <Card className="mx-auto max-w-3xl bg-background/90 backdrop-blur-sm overflow-hidden p-6">
             <div className="flex items-center gap-6">
                 <div className="relative h-32 w-32 group">
                     <Avatar className="h-32 w-32 border-4 border-background" onClick={handleAvatarClick}>
@@ -337,5 +337,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-    
