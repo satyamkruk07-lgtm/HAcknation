@@ -28,6 +28,8 @@ export function Footer() {
             href="https://www.instagram.com/official_satya_.0001_?igsh=dGk3ZWw3MDZ1eWI5"
             className="text-muted-foreground hover:text-foreground"
             aria-label="Instagram"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             <Instagram className="h-5 w-5" />
           </a>
