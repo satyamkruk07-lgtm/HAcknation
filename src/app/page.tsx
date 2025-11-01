@@ -29,22 +29,12 @@ export default function Home() {
         </div>
       </header>
       <main className="flex-1">
-        <section className="relative py-20 md:py-32">
-          {heroImage && (
-            <Image
-              src={heroImage.imageUrl}
-              alt={heroImage.description}
-              fill
-              className="absolute inset-0 object-cover w-full h-full -z-10 brightness-50"
-              data-ai-hint={heroImage.imageHint}
-              priority
-            />
-          )}
-          <div className="container text-center text-primary-foreground">
+        <section className="relative py-20 md:py-32 bg-background">
+          <div className="container text-center">
             <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
               HackTrack
             </h1>
-            <p className="mx-auto mt-4 max-w-[700px] text-lg md:text-xl">
+            <p className="mx-auto mt-4 max-w-[700px] text-lg md:text-xl text-muted-foreground">
               Innovate. Collaborate. Create. The future is in your hands.
             </p>
             <div className="mt-6 flex items-center justify-center gap-6 text-lg text-destructive">
@@ -58,10 +48,10 @@ export default function Home() {
                 </div>
             </div>
             <div className="mt-8 flex justify-center gap-4">
-              <Button asChild size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground">
+              <Button asChild size="lg">
                 <Link href="/register">Register Now</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-primary-foreground text-primary-foreground bg-transparent hover:bg-primary-foreground hover:text-background">
+              <Button asChild size="lg" variant="outline">
                 <Link href="/schedule">View Schedule</Link>
               </Button>
             </div>
