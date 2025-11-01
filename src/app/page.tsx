@@ -39,7 +39,7 @@ export default function Home() {
               data-ai-hint={heroImage.imageHint}
             />
           )}
-          <div className="absolute inset-0 bg-black/70" />
+          <div className="absolute inset-0 bg-black/40" />
           <div className="container text-center relative">
             <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl text-primary-foreground">
               HackTrack
@@ -47,7 +47,7 @@ export default function Home() {
             <p className="mx-auto mt-4 max-w-[700px] text-lg md:text-xl text-primary-foreground/80">
               Innovate. Collaborate. Create. The future is in your hands.
             </p>
-            <div className="mt-6 flex items-center justify-center gap-6 text-lg text-destructive">
+            <div className="mt-6 flex items-center justify-center gap-6 text-lg text-primary-foreground">
                 <div className='flex items-center gap-2'>
                     <Calendar className='h-5 w-5' />
                     <span>October 26-27, 2024</span>
