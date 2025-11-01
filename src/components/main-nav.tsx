@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -16,18 +17,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, User as UserIcon, LayoutGrid } from 'lucide-react';
 
 export function MainNav() {
   const pathname = usePathname();
   const { user, auth, isUserLoading } = useUser();
-
-  const routes = [
-    { href: '/schedule', label: 'Schedule' },
-    { href: '/teams', label: 'Team Up' },
-    { href: '/submit', label: 'Submit' },
-    { href: '/judging', label: 'Judging' },
-  ];
 
   const handleLogout = async () => {
     if (auth) {
@@ -47,22 +41,6 @@ export function MainNav() {
     <div className="flex w-full items-center justify-between">
       <div className="flex items-center gap-6">
         <Logo />
-        <nav className="hidden items-center gap-6 text-sm md:flex">
-          {routes.map((route) => (
-            <Link
-              key={route.href}
-              href={route.href}
-              className={cn(
-                'transition-colors hover:text-foreground/80',
-                pathname === route.href
-                  ? 'text-foreground'
-                  : 'text-foreground/60'
-              )}
-            >
-              {route.label}
-            </Link>
-          ))}
-        </nav>
       </div>
       <div className="flex items-center gap-4">
         {isUserLoading ? (
@@ -89,6 +67,13 @@ export function MainNav() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+               <DropdownMenuItem asChild>
+                <Link href="/dashboard">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
@@ -109,5 +94,3 @@ export function MainNav() {
     </div>
   );
 }
-
-    

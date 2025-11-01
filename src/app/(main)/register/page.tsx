@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -18,11 +19,9 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -72,7 +71,7 @@ export default function RegisterPage() {
         data.password
       );
       await updateProfile(userCredential.user, { displayName: data.name });
-      router.push('/');
+      router.push('/dashboard');
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -180,5 +179,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-    
