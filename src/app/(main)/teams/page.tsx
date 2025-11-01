@@ -62,7 +62,7 @@ export default function TeamsPage() {
   const { data: teamProfiles, isLoading } = useCollection<UserAccount>(usersCollectionQuery);
 
   const filteredProfiles = teamProfiles?.filter(profile => {
-    const namesToFilter = ['priyanshu singh', 'kalyani kumari', 'djlnac', 'grace'];
+    const namesToFilter = ['priyanshu singh', 'djlnac', 'grace'];
     if (profile.name && namesToFilter.includes(profile.name.toLowerCase())) {
         return false;
     }
