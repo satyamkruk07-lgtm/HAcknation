@@ -61,7 +61,7 @@ export default function Home() {
             <h2 className="text-center text-3xl font-headline font-bold mb-12">
               Our Sponsors
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-8 gap-y-10 items-center justify-items-center">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 items-center justify-items-center">
               {sponsors.map((sponsor) => (
                 <div key={sponsor.name} className="flex items-center space-x-4">
                   {sponsor.icon}

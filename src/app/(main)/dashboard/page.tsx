@@ -46,9 +46,7 @@ const features = [
   },
 ];
 
-const nextEvent = schedule.find(
-  (e) => new Date(e.time.replace(/Day \d - /, '')) > new Date()
-) || schedule[1];
+const nextEvent = schedule.length > 1 ? schedule[1] : schedule[0];
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
@@ -161,7 +159,7 @@ export default function DashboardPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+                    <div className="grid grid-cols-3 gap-6">
                     {sponsors.map((sponsor) => (
                         <div key={sponsor.name} className="flex items-center space-x-3">
                         {sponsor.icon}
