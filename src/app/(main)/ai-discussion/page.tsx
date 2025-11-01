@@ -33,8 +33,8 @@ export default function AiDiscussionPage() {
           result.error || "Sorry, I couldn't come up with ideas. Please try again."
         );
       }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again later.');
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred. Please try again later.');
     } finally {
       setIsLoading(false);
     }
