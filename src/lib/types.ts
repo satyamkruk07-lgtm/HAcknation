@@ -49,4 +49,7 @@ export type UserAccount = {
   skills?: string[];
   bio?: string;
   photoURL?: string;
+  profileBannerUrl?: string;
 };
+
+    

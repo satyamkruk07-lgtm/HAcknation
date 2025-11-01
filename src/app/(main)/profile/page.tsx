@@ -30,7 +30,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2, Upload, Pencil } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
@@ -54,10 +54,12 @@ export default function ProfilePage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const avatarFileInputRef = useRef<HTMLInputElement>(null);
+  const bannerFileInputRef = useRef<HTMLInputElement>(null);
   
-  const profileBannerImage = PlaceHolderImages.find(p => p.id === "profile-banner");
+  const defaultBannerImage = PlaceHolderImages.find(p => p.id === "profile-banner");
 
   const userDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null;
@@ -68,7 +70,6 @@ export default function ProfilePage() {
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
-    // Initialize with empty strings to prevent uncontrolled-to-controlled error
     defaultValues: {
       name: '',
       college: '',
@@ -84,8 +85,6 @@ export default function ProfilePage() {
   }, [user, isUserLoading, router]);
 
   useEffect(() => {
-    // When data is loaded, reset the form with the new values.
-    // Ensure all fields get a defined value (e.g., '' instead of undefined).
     if (userProfile) {
       form.reset({
         name: userProfile.name || '',
@@ -104,10 +103,14 @@ export default function ProfilePage() {
   }, [userProfile, user, form, isProfileLoading]);
 
   const handleAvatarClick = () => {
-    fileInputRef.current?.click();
+    avatarFileInputRef.current?.click();
   };
 
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerClick = () => {
+    bannerFileInputRef.current?.click();
+  };
+
+  const handleAvatarFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || event.target.files.length === 0) {
       return;
     }
@@ -123,22 +126,19 @@ export default function ProfilePage() {
     const file = event.target.files[0];
     const storageRef = ref(storage, `avatars/${user.uid}/${file.name}`);
 
-    setIsUploading(true);
+    setIsUploadingAvatar(true);
     try {
       const snapshot = await uploadBytes(storageRef, file);
       const photoURL = await getDownloadURL(snapshot.ref);
 
-      // Update Firebase Auth user profile
       await updateProfile(auth.currentUser, { photoURL });
       
-      // Update Firestore document
       if(userDocRef) {
         await setDoc(userDocRef, { photoURL }, { merge: true });
       }
 
-      // **CRITICAL FIX**: Force re-fetch of user data for both auth state and firestore doc
-      await mutateUser(); // This refreshes the `useUser` hook data
-      mutate(); // This refreshes the `useDoc` hook data
+      await mutateUser();
+      mutate();
 
       toast({
         title: 'Success!',
@@ -151,7 +151,43 @@ export default function ProfilePage() {
         description: error.message || "Could not upload your picture.",
       });
     } finally {
-      setIsUploading(false);
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleBannerFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || event.target.files.length === 0) {
+      return;
+    }
+    if (!user || !storage || !userDocRef) {
+       toast({
+        variant: "destructive",
+        title: "Error",
+        description: "You must be logged in to upload an image.",
+      });
+      return;
+    }
+
+    const file = event.target.files[0];
+    const storageRef = ref(storage, `banners/${user.uid}/${file.name}`);
+    setIsUploadingBanner(true);
+    try {
+      const snapshot = await uploadBytes(storageRef, file);
+      const bannerUrl = await getDownloadURL(snapshot.ref);
+      await setDoc(userDocRef, { profileBannerUrl: bannerUrl }, { merge: true });
+      mutate();
+      toast({
+        title: "Success!",
+        description: "Your banner image has been updated.",
+      });
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: error.message || "Could not upload banner image.",
+      });
+    } finally {
+      setIsUploadingBanner(false);
     }
   };
 
@@ -184,8 +220,8 @@ export default function ProfilePage() {
         await updateProfile(auth.currentUser, { displayName: data.name });
       }
       
-      mutate(); // re-fetch firestore doc after update
-      await mutateUser(); // re-fetch user after update
+      mutate(); 
+      await mutateUser(); 
 
       toast({
         title: 'Success!',
@@ -238,6 +274,8 @@ export default function ProfilePage() {
     );
   }
 
+  const bannerImageUrl = userProfile?.profileBannerUrl || defaultBannerImage?.imageUrl;
+
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]" style={{
         backgroundImage: 'radial-gradient(circle at 1px 1px, hsl(var(--border)) 1px, transparent 0)',
@@ -245,15 +283,29 @@ export default function ProfilePage() {
     }}>
       <div className="container py-12">
         <Card className="mx-auto max-w-3xl bg-background/80 backdrop-blur-sm overflow-hidden">
-          {profileBannerImage && (
-            <div className="relative h-52 w-full">
+          {bannerImageUrl && (
+            <div className="relative h-52 w-full group">
               <Image
-                src={profileBannerImage.imageUrl}
-                alt={profileBannerImage.description}
+                src={bannerImageUrl}
+                alt={userProfile?.name || "Profile banner"}
                 fill
                 className="object-cover"
-                data-ai-hint={profileBannerImage.imageHint}
+                data-ai-hint={defaultBannerImage?.imageHint}
               />
+              <div 
+                className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                onClick={handleBannerClick}
+              >
+                {isUploadingBanner ? (
+                  <Loader2 className="h-8 w-8 animate-spin text-white" />
+                ) : (
+                  <Button variant="outline" className="bg-transparent text-white border-white hover:bg-white hover:text-black">
+                    <Pencil className="mr-2 h-4 w-4" /> Edit Banner
+                  </Button>
+                )}
+                
+              </div>
+              <input type="file" ref={bannerFileInputRef} onChange={handleBannerFileChange} accept="image/*" className="hidden" />
             </div>
           )}
           <div className='relative p-6'>
@@ -266,9 +318,9 @@ export default function ProfilePage() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={handleAvatarClick}>
-                  {isUploading ? <Loader2 className="h-10 w-10 animate-spin text-white" /> : <Upload className="h-10 w-10 text-white" />}
+                  {isUploadingAvatar ? <Loader2 className="h-10 w-10 animate-spin text-white" /> : <Upload className="h-10 w-10 text-white" />}
                 </div>
-                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+                <input type="file" ref={avatarFileInputRef} onChange={handleAvatarFileChange} accept="image/*" className="hidden" />
               </div>
             </div>
              <div className="pt-20">
@@ -355,3 +407,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    
