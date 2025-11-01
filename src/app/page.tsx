@@ -82,7 +82,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-2 gap-8">
               <div className="flex items-start space-x-4">
-                <Lightbulb className="mt-1 h-8 w-8 text-accent" />
+                <Lightbulb className="mt-1 h-10 w-10 text-accent" />
                 <div>
                   <h3 className="font-semibold">Innovate</h3>
                   <p className="text-sm text-muted-foreground">
@@ -91,7 +91,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex items-start space-x-4">
-                <Users className="mt-1 h-8 w-8 text-accent" />
+                <Users className="mt-1 h-10 w-10 text-accent" />
                 <div>
                   <h3 className="font-semibold">Collaborate</h3>
                   <p className="text-sm text-muted-foreground">
@@ -100,7 +100,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex items-start space-x-4">
-                <Code className="mt-1 h-8 w-8 text-accent" />
+                <Code className="mt-1 h-10 w-10 text-accent" />
                 <div>
                   <h3 className="font-semibold">Build</h3>
                   <p className="text-sm text-muted-foreground">
@@ -109,7 +109,7 @@ export default function Home() {
                 </div>
               </div>
               <div className="flex items-start space-x-4">
-                <Rocket className="mt-1 h-8 w-8 text-accent" />
+                <Rocket className="mt-1 h-10 w-10 text-accent" />
                 <div>
                   <h3 className="font-semibold">Launch</h3>
                   <p className="text-sm text-muted-foreground">
