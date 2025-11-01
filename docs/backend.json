@@ -65,6 +65,21 @@
           "type": "string",
           "description": "Date the user registered.",
           "format": "date-time"
+        },
+        "college": {
+          "type": "string",
+          "description": "The college or university the user attends."
+        },
+        "skills": {
+          "type": "array",
+          "description": "A list of the user's skills.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bio": {
+          "type": "string",
+          "description": "A short biography of the user."
         }
       },
       "required": [
@@ -348,7 +363,7 @@
       ]
     },
     "UserSkill": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
+      "$schema": "http://json-schema.org/draft_07/schema#",
       "title": "UserSkill",
       "type": "object",
       "description": "Represents the skills possessed by a user.",
@@ -581,4 +596,3 @@
     "reasoning": "The Firestore structure is designed to support the HackTrack application, focusing on a national-level hackathon. The structure prioritizes authorization independence through denormalization, clarity, and QAPs.\n\nUser accounts are stored in `/users/{userId}`, ensuring clear ownership. Hackathon events are stored in `/hackathonEvents/{hackathonEventId}`.\n\nSubcollections like `/hackathonEvents/{hackathonEventId}/scheduleItems/{scheduleItemId}`, `/hackathonEvents/{hackathonEventId}/announcements/{announcementId}`, `/hackathonEvents/{hackathonEventId}/projectSubmissions/{projectSubmissionId}`, `/hackathonEvents/{hackathonEventId}/judgingCriteria/{judgingCriteriaId}`, and `/hackathonEvents/{hackathonEventId}/teams/{teamId}` are used to manage event-specific data. For authorization independence, the `hackathonEventId` is duplicated in each document within these subcollections.  This eliminates the need for `get()` calls in security rules to verify the parent event.  The team `memberIds` array is used to store user ids of team members.\n\nJudges are stored in the `/judges/{judgeId}` collection, linked to user accounts via the `userAccountId` field. Project scores are stored in `/projectScores/{projectScoreId}`, referencing judges, project submissions, and judging criteria. User skills are stored in `/userSkills/{userSkillId}`, linking users to skills.\n\nThis structure allows for efficient and secure data access, with clear ownership and role-based permissions. The design supports the core features of the HackTrack application, including event schedules, registration, live updates, submission platform, judging system, and team formation."
   }
 }
-    

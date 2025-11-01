@@ -39,3 +39,13 @@ export type TeamMemberProfile = {
   bio: string;
   email: string;
 };
+
+export type UserAccount = {
+  id: string;
+  email: string;
+  name: string;
+  registrationDate: string;
+  college?: string;
+  skills?: string[];
+  bio?: string;
+};
