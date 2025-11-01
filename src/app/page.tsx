@@ -72,7 +72,7 @@ export default function Home() {
               <h2 className="font-headline text-3xl font-bold">
                 About HackTrack
               </h2>
-              <p className="mt-4 text-muted-foreground">
+              <p className="mt-4 text-muted-foreground text-lg">
                 HackTrack is the country's most prestigious hackathon, bringing
                 together the brightest minds to solve real-world problems
                 through technology. Over 48 hours, participants will form
