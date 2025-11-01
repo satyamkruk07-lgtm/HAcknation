@@ -1,19 +1,16 @@
-
 'use client';
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { useAuth } from '@/firebase';
 
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -33,31 +30,30 @@ import Link from 'next/link';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(1, 'Password is required'),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   const auth = useAuth();
-  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
-      password: '',
     },
   });
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setError(null);
+    setSuccess(null);
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      router.push('/dashboard');
+      await sendPasswordResetEmail(auth, data.email);
+      setSuccess('Password reset link sent! Check your inbox.');
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -70,10 +66,10 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">
-            Welcome Back
+            Forgot Your Password?
           </CardTitle>
           <CardDescription>
-            Log in to your HackTrack account to continue.
+            No problem. Enter your email and we&apos;ll send you a reset link.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -81,8 +77,14 @@ export default function LoginPage() {
             <CardContent className="space-y-4">
               {error && (
                 <Alert variant="destructive">
-                  <AlertTitle>Login Failed</AlertTitle>
+                  <AlertTitle>Error</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+               {success && (
+                <Alert variant="default">
+                  <AlertTitle>Success</AlertTitle>
+                  <AlertDescription>{success}</AlertDescription>
                 </Alert>
               )}
               <FormField
@@ -102,47 +104,20 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Password</FormLabel>
-                      <Link
-                        href="/forgot-password"
-                        className="text-sm font-medium text-primary hover:underline"
-                      >
-                        Forgot Password?
-                      </Link>
-                    </div>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </CardContent>
-            <CardFooter className="flex flex-col items-stretch gap-4">
-              <Button type="submit" disabled={isSubmitting} className="w-full">
+               <Button type="submit" disabled={isSubmitting} className="w-full">
                 {isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Log In
+                Send Reset Link
               </Button>
-              <p className="text-center text-sm text-muted-foreground">
-                Don&apos;t have an account?{' '}
-                <Link
-                  href="/register"
-                  className="font-medium text-primary hover:underline"
-                >
-                  Register
-                </Link>
-              </p>
-            </CardFooter>
+            </CardContent>
           </form>
         </Form>
+        <CardFooter className="justify-center">
+             <Button variant="link" asChild>
+                <Link href="/login">Back to Log In</Link>
+             </Button>
+        </CardFooter>
       </Card>
     </div>
   );
