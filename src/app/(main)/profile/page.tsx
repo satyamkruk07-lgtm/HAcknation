@@ -198,7 +198,7 @@ export default function ProfilePage() {
 
   if (isUserLoading || isProfileLoading || !user) {
     return (
-      <div className="bg-background min-h-[calc(100vh-3.5rem)]">
+      <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
         <div className="container py-12">
           <Card className="mx-auto max-w-3xl">
             <CardHeader>
@@ -227,7 +227,7 @@ export default function ProfilePage() {
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
-        <Card className="mx-auto max-w-3xl overflow-hidden p-6">
+        <Card className="mx-auto max-w-3xl overflow-hidden p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
             <div className="flex items-center gap-6">
                 <div className="relative h-32 w-32 group">
                     <Avatar className="h-32 w-32 border-4 border-background" onClick={handleAvatarClick}>
