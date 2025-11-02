@@ -9,7 +9,7 @@
  * - /users/{userId}: Stores personal user profiles; access is restricted to the owner for writes, but readable by any signed-in user for team-finding purposes.
  * - /events/{eventId}: Stores event details; publicly readable.
  * - /events/{eventId}/scheduleItems/{scheduleItemId}: Stores schedule items for events; publicly readable.
- * - /events/{eventId}/announcements/{announcementId}: Stores announcements for events; publicly readable.
+ * - /announcements: Stores announcements for events; readable by authenticated users.
  * - /teams/{teamId}: Stores team data, with memberIDs for authorization.
  * - /projects/{projectId}: Stores project submissions associated with teams.
  * - /judgingAssignments/{judgingAssignmentId}: Stores judge assignments and scores.
@@ -19,13 +19,14 @@
  *
  * Key Security Decisions:
  * - User listing is allowed for any authenticated user to facilitate team formation.
- * - Public read access is granted to 'events', 'scheduleItems', and 'announcements'.
+ * - Public read access is granted to 'events' and 'scheduleItems'.
+ * - Authenticated users can read 'announcements'.
  * - Only team members can access the team projects.
  * - Roles for Event Admins are determined by presence of a document in `/roles_event_admin/{uid}`.
  *
  * Denormalization for Authorization:
  * - The 'teams' collection relies on the 'memberIDs' array within each document to authorize access to team-related resources.
- * - Event-related data (schedule items, announcements) are stored in subcollections under `/events/{eventId}`, with the `eventID` field in each document ensuring association with the correct event.
+ * - Event-related data (schedule items) are stored in subcollections under `/events/{eventId}`, with the `eventID` field in each document ensuring association with the correct event.
  */
 rules_version = '2';
 service cloud.firestore {
@@ -81,20 +82,25 @@ service cloud.firestore {
       allow update: if isAdmin() && resource != null; // Check document existence before update.
       allow delete: if isAdmin() && resource != null; // Check document existence before deletion.
     }
-
+    
     /**
-     * @description: Allow public read access to announcements; restrict write access to admins.
-     * @path: /events/{eventId}/announcements/{announcementId}
-     * @allow: (get) Any user can read announcements.
+     * @description: Allow authenticated users to read announcements; restrict write access to admins.
+     * @path: /announcements/{announcementId}
+     * @allow: (get, list) Authenticated users can read announcements.
      * @deny: (create) Non-admin user cannot create announcements.
-     * @principle: Public read access with restricted write access.
+     * @principle: Authenticated read access with restricted write access.
      */
-    match /events/{eventId}/announcements/{announcementId} {
-      allow get, list: if true;
+    match /announcements/{announcementId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      allow get, list: if isSignedIn();
       allow create: if isAdmin();
-      allow update: if isAdmin() && resource != null; // Check document existence before update.
-      allow delete: if isAdmin() && resource != null; // Check document existence before deletion.
+      allow update: if isAdmin() && resource != null;
+      allow delete: if isAdmin() && resource != null;
     }
+
 
     /**
      * @description: Secure team data; only team members can read or write team data.
