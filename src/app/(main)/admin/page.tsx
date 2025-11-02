@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ExternalLink, Github, Loader2 } from 'lucide-react';
+import { ExternalLink, Github, Loader2, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -37,6 +37,16 @@ import {
 import type { UserAccount, SubmittedProject } from '@/lib/types';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -237,6 +247,9 @@ function UserManagementTab() {
 
 function ProjectManagementTab() {
   const firestore = useFirestore();
+  const { toast } = useToast();
+  const [projectToDelete, setProjectToDelete] = useState<SubmittedProject | null>(null);
+
   const projectsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
     return query(collection(firestore, 'projects'), orderBy('submissionDate', 'desc'));
@@ -244,63 +257,110 @@ function ProjectManagementTab() {
 
   const { data: projects, isLoading } = useCollection<SubmittedProject>(projectsQuery);
 
+  const handleDeleteProject = async () => {
+    if (!firestore || !projectToDelete) return;
+
+    try {
+      await deleteDoc(doc(firestore, 'projects', projectToDelete.id));
+      toast({
+        title: 'Project Deleted',
+        description: `"${projectToDelete.name}" has been removed.`,
+      });
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Deletion Failed',
+        description: error.message || 'An unknown error occurred.',
+      });
+    } finally {
+      setProjectToDelete(null);
+    }
+  };
+
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Project Management</CardTitle>
-        <CardDescription>View and manage all project submissions.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Project Name</TableHead>
-              <TableHead>Team</TableHead>
-              <TableHead>Submitted On</TableHead>
-              <TableHead className="text-right">Links</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell><Skeleton className="h-5 w-40" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-48" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                  <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
-                </TableRow>
-              ))
-            ) : projects && projects.length > 0 ? (
-              projects.map((project) => (
-                <TableRow key={project.id}>
-                  <TableCell className="font-medium">{project.name}</TableCell>
-                  <TableCell>{(project.studentNames || project.teamMembers || []).join(', ')}</TableCell>
-                  <TableCell>
-                    {project.submissionDate
-                      ? format(new Date(project.submissionDate.seconds * 1000), 'PPp')
-                      : 'N/A'}
-                  </TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button asChild variant="outline" size="icon">
-                      <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"><Github className="h-4 w-4" /></a>
-                    </Button>
-                    <Button asChild variant="outline" size="icon">
-                      <a href={project.demoUrl} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-4 w-4" /></a>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Project Management</CardTitle>
+          <CardDescription>View and manage all project submissions.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={4} className="text-center">
-                  No projects submitted yet.
-                </TableCell>
+                <TableHead>Project Name</TableHead>
+                <TableHead>Team</TableHead>
+                <TableHead>Submitted On</TableHead>
+                <TableHead>Links</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-5 w-40" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-48" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-16 ml-auto" /></TableCell>
+                  </TableRow>
+                ))
+              ) : projects && projects.length > 0 ? (
+                projects.map((project) => (
+                  <TableRow key={project.id}>
+                    <TableCell className="font-medium">{project.name}</TableCell>
+                    <TableCell>{(project.studentNames || project.teamMembers || []).join(', ')}</TableCell>
+                    <TableCell>
+                      {project.submissionDate
+                        ? format(new Date(project.submissionDate.seconds * 1000), 'PPp')
+                        : 'N/A'}
+                    </TableCell>
+                    <TableCell className="space-x-2">
+                      <Button asChild variant="outline" size="icon">
+                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"><Github className="h-4 w-4" /></a>
+                      </Button>
+                      <Button asChild variant="outline" size="icon">
+                        <a href={project.demoUrl} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-4 w-4" /></a>
+                      </Button>
+                    </TableCell>
+                    <TableCell className="text-right">
+                       <Button variant="destructive" size="icon" onClick={() => setProjectToDelete(project)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center">
+                    No projects submitted yet.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      <AlertDialog open={!!projectToDelete} onOpenChange={(open) => !open && setProjectToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the project
+              "{projectToDelete?.name}" from the database.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteProject} className="bg-destructive hover:bg-destructive/90">
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
