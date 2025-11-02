@@ -309,10 +309,10 @@ export default function DashboardPage() {
               <h2 className="mb-4 font-headline text-2xl font-bold">Hackathon Tips</h2>
               <div className="grid grid-cols-1 gap-6">
                 {hackathonTips.map((tip, index) => (
-                   <Card key={index} className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+                   <Card key={index} className="group transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
                       <CardContent className="p-6">
                         <div className="flex items-start gap-4">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 text-accent transition-transform duration-200 group-hover:scale-105 group-active:scale-110 group-active:shadow-lg group-active:shadow-accent/50">
                             <tip.icon className="h-6 w-6" />
                           </div>
                           <div>
