@@ -21,7 +21,7 @@
  * - User listing is allowed for any authenticated user to facilitate team formation. Admins can list all users for management.
  * - Public read access is granted to 'events' and 'scheduleItems'.
  * - Authenticated users can read 'announcements'.
- * - Only team members can access the team projects.
+ * - Only team members can access the team projects. Admins can access all projects.
  * - Roles for Event Admins are determined by presence of a document in `/roles_event_admin/{uid}`.
  *
  * Denormalization for Authorization:
@@ -131,11 +131,11 @@ service cloud.firestore {
     }
 
     /**
-     * @description: Secure project submissions; only team members can access project details.
+     * @description: Secure project submissions; only team members can access project details. Admins can access all projects.
      * @path: /projects/{projectId}
-     * @allow: (get) Team member 'user123' can read project details.
+     * @allow: (get, list) Team member 'user123' can read project details. Admin can read all projects.
      * @deny: (get) Non-team member 'user456' cannot read project details.
-     * @principle: Enforces shared access based on team membership.
+     * @principle: Enforces shared access based on team membership, with admin override.
      */
     match /projects/{projectId} {
         function isSignedIn() {
@@ -150,10 +150,11 @@ service cloud.firestore {
             return isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/teams/$(teamId)).data.memberIDs;
         }
 
-        allow get, list: if isSignedIn() && isTeamMember(getTeamIdForProject(projectId));
+        allow get: if isSignedIn() && isTeamMember(getTeamIdForProject(projectId));
+        allow list: if isAdmin();
         allow create: if isSignedIn(); // Any signed-in user can create a project.
-        allow update: if isSignedIn() && isTeamMember(getTeamIdForProject(projectId)) && resource != null; // Check document existence before update.
-        allow delete: if isSignedIn() && isTeamMember(getTeamIdForProject(projectId)) && resource != null; // Check document existence before deletion.
+        allow update: if isSignedIn() && (isTeamMember(getTeamIdForProject(projectId)) || isAdmin()) && resource != null; // Check document existence before update.
+        allow delete: if isSignedIn() && (isTeamMember(getTeamIdForProject(projectId)) || isAdmin()) && resource != null; // Check document existence before deletion.
     }
 
     /**
