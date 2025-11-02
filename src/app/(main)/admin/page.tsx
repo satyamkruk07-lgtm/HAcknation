@@ -47,6 +47,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { cn } from '@/lib/utils';
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -377,9 +378,9 @@ export default function AdminPage() {
 
         <Tabs defaultValue="announcements" className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-background/50 border shadow-inner">
-            <TabsTrigger value="announcements">Announcements</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="projects">Projects</TabsTrigger>
+            <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
+            <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
+            <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
           </TabsList>
           <TabsContent value="announcements" className="mt-6">
             <CreateAnnouncementForm />
