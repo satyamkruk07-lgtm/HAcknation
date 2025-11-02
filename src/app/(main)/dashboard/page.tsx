@@ -242,6 +242,23 @@ export default function DashboardPage() {
                 </Button>
               </CardContent>
             </Card>
+
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 font-headline">
+                  <Lightbulb className="h-6 w-6 text-accent" />
+                  <span>AI-Powered Ideas</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Stuck for an idea? Brainstorm with our AI assistant or browse curated project ideas.
+                </p>
+                <Button asChild className="w-full">
+                  <Link href="/ai-discussion">Get Inspired</Link>
+                </Button>
+              </CardContent>
+            </Card>
             
             {/* Sponsors */}
             <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
