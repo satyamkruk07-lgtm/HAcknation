@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ExternalLink, Github, Loader2, Trash2 } from 'lucide-react';
+import { ExternalLink, Github, Loader2, Trash2, User as UserIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -47,7 +47,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -182,6 +191,8 @@ function CreateAnnouncementForm() {
 
 function UserManagementTab() {
   const firestore = useFirestore();
+  const [selectedUser, setSelectedUser] = useState<UserAccount | null>(null);
+
   const usersQuery = useMemoFirebase(() => {
     if (!firestore) return null;
     return query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'));
@@ -190,59 +201,109 @@ function UserManagementTab() {
   const { data: users, isLoading } = useCollection<UserAccount>(usersQuery);
 
   return (
-    <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
-      <CardHeader>
-        <CardTitle className="font-headline text-2xl">User Management</CardTitle>
-        <CardDescription>View and manage registered users.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Registered On</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-48" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                  <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
-                </TableRow>
-              ))
-            ) : users && users.length > 0 ? (
-              users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    {user.registrationDate
-                      ? format(new Date(user.registrationDate), 'PP')
-                      : 'N/A'}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="sm">
-                      View Details
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
+    <>
+      <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+        <CardHeader>
+          <CardTitle className="font-headline text-2xl">User Management</CardTitle>
+          <CardDescription>View and manage registered users.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={4} className="text-center">
-                  No users found.
-                </TableCell>
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Registered On</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-48" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                    <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                  </TableRow>
+                ))
+              ) : users && users.length > 0 ? (
+                users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="font-medium">{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      {user.registrationDate
+                        ? format(new Date(user.registrationDate), 'PP')
+                        : 'N/A'}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm" onClick={() => setSelectedUser(user)}>
+                        View Details
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">
+                    No users found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+      {selectedUser && (
+        <Dialog open={!!selectedUser} onOpenChange={(open) => !open && setSelectedUser(null)}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <div className="flex items-center gap-4 mb-4">
+                  <Image
+                    src={selectedUser.photoURL || `https://picsum.photos/seed/${selectedUser.id}/200/200`}
+                    alt={selectedUser.name}
+                    width={64}
+                    height={64}
+                    className="rounded-full"
+                    data-ai-hint="person portrait"
+                  />
+                  <div>
+                    <DialogTitle className="text-2xl">{selectedUser.name}</DialogTitle>
+                    <DialogDescription>{selectedUser.email}</DialogDescription>
+                  </div>
+              </div>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">College</Label>
+                <span className="col-span-3">{selectedUser.college || 'Not provided'}</span>
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Registered</Label>
+                <span className="col-span-3">
+                    {selectedUser.registrationDate ? format(new Date(selectedUser.registrationDate), 'PPP') : 'N/A'}
+                </span>
+              </div>
+              <div className="grid grid-cols-4 items-start gap-4">
+                 <Label className="text-right mt-1">Bio</Label>
+                 <p className="col-span-3 text-sm text-muted-foreground">{selectedUser.bio || 'Not provided'}</p>
+              </div>
+              <div className="grid grid-cols-4 items-start gap-4">
+                <Label className="text-right mt-1">Skills</Label>
+                <div className="col-span-3 flex flex-wrap gap-2">
+                  {(selectedUser.skills && selectedUser.skills.length > 0) ? (
+                    selectedUser.skills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>)
+                  ) : (
+                    <span className="text-sm text-muted-foreground">No skills listed</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }
 
