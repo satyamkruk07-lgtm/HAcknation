@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { ExternalLink, Github, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -34,9 +34,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { UserAccount } from '@/lib/types';
+import type { UserAccount, SubmittedProject, ScheduleEvent } from '@/lib/types';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
+import { schedule as staticSchedule } from '@/lib/data';
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -235,6 +236,111 @@ function UserManagementTab() {
   );
 }
 
+function ProjectManagementTab() {
+  const firestore = useFirestore();
+  const projectsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'projects'), orderBy('submissionDate', 'desc'));
+  }, [firestore]);
+
+  const { data: projects, isLoading } = useCollection<SubmittedProject>(projectsQuery);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Project Management</CardTitle>
+        <CardDescription>View and manage all project submissions.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Project Name</TableHead>
+              <TableHead>Team</TableHead>
+              <TableHead>Submitted On</TableHead>
+              <TableHead className="text-right">Links</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-5 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-48" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                  <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
+                </TableRow>
+              ))
+            ) : projects && projects.length > 0 ? (
+              projects.map((project) => (
+                <TableRow key={project.id}>
+                  <TableCell className="font-medium">{project.name}</TableCell>
+                  <TableCell>{project.studentNames.join(', ')}</TableCell>
+                  <TableCell>
+                    {project.submissionDate
+                      ? format(new Date(project.submissionDate.seconds * 1000), 'PPp')
+                      : 'N/A'}
+                  </TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button asChild variant="outline" size="icon">
+                      <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"><Github className="h-4 w-4" /></a>
+                    </Button>
+                    <Button asChild variant="outline" size="icon">
+                      <a href={project.demoUrl} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-4 w-4" /></a>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center">
+                  No projects submitted yet.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
+
+
+function ScheduleManagementTab() {
+  // For now, we will use static data as there is no backend functionality to edit it.
+  const schedule: ScheduleEvent[] = staticSchedule;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Schedule Management</CardTitle>
+        <CardDescription>View the event schedule. Editing functionality will be added soon.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Time</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Speaker</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {schedule.map((event) => (
+              <TableRow key={event.id}>
+                <TableCell className="font-medium">{event.time}</TableCell>
+                <TableCell>{event.title}</TableCell>
+                <TableCell>{event.description}</TableCell>
+                <TableCell>{event.speaker || 'N/A'}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function AdminPage() {
   return (
@@ -260,30 +366,10 @@ export default function AdminPage() {
           <UserManagementTab />
         </TabsContent>
         <TabsContent value="schedule" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Schedule Management</CardTitle>
-              <CardDescription>
-                This feature is currently under development.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>Soon, you will be able to add, edit, and delete event schedule items from here.</p>
-            </CardContent>
-          </Card>
+           <ScheduleManagementTab />
         </TabsContent>
         <TabsContent value="projects" className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Project Management</CardTitle>
-              <CardDescription>
-                This feature is currently under development.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>Soon, you will be able to view and manage all project submissions from this dashboard.</p>
-            </CardContent>
-          </Card>
+          <ProjectManagementTab />
         </TabsContent>
       </Tabs>
     </div>

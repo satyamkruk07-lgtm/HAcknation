@@ -33,6 +33,17 @@ export type Project = {
   demoUrl: string;
 };
 
+export type SubmittedProject = {
+  id: string;
+  name: string;
+  studentNames: string[];
+  description: string;
+  githubUrl: string;
+  demoUrl: string;
+  submittedBy: string;
+  submissionDate: Timestamp;
+}
+
 export type UserAccount = {
   id: string;
   email: string;
