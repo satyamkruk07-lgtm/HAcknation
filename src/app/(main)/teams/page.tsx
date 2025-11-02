@@ -136,7 +136,7 @@ export default function TeamsPage() {
             }
 
             return (
-              <Card key={profile.id} className="flex flex-col">
+              <Card key={profile.id} className="flex flex-col transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
                 <CardHeader className="flex flex-row items-center gap-4">
                   <Image
                     src={imageUrl}
