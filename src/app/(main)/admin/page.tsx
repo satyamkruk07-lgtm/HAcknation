@@ -250,8 +250,8 @@ export default function AdminPage() {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="announcements">Announcements</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="schedule" disabled>Schedule</TabsTrigger>
-          <TabsTrigger value="projects" disabled>Projects</TabsTrigger>
+          <TabsTrigger value="schedule">Schedule</TabsTrigger>
+          <TabsTrigger value="projects">Projects</TabsTrigger>
         </TabsList>
         <TabsContent value="announcements" className="mt-6">
           <CreateAnnouncementForm />
