@@ -8,8 +8,8 @@
  * Data Structure:
  * - /users/{userId}: Stores personal user profiles; access is restricted to the owner for writes, but readable by any signed-in user for team-finding purposes. Admins can read all user profiles.
  * - /events/{eventId}: Stores event details; publicly readable.
- * - /events/{eventId}/scheduleItems/{scheduleItemId}: Stores schedule items for events; publicly readable.
- * - /announcements: Stores announcements for events; readable by authenticated users.
+ * - /schedule/{scheduleId}: Stores schedule items for events; publicly readable, admin writable.
+ * - /announcements: Stores announcements for events; readable by authenticated users, admin writable.
  * - /teams/{teamId}: Stores team data, with memberIDs for authorization.
  * - /projects/{projectId}: Stores project submissions associated with teams.
  * - /judgingAssignments/{judgingAssignmentId}: Stores judge assignments and scores.
@@ -19,7 +19,7 @@
  *
  * Key Security Decisions:
  * - User listing is allowed for any authenticated user to facilitate team formation. Admins can list all users for management.
- * - Public read access is granted to 'events' and 'scheduleItems'.
+ * - Public read access is granted to 'events' and 'schedule'.
  * - Authenticated users can read 'announcements'.
  * - Only team members can access the team projects. Admins can access all projects.
  * - Roles for Event Admins are determined by presence of a document in `/roles_event_admin/{uid}`.
@@ -77,16 +77,14 @@ service cloud.firestore {
 
     /**
      * @description: Allow public read access to schedule items; restrict write access to admins.
-     * @path: /events/{eventId}/scheduleItems/{scheduleItemId}
-     * @allow: (get) Any user can read schedule items.
+     * @path: /schedule/{scheduleId}
+     * @allow: (get, list) Any user can read schedule items.
      * @deny: (create) Non-admin user cannot create schedule items.
      * @principle: Public read access with restricted write access.
      */
-    match /events/{eventId}/scheduleItems/{scheduleItemId} {
+    match /schedule/{scheduleId} {
       allow get, list: if true;
-      allow create: if isAdmin();
-      allow update: if isAdmin() && resource != null; // Check document existence before update.
-      allow delete: if isAdmin() && resource != null; // Check document existence before deletion.
+      allow create, update, delete: if isAdmin();
     }
     
     /**
@@ -102,9 +100,7 @@ service cloud.firestore {
       }
 
       allow get, list: if isSignedIn();
-      allow create: if isAdmin();
-      allow update: if isAdmin() && resource != null;
-      allow delete: if isAdmin() && resource != null;
+      allow create, update, delete: if isAdmin();
     }
 
 
@@ -150,7 +146,7 @@ service cloud.firestore {
             return isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/teams/$(teamId)).data.memberIDs;
         }
 
-        allow get: if isSignedIn() && isTeamMember(getTeamIdForProject(projectId));
+        allow get: if isSignedIn() && (isTeamMember(getTeamIdForProject(projectId)) || isAdmin());
         allow list: if isAdmin();
         allow create: if isSignedIn(); // Any signed-in user can create a project.
         allow update: if isSignedIn() && (isTeamMember(getTeamIdForProject(projectId)) || isAdmin()) && resource != null; // Check document existence before update.

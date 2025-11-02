@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc, setDoc } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ExternalLink, Github, Loader2 } from 'lucide-react';
+import { ExternalLink, Github, Loader2, PlusCircle, Trash2, Edit } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -37,7 +37,16 @@ import {
 import type { UserAccount, SubmittedProject, ScheduleEvent } from '@/lib/types';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
-import { schedule as staticSchedule } from '@/lib/data';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from '@/components/ui/dialog';
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -307,14 +316,85 @@ function ProjectManagementTab() {
 
 
 function ScheduleManagementTab() {
-  // For now, we will use static data as there is no backend functionality to edit it.
-  const schedule: ScheduleEvent[] = staticSchedule;
+  const firestore = useFirestore();
+  const { toast } = useToast();
+  const scheduleQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    // Assuming a top-level 'schedule' collection for simplicity
+    return query(collection(firestore, 'schedule'), orderBy('time', 'asc'));
+  }, [firestore]);
+
+  const { data: schedule, isLoading, error } = useCollection<ScheduleEvent>(scheduleQuery);
+  
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<Partial<ScheduleEvent> | null>(null);
+
+  const handleAddNew = () => {
+    setCurrentEvent({});
+    setIsDialogOpen(true);
+  };
+  
+  const handleEdit = (event: ScheduleEvent) => {
+    setCurrentEvent(event);
+    setIsDialogOpen(true);
+  };
+  
+  const handleDelete = async (eventId: string) => {
+    if (!firestore || !window.confirm('Are you sure you want to delete this event?')) return;
+    try {
+      await deleteDoc(doc(firestore, 'schedule', eventId));
+      toast({ title: 'Event Deleted', description: 'The schedule has been updated.' });
+    } catch (e: any) {
+      toast({ variant: 'destructive', title: 'Error deleting event', description: e.message });
+    }
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!firestore || !currentEvent) return;
+
+    setIsSubmitting(true);
+    const eventData = {
+        time: currentEvent.time,
+        title: currentEvent.title,
+        description: currentEvent.description,
+        speaker: currentEvent.speaker || null,
+    };
+
+    try {
+        if (currentEvent.id) {
+            // Update existing event
+            const eventRef = doc(firestore, 'schedule', currentEvent.id);
+            await setDoc(eventRef, eventData, { merge: true });
+            toast({ title: 'Event Updated', description: 'The schedule has been successfully updated.' });
+        } else {
+            // Create new event
+            await addDoc(collection(firestore, 'schedule'), eventData);
+            toast({ title: 'Event Added', description: 'A new event has been added to the schedule.' });
+        }
+        setIsDialogOpen(false);
+        setCurrentEvent(null);
+    } catch (error: any) {
+        toast({
+            variant: 'destructive',
+            title: 'Operation Failed',
+            description: error.message || 'An unknown error occurred.',
+        });
+    } finally {
+        setIsSubmitting(false);
+    }
+  };
+
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Schedule Management</CardTitle>
-        <CardDescription>View the event schedule. Editing functionality will be added soon.</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Schedule Management</CardTitle>
+          <CardDescription>View, add, edit, or delete schedule events.</CardDescription>
+        </div>
+        <Button onClick={handleAddNew}><PlusCircle className="mr-2 h-4 w-4" /> Add Event</Button>
       </CardHeader>
       <CardContent>
         <Table>
@@ -324,20 +404,80 @@ function ScheduleManagementTab() {
               <TableHead>Title</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Speaker</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {schedule.map((event) => (
-              <TableRow key={event.id}>
-                <TableCell className="font-medium">{event.time}</TableCell>
-                <TableCell>{event.title}</TableCell>
-                <TableCell>{event.description}</TableCell>
-                <TableCell>{event.speaker || 'N/A'}</TableCell>
-              </TableRow>
-            ))}
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-40" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-64" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                  <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                </TableRow>
+              ))
+            ) : schedule && schedule.length > 0 ? (
+              schedule.map((event) => (
+                <TableRow key={event.id}>
+                  <TableCell className="font-medium">{event.time}</TableCell>
+                  <TableCell>{event.title}</TableCell>
+                  <TableCell>{event.description}</TableCell>
+                  <TableCell>{event.speaker || 'N/A'}</TableCell>
+                  <TableCell className="text-right space-x-2">
+                    <Button variant="outline" size="icon" onClick={() => handleEdit(event)}><Edit className="h-4 w-4" /></Button>
+                    <Button variant="destructive" size="icon" onClick={() => handleDelete(event.id)}><Trash2 className="h-4 w-4" /></Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+                <TableRow>
+                    <TableCell colSpan={5} className="text-center h-24">
+                        {error ? `Error: ${error.message}` : 'No schedule events found.'}
+                    </TableCell>
+                </TableRow>
+            )}
           </TableBody>
         </Table>
       </CardContent>
+       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{currentEvent?.id ? 'Edit Event' : 'Add New Event'}</DialogTitle>
+              <DialogDescription>
+                Fill in the details for the schedule item.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleFormSubmit} className="space-y-4 py-4">
+                <div>
+                    <Label htmlFor="event-time">Time</Label>
+                    <Input id="event-time" value={currentEvent?.time || ''} onChange={(e) => setCurrentEvent({...currentEvent, time: e.target.value})} placeholder="e.g., Day 1 - 09:00 AM" required />
+                </div>
+                <div>
+                    <Label htmlFor="event-title">Title</Label>
+                    <Input id="event-title" value={currentEvent?.title || ''} onChange={(e) => setCurrentEvent({...currentEvent, title: e.target.value})} placeholder="e.g., Opening Ceremony" required />
+                </div>
+                <div>
+                    <Label htmlFor="event-description">Description</Label>
+                    <Textarea id="event-description" value={currentEvent?.description || ''} onChange={(e) => setCurrentEvent({...currentEvent, description: e.target.value})} placeholder="Describe the event" required />
+                </div>
+                <div>
+                    <Label htmlFor="event-speaker">Speaker (Optional)</Label>
+                    <Input id="event-speaker" value={currentEvent?.speaker || ''} onChange={(e) => setCurrentEvent({...currentEvent, speaker: e.target.value})} placeholder="e.g., Jane Doe" />
+                </div>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button type="button" variant="secondary">Cancel</Button>
+                    </DialogClose>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {currentEvent?.id ? 'Save Changes' : 'Create Event'}
+                    </Button>
+                </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
     </Card>
   );
 }

@@ -15,13 +15,14 @@ export type Announcement = {
 };
 
 export type ScheduleEvent = {
-  id: number;
+  id: string; // Changed from number to string for Firestore IDs
   time: string;
   title: string;
   description: string;
   speaker?: string;
-  type: 'workshop' | 'talk' | 'milestone' | 'social';
-  icon: LucideIcon;
+  // The 'type' and 'icon' properties might be deprecated if not used in Firestore model
+  type?: 'workshop' | 'talk' | 'milestone' | 'social';
+  icon?: LucideIcon;
 };
 
 export type Project = {
