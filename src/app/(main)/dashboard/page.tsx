@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useUser } from '@/firebase';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
@@ -19,8 +18,11 @@ import {
   FileText,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { schedule, sponsors, announcements } from '@/lib/data.tsx';
+import { schedule, sponsors } from '@/lib/data.tsx';
 import { Badge } from '@/components/ui/badge';
+import type { Announcement } from '@/lib/types';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { formatDistanceToNow } from 'date-fns';
 
 const features = [
   {
@@ -51,9 +53,34 @@ const features = [
 
 const nextEvent = schedule.find((e) => e.id === 2) ?? schedule[0];
 
+function AnnouncementSkeleton() {
+    return (
+        <div className="relative flex items-start space-x-3">
+            <div className="relative">
+                <Skeleton className="flex h-8 w-8 items-center justify-center rounded-full ring-4 ring-background" />
+            </div>
+            <div className="min-w-0 flex-1 py-1 space-y-2">
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-4 w-full" />
+            </div>
+        </div>
+    )
+}
+
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
   const router = useRouter();
+
+  const announcementsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    // Assuming a single event for now, so we query the top-level announcements.
+    // In a multi-event app, you'd filter by eventID.
+    return query(collection(firestore, 'announcements'), orderBy('timestamp', 'desc'), limit(5));
+  }, [firestore]);
+
+  const { data: announcements, isLoading: areAnnouncementsLoading } = useCollection<Announcement>(announcementsQuery);
+
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -92,7 +119,7 @@ export default function DashboardPage() {
               Welcome, {user.displayName || 'Hacker'}!
             </h1>
             <p className="mt-2 text-lg text-muted-foreground">
-              Your HackNation journey starts here. Let&apos;s get building!
+              Your HackNation journey starts here. Let's get building!
             </p>
           </div>
         </div>
@@ -143,41 +170,58 @@ export default function DashboardPage() {
               <CardContent>
                  <div className="flow-root">
                     <ul className="-mb-4">
-                      {announcements.map((announcement, announcementIdx) => (
-                        <li key={announcement.id}>
-                          <div className="relative pb-4">
-                            {announcementIdx !== announcements.length - 1 ? (
-                              <span
-                                className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-border"
-                                aria-hidden="true"
-                              />
-                            ) : null}
-                            <div className="relative flex items-start space-x-3">
-                              <div className="relative">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary ring-4 ring-background">
-                                  <Megaphone
-                                    className="h-4 w-4"
-                                    aria-hidden="true"
-                                  />
+                      {areAnnouncementsLoading ? (
+                        <>
+                            <li className="pb-4"><AnnouncementSkeleton /></li>
+                            <li className="pb-4"><AnnouncementSkeleton /></li>
+                            <li className="pb-4"><AnnouncementSkeleton /></li>
+                        </>
+                      ) : announcements && announcements.length > 0 ? (
+                        announcements.map((announcement, announcementIdx) => (
+                          <li key={announcement.id}>
+                            <div className="relative pb-4">
+                              {announcementIdx !== announcements.length - 1 ? (
+                                <span
+                                  className="absolute left-4 top-4 -ml-px h-full w-0.5 bg-border"
+                                  aria-hidden="true"
+                                />
+                              ) : null}
+                              <div className="relative flex items-start space-x-3">
+                                <div className="relative">
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary ring-4 ring-background">
+                                    <Megaphone
+                                      className="h-4 w-4"
+                                      aria-hidden="true"
+                                    />
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="min-w-0 flex-1 py-1">
-                                <div className="text-sm text-muted-foreground">
-                                  <Badge variant={announcement.type === 'Update' ? 'default' : 'secondary'}>{announcement.type}</Badge>
-                                  <span className="ml-2 whitespace-nowrap">
-                                    {announcement.time}
-                                  </span>
-                                </div>
-                                <div className="mt-1">
-                                  <p className="text-sm text-foreground">
-                                    {announcement.content}
-                                  </p>
+                                <div className="min-w-0 flex-1 py-1">
+                                  <div className="text-sm text-muted-foreground">
+                                    <Badge variant={announcement.type === 'Update' ? 'default' : 'secondary'}>{announcement.type}</Badge>
+                                    {announcement.timestamp && (
+                                       <span className="ml-2 whitespace-nowrap">
+                                        {formatDistanceToNow(new Date(announcement.timestamp.seconds * 1000), { addSuffix: true })}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="mt-1">
+                                    <p className="text-sm font-semibold text-foreground">
+                                      {announcement.title}
+                                    </p>
+                                    <p className="text-sm text-foreground/80 mt-0.5">
+                                      {announcement.content}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
+                          </li>
+                        ))
+                      ) : (
+                        <li>
+                            <p className="text-sm text-muted-foreground text-center py-4">No announcements yet. Check back soon!</p>
                         </li>
-                      ))}
+                      )}
                     </ul>
                   </div>
               </CardContent>
@@ -248,3 +292,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    

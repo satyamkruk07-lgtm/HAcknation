@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { Timestamp } from 'firebase/firestore';
 
 export type Sponsor = {
   name: string;
@@ -6,10 +7,11 @@ export type Sponsor = {
 };
 
 export type Announcement = {
-  id: number;
-  type: "Update" | "Info";
-  time: string;
+  id: string;
+  title: string;
   content: string;
+  type: "Update" | "Info";
+  timestamp: Timestamp;
 };
 
 export type ScheduleEvent = {
@@ -48,3 +50,5 @@ export type ProjectIdea = {
   description: string;
   technologies: string[];
 };
+
+    

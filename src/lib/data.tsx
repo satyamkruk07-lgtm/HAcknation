@@ -1,6 +1,5 @@
-
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
-import type { Sponsor, Announcement, ScheduleEvent, Project, ProjectIdea } from './types';
+import type { Sponsor, ScheduleEvent, Project, ProjectIdea } from './types';
 
 export const sponsors: Sponsor[] = [
   { name: 'Innovate Inc.', icon: <Briefcase className="h-10 w-10 text-muted-foreground" /> },
@@ -15,12 +14,6 @@ export const sponsors: Sponsor[] = [
   { name: 'TestWorks', icon: <TestTube className="h-10 w-10 text-muted-foreground" /> },
   { name: 'AI Alchemists', icon: <BrainCircuit className="h-10 w-10 text-muted-foreground" /> },
   { name: 'SynthLabs', icon: <FlaskConical className="h-10 w-10 text-muted-foreground" /> },
-];
-
-export const announcements: Announcement[] = [
-  { id: 1, type: 'Info', time: '10 minutes ago', content: 'Welcome to HackNation! Check-in is now open at the main hall.' },
-  { id: 2, type: 'Update', time: '5 minutes ago', content: 'The "Intro to AI" workshop has been moved to Room 202.' },
-  { id: 3, type: 'Info', time: 'Just now', content: 'Lunch is being served in the main cafeteria. Enjoy the pizza!' },
 ];
 
 export const schedule: ScheduleEvent[] = [
@@ -295,7 +288,5 @@ export const projectIdeas: ProjectIdea[] = [
         technologies: ["WebSockets", "React", "Chart.js", "Firebase"]
     }
 ];
-
-    
 
     

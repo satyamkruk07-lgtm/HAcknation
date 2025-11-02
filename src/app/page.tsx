@@ -12,13 +12,34 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { announcements, sponsors } from '@/lib/data.tsx';
+import { sponsors } from '@/lib/data.tsx';
 import { Badge } from '@/components/ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { MainNav } from '@/components/main-nav';
 import { Footer } from '@/components/footer';
 
 const heroImage = PlaceHolderImages.find(p => p.id === "hero");
+
+const hardcodedAnnouncements = [
+    {
+      id: 1,
+      type: 'Info',
+      time: '10 minutes ago',
+      content: 'Welcome to HackNation! Check-in is now open at the main hall.',
+    },
+    {
+      id: 2,
+      type: 'Update',
+      time: '5 minutes ago',
+      content: 'The "Intro to AI" workshop has been moved to Room 202.',
+    },
+    {
+      id: 3,
+      type: 'Info',
+      time: 'Just now',
+      content: 'Lunch is being served in the main cafeteria. Enjoy the pizza!',
+    },
+  ];
 
 export default function Home() {
   return (
@@ -131,10 +152,10 @@ export default function Home() {
                 <CardContent className="p-6">
                   <div className="flow-root">
                     <ul className="-mb-8">
-                      {announcements.map((announcement, announcementIdx) => (
+                      {hardcodedAnnouncements.map((announcement, announcementIdx) => (
                         <li key={announcement.id}>
                           <div className="relative pb-8">
-                            {announcementIdx !== announcements.length - 1 ? (
+                            {announcementIdx !== hardcodedAnnouncements.length - 1 ? (
                               <span
                                 className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-border"
                                 aria-hidden="true"
