@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { LogOut, User as UserIcon, LayoutGrid } from 'lucide-react';
+import { LogOut, User as UserIcon, LayoutGrid, Shield } from 'lucide-react';
 
 export function MainNav() {
   const pathname = usePathname();
@@ -68,15 +68,21 @@ export function MainNav() {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
+                <Link href="/dashboard">
+                  <LayoutGrid className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
                 <Link href="/profile">
                   <UserIcon className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Link>
               </DropdownMenuItem>
                <DropdownMenuItem asChild>
-                <Link href="/dashboard">
-                  <LayoutGrid className="mr-2 h-4 w-4" />
-                  <span>Dashboard</span>
+                <Link href="/admin">
+                  <Shield className="mr-2 h-4 w-4" />
+                  <span>Admin</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -100,5 +106,3 @@ export function MainNav() {
     </div>
   );
 }
-
-    
