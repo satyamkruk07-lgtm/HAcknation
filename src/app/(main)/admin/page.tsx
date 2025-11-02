@@ -113,7 +113,7 @@ function CreateAnnouncementForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Card>
+      <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">
             Create Announcement
@@ -189,7 +189,7 @@ function UserManagementTab() {
   const { data: users, isLoading } = useCollection<UserAccount>(usersQuery);
 
   return (
-    <Card>
+    <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
       <CardHeader>
         <CardTitle className="font-headline text-2xl">User Management</CardTitle>
         <CardDescription>View and manage registered users.</CardDescription>
@@ -255,7 +255,7 @@ function ProjectManagementTab() {
     return query(collection(firestore, 'projects'), orderBy('submissionDate', 'desc'));
   }, [firestore]);
 
-  const { data: projects, isLoading } = useCollection<SubmittedProject>(projectsQuery);
+  const { data: projects, isLoading, error } = useCollection<SubmittedProject>(projectsQuery);
 
   const handleDeleteProject = async () => {
     if (!firestore || !projectToDelete) return;
@@ -280,7 +280,7 @@ function ProjectManagementTab() {
 
   return (
     <>
-      <Card>
+      <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
         <CardHeader>
           <CardTitle>Project Management</CardTitle>
           <CardDescription>View and manage all project submissions.</CardDescription>
@@ -366,30 +366,32 @@ function ProjectManagementTab() {
 
 export default function AdminPage() {
   return (
-    <div className="container py-12">
-      <div className="mb-8">
-        <h1 className="font-headline text-4xl font-bold">Admin Dashboard</h1>
-        <p className="mt-2 text-lg text-muted-foreground">
-          Manage your HackNation event from here.
-        </p>
-      </div>
+    <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
+      <div className="container py-12">
+        <div className="mb-8">
+          <h1 className="font-headline text-4xl font-bold tracking-tight">Admin Dashboard</h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            Manage your HackNation event from here.
+          </p>
+        </div>
 
-      <Tabs defaultValue="announcements" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="announcements">Announcements</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="projects">Projects</TabsTrigger>
-        </TabsList>
-        <TabsContent value="announcements" className="mt-6">
-          <CreateAnnouncementForm />
-        </TabsContent>
-        <TabsContent value="users" className="mt-6">
-          <UserManagementTab />
-        </TabsContent>
-        <TabsContent value="projects" className="mt-6">
-          <ProjectManagementTab />
-        </TabsContent>
-      </Tabs>
+        <Tabs defaultValue="announcements" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="announcements">Announcements</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="projects">Projects</TabsTrigger>
+          </TabsList>
+          <TabsContent value="announcements" className="mt-6">
+            <CreateAnnouncementForm />
+          </TabsContent>
+          <TabsContent value="users" className="mt-6">
+            <UserManagementTab />
+          </TabsContent>
+          <TabsContent value="projects" className="mt-6">
+            <ProjectManagementTab />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }
