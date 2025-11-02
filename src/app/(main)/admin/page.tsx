@@ -260,10 +260,30 @@ export default function AdminPage() {
           <UserManagementTab />
         </TabsContent>
         <TabsContent value="schedule" className="mt-6">
-            <p>Schedule management coming soon.</p>
+          <Card>
+            <CardHeader>
+              <CardTitle>Schedule Management</CardTitle>
+              <CardDescription>
+                This feature is currently under development.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Soon, you will be able to add, edit, and delete event schedule items from here.</p>
+            </CardContent>
+          </Card>
         </TabsContent>
         <TabsContent value="projects" className="mt-6">
-           <p>Project management coming soon.</p>
+          <Card>
+            <CardHeader>
+              <CardTitle>Project Management</CardTitle>
+              <CardDescription>
+                This feature is currently under development.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Soon, you will be able to view and manage all project submissions from this dashboard.</p>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
