@@ -1,5 +1,5 @@
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
-import type { Sponsor, ScheduleEvent, Project, ProjectIdea } from './types';
+import type { Sponsor, Project, ProjectIdea } from './types';
 
 export const sponsors: Sponsor[] = [
   { name: 'Innovate Inc.', icon: <Briefcase className="h-10 w-10 text-muted-foreground" /> },
@@ -16,18 +16,8 @@ export const sponsors: Sponsor[] = [
   { name: 'SynthLabs', icon: <FlaskConical className="h-10 w-10 text-muted-foreground" /> },
 ];
 
-export const schedule: ScheduleEvent[] = [
-  { id: 1, time: 'Day 1 - 09:00 AM', title: 'Opening Ceremony', description: 'Kick-off and welcome address.', type: 'milestone', icon: Flag },
-  { id: 2, time: 'Day 1 - 10:00 AM', title: 'Hacking Begins', description: 'Let the innovation start!', type: 'milestone', icon: Code },
-  { id: 3, time: 'Day 1 - 11:00 AM', title: 'Workshop: React State Management', description: 'By Jane Doe from Innovate Inc.', type: 'workshop', icon: Wrench, speaker: 'Jane Doe' },
-  { id: 4, time: 'Day 1 - 01:00 PM', title: 'Lunch Break', description: 'Pizza and networking.', type: 'social', icon: Pizza },
-  { id: 5, time: 'Day 1 - 03:00 PM', title: 'Talk: The Future of Web Dev', description: 'By John Smith from CodeCrafters.', type: 'talk', icon: Mic, speaker: 'John Smith' },
-  { id: 6, time: 'Day 1 - 07:00 PM', title: 'Dinner', description: 'Refuel for a long night of coding.', type: 'social', icon: Coffee },
-  { id: 7, time: 'Day 2 - 09:00 AM', title: 'Breakfast & Morning Updates', description: 'Start the day with coffee and announcements.', type: 'social', icon: Megaphone },
-  { id: 8, time: 'Day 2 - 12:00 PM', title: 'Submission Deadline', description: 'All projects must be submitted.', type: 'milestone', icon: Milestone },
-  { id: 9, time: 'Day 2 - 01:00 PM', title: 'Judging Begins', description: 'Present your projects to the judges.', type: 'milestone', icon: Presentation },
-  { id: 10, time: 'Day 2 - 04:00 PM', title: 'Closing Ceremony & Awards', description: 'Announcing the winners of HackNation!', type: 'milestone', icon: Trophy },
-];
+// This is now legacy data. All schedule management is done via the admin panel and Firestore.
+export const schedule = [];
 
 export const projects: Project[] = [
   { id: '1', name: 'EcoTrack', team: ['Alice', 'Bob'], description: 'A mobile app to track and reduce personal carbon footprint using gamification.', githubUrl: '#', demoUrl: '#' },

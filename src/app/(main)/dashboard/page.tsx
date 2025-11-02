@@ -18,9 +18,9 @@ import {
   FileText,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { schedule, sponsors } from '@/lib/data.tsx';
+import { sponsors } from '@/lib/data.tsx';
 import { Badge } from '@/components/ui/badge';
-import type { Announcement } from '@/lib/types';
+import type { Announcement, ScheduleEvent } from '@/lib/types';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -51,8 +51,6 @@ const features = [
   },
 ];
 
-const nextEvent = schedule.find((e) => e.id === 2) ?? schedule[0];
-
 function AnnouncementSkeleton() {
     return (
         <div className="relative flex items-start space-x-3">
@@ -74,12 +72,18 @@ export default function DashboardPage() {
 
   const announcementsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
-    // Query the top-level announcements, order by timestamp descending, and limit to 5
     return query(collection(firestore, 'announcements'), orderBy('timestamp', 'desc'), limit(5));
   }, [firestore]);
 
-  const { data: announcements, isLoading: areAnnouncementsLoading } = useCollection<Announcement>(announcementsQuery);
+  const scheduleQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'schedule'), orderBy('sortTime', 'asc'), limit(1));
+  }, [firestore]);
 
+  const { data: announcements, isLoading: areAnnouncementsLoading } = useCollection<Announcement>(announcementsQuery);
+  const { data: schedule, isLoading: isScheduleLoading } = useCollection<ScheduleEvent>(scheduleQuery);
+  
+  const nextEvent = schedule?.[0];
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -230,25 +234,36 @@ export default function DashboardPage() {
           {/* Right Column */}
           <div className="space-y-8">
             {/* Next Event */}
-            {nextEvent && (
-              <Card className="bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
-                <CardHeader>
+            <Card className="bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
+             <CardHeader>
                   <CardTitle className="flex items-center gap-3 text-xl">
                     <Clock className="h-6 w-6" />
-                    <span>Up Next: {nextEvent.title}</span>
+                    <span>
+                      {isScheduleLoading ? <Skeleton className="h-6 w-48 inline-block" /> : nextEvent ? `Up Next: ${nextEvent.title}` : 'Up Next'}
+                    </span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-primary-foreground/80">{nextEvent.description}</p>
-                  <div className="mt-3 flex items-center gap-4 text-xs">
-                    <span className="font-semibold">{nextEvent.time}</span>
-                    {nextEvent.speaker && (
-                      <span className="truncate">- {nextEvent.speaker}</span>
-                    )}
-                  </div>
+                  {isScheduleLoading ? (
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                  ): nextEvent ? (
+                    <>
+                    <p className="text-sm text-primary-foreground/80">{nextEvent.description}</p>
+                    <div className="mt-3 flex items-center gap-4 text-xs">
+                      <span className="font-semibold">{nextEvent.time}</span>
+                      {nextEvent.speaker && (
+                        <span className="truncate">- {nextEvent.speaker}</span>
+                      )}
+                    </div>
+                    </>
+                  ) : (
+                     <p className="text-sm text-primary-foreground/80">No upcoming events. Stay tuned!</p>
+                  )}
                 </CardContent>
-              </Card>
-            )}
+            </Card>
 
             {/* My Project */}
             <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
