@@ -60,7 +60,7 @@ export default function SubmitPage() {
       const projectsCollection = collection(firestore, 'projects');
       await addDoc(projectsCollection, {
         name: projectName,
-        studentNames: teamMembers.split(',').map((m) => m.trim()),
+        teamMembers: teamMembers.split(',').map((m) => m.trim()),
         description,
         githubUrl,
         demoUrl,

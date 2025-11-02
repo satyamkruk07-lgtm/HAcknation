@@ -37,6 +37,7 @@ export type SubmittedProject = {
   id: string;
   name: string;
   studentNames: string[];
+  teamMembers?: string[]; // Add optional teamMembers
   description: string;
   githubUrl: string;
   demoUrl: string;
