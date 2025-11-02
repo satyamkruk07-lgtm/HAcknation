@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebase';
 import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import {
@@ -57,6 +57,8 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+
+const adminEmails = ['kalyanikri1111@gmail.com', 'frgtpeople@gmail.com'];
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -194,7 +196,7 @@ function UserManagementTab() {
   const { user, isUserLoading } = useUser();
   const [selectedUser, setSelectedUser] = useState<UserAccount | null>(null);
 
-  const isAdmin = user?.email && ['kalyanikri1111@gmail.com', 'frgtpeople@gmail.com'].includes(user.email);
+  const isAdmin = user?.email && adminEmails.includes(user.email);
 
   const usersQuery = useMemoFirebase(() => {
     if (!firestore || !isAdmin) return null; // Only create query if user is an admin
@@ -432,6 +434,27 @@ function ProjectManagementTab() {
 }
 
 export default function AdminPage() {
+  const { user, isUserLoading } = useUser();
+  const router = useRouter();
+
+  const isAdmin = user?.email && adminEmails.includes(user.email);
+
+  useEffect(() => {
+    if (!isUserLoading) {
+      if (!isAdmin) {
+        router.push('/login');
+      }
+    }
+  }, [user, isUserLoading, isAdmin, router]);
+
+  if (isUserLoading || !isAdmin) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
