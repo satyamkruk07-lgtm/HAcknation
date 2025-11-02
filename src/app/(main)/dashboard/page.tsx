@@ -2,7 +2,7 @@
 
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,6 +50,68 @@ const features = [
     icon: Lightbulb,
   },
 ];
+
+function Countdown() {
+    const deadline = new Date('2025-11-13T11:00:00');
+    const [timeLeft, setTimeLeft] = useState({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+    });
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const now = new Date();
+            const difference = deadline.getTime() - now.getTime();
+
+            if (difference > 0) {
+                setTimeLeft({
+                    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+                    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+                    minutes: Math.floor((difference / 1000 / 60) % 60),
+                    seconds: Math.floor((difference / 1000) % 60),
+                });
+            } else {
+                setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+                clearInterval(timer);
+            }
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [deadline]);
+
+    return (
+        <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-3 font-headline">
+                    <Clock className="h-6 w-6 text-accent" />
+                    <span>Submission Deadline</span>
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-4 gap-2 text-center">
+                    <div>
+                        <div className="text-3xl font-bold font-mono">{String(timeLeft.days).padStart(2, '0')}</div>
+                        <div className="text-xs text-muted-foreground">DAYS</div>
+                    </div>
+                    <div>
+                        <div className="text-3xl font-bold font-mono">{String(timeLeft.hours).padStart(2, '0')}</div>
+                        <div className="text-xs text-muted-foreground">HOURS</div>
+                    </div>
+                    <div>
+                        <div className="text-3xl font-bold font-mono">{String(timeLeft.minutes).padStart(2, '0')}</div>
+                        <div className="text-xs text-muted-foreground">MINUTES</div>
+                    </div>
+                    <div>
+                        <div className="text-3xl font-bold font-mono">{String(timeLeft.seconds).padStart(2, '0')}</div>
+                        <div className="text-xs text-muted-foreground">SECONDS</div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+    );
+}
 
 function AnnouncementSkeleton() {
     return (
@@ -225,7 +287,7 @@ export default function DashboardPage() {
 
           {/* Right Column */}
           <div className="space-y-8">
-            
+            <Countdown />
 
             {/* My Project */}
             <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
@@ -239,23 +301,6 @@ export default function DashboardPage() {
                 <p className="text-sm text-muted-foreground mb-4">You have not submitted a project yet. The deadline is approaching!</p>
                 <Button asChild className="w-full">
                   <Link href="/submit">Submit Your Project</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-3 font-headline">
-                  <Lightbulb className="h-6 w-6 text-accent" />
-                  <span>AI-Powered Ideas</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Stuck for an idea? Brainstorm with our AI assistant or browse curated project ideas.
-                </p>
-                <Button asChild className="w-full">
-                  <Link href="/ai-discussion">Get Inspired</Link>
                 </Button>
               </CardContent>
             </Card>
