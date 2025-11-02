@@ -19,11 +19,13 @@ const ScheduleTimeline = ({ events }: { events: ScheduleEvent[] }) => (
     />
     <ul className="space-y-8">
       {events.map((event) => (
-        <li key={event.id} className="relative pl-16">
-          <div className="absolute left-0 top-1.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground ring-8 ring-background">
+        <li key={event.id} className="relative pl-16 group">
+           <div
+            className="absolute left-0 top-1.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground ring-8 ring-background transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg"
+          >
             <event.icon className="h-5 w-5" aria-hidden="true" />
           </div>
-          <div>
+          <div className="bg-card p-4 rounded-lg border shadow-sm transition-all duration-300 group-hover:shadow-xl group-hover:scale-[1.02] group-hover:-translate-x-1">
             <div className="text-sm font-semibold text-muted-foreground">
               {event.time.split(' - ')[1]}
             </div>
