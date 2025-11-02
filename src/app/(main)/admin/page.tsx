@@ -284,7 +284,7 @@ function ProjectManagementTab() {
               projects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell className="font-medium">{project.name}</TableCell>
-                  <TableCell>{(project.teamMembers || project.studentNames || []).join(', ')}</TableCell>
+                  <TableCell>{(project.teamMembers || []).join(', ')}</TableCell>
                   <TableCell>
                     {project.submissionDate
                       ? format(new Date(project.submissionDate.seconds * 1000), 'PPp')
@@ -330,7 +330,7 @@ function ScheduleManagementTab() {
   const [currentEvent, setCurrentEvent] = useState<Partial<ScheduleEvent> | null>(null);
 
   const handleAddNew = () => {
-    setCurrentEvent({});
+    setCurrentEvent({type: 'default'});
     setIsDialogOpen(true);
   };
   
@@ -353,10 +353,10 @@ function ScheduleManagementTab() {
     if (!timeStr) return '';
     
     const parts = timeStr.toLowerCase().split(' - ');
-    if (parts.length < 2) return timeStr; // Fallback for invalid format
+    if (parts.length < 2) return timeStr; 
 
-    const dayPart = parts[0]; // "day 1" or "day 2"
-    const timePart = parts[1]; // "hh:mm am/pm"
+    const dayPart = parts[0]; 
+    const timePart = parts[1]; 
 
     const dayNumber = dayPart.includes('1') ? '1' : '2';
 
@@ -376,29 +376,30 @@ function ScheduleManagementTab() {
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!firestore || !currentEvent || !currentEvent.time) return;
+    if (!firestore || !currentEvent || !currentEvent.time || !currentEvent.title || !currentEvent.description) {
+        toast({ variant: 'destructive', title: 'Missing Fields', description: 'Please fill out all required fields.' });
+        return;
+    }
 
     setIsSubmitting(true);
     
     const sortTime = createSortableTime(currentEvent.time);
 
-    const eventData: Partial<ScheduleEvent> = {
+    const eventData: Omit<ScheduleEvent, 'id'> = {
         time: currentEvent.time,
         title: currentEvent.title,
         description: currentEvent.description,
-        speaker: currentEvent.speaker || null,
+        speaker: currentEvent.speaker || '',
         sortTime: sortTime,
         type: currentEvent.type || 'default',
     };
 
     try {
         if (currentEvent.id) {
-            // Update existing event
             const eventRef = doc(firestore, 'schedule', currentEvent.id);
             await setDoc(eventRef, eventData, { merge: true });
             toast({ title: 'Event Updated', description: 'The schedule has been successfully updated.' });
         } else {
-            // Create new event
             await addDoc(collection(firestore, 'schedule'), eventData);
             toast({ title: 'Event Added', description: 'A new event has been added to the schedule.' });
         }
@@ -431,7 +432,7 @@ function ScheduleManagementTab() {
             <TableRow>
               <TableHead>Time</TableHead>
               <TableHead>Title</TableHead>
-              <TableHead>Description</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Speaker</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -442,7 +443,7 @@ function ScheduleManagementTab() {
                 <TableRow key={i}>
                   <TableCell><Skeleton className="h-5 w-24" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-40" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-64" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-20" /></TableCell>
                   <TableCell><Skeleton className="h-5 w-32" /></TableCell>
                   <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
                 </TableRow>
@@ -452,7 +453,7 @@ function ScheduleManagementTab() {
                 <TableRow key={event.id}>
                   <TableCell className="font-medium">{event.time}</TableCell>
                   <TableCell>{event.title}</TableCell>
-                  <TableCell>{event.description}</TableCell>
+                  <TableCell><span className='capitalize'>{event.type}</span></TableCell>
                   <TableCell>{event.speaker || 'N/A'}</TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button variant="outline" size="icon" onClick={() => handleEdit(event)}><Edit className="h-4 w-4" /></Button>
@@ -491,14 +492,33 @@ function ScheduleManagementTab() {
                     <Label htmlFor="event-description">Description</Label>
                     <Textarea id="event-description" value={currentEvent?.description || ''} onChange={(e) => setCurrentEvent({...currentEvent, description: e.target.value})} placeholder="Describe the event" required />
                 </div>
+                 <div>
+                    <Label htmlFor="event-type">Type</Label>
+                     <Select
+                        value={currentEvent?.type || 'default'}
+                        onValueChange={(value) => setCurrentEvent({...currentEvent, type: value as any})}
+                    >
+                        <SelectTrigger id="event-type">
+                            <SelectValue placeholder="Select event type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                             <SelectItem value="default">Default</SelectItem>
+                             <SelectItem value="milestone">Milestone</SelectItem>
+                             <SelectItem value="workshop">Workshop</SelectItem>
+                             <SelectItem value="talk">Talk</SelectItem>
+                             <SelectItem value="social">Social</SelectItem>
+                             <SelectItem value="flag">Flag</SelectItem>
+                             <SelectItem value="code">Code</SelectItem>
+                             <SelectItem value="coffee">Coffee</SelectItem>
+                             <SelectItem value="megaphone">Megaphone</SelectItem>
+                             <SelectItem value="presentation">Presentation</SelectItem>
+                             <SelectItem value="trophy">Trophy</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
                 <div>
                     <Label htmlFor="event-speaker">Speaker (Optional)</Label>
                     <Input id="event-speaker" value={currentEvent?.speaker || ''} onChange={(e) => setCurrentEvent({...currentEvent, speaker: e.target.value})} placeholder="e.g., Jane Doe" />
-                </div>
-                 <div>
-                    <Label htmlFor="event-type">Type (Optional)</Label>
-                     <Input id="event-type" value={currentEvent?.type || ''} onChange={(e) => setCurrentEvent({...currentEvent, type: e.target.value as any})} placeholder="e.g., workshop, talk, milestone" />
-                     <p className='text-xs text-muted-foreground'>Use keywords like: milestone, workshop, talk, social, flag, code, coffee, megaphone, presentation, trophy.</p>
                 </div>
                 <DialogFooter>
                     <DialogClose asChild>
@@ -526,7 +546,7 @@ export default function AdminPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="announcements" className="w-full">
+      <Tabs defaultValue="schedule" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="announcements">Announcements</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
