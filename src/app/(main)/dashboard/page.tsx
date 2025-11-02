@@ -74,8 +74,7 @@ export default function DashboardPage() {
 
   const announcementsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
-    // Assuming a single event for now, so we query the top-level announcements.
-    // In a multi-event app, you'd filter by eventID.
+    // Query the top-level announcements, order by timestamp descending, and limit to 5
     return query(collection(firestore, 'announcements'), orderBy('timestamp', 'desc'), limit(5));
   }, [firestore]);
 
@@ -292,5 +291,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
