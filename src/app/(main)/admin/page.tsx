@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ExternalLink, Github, Loader2, PlusCircle, Trash2, Edit } from 'lucide-react';
+import { ExternalLink, Github, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -34,30 +34,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { UserAccount, SubmittedProject, ScheduleEvent } from '@/lib/types';
+import type { UserAccount, SubmittedProject } from '@/lib/types';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogClose
-} from '@/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -295,7 +274,7 @@ function ProjectManagementTab() {
               projects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell className="font-medium">{project.name}</TableCell>
-                  <TableCell>{(project.teamMembers || []).join(', ')}</TableCell>
+                  <TableCell>{(project.studentNames || project.teamMembers || []).join(', ')}</TableCell>
                   <TableCell>
                     {project.submissionDate
                       ? format(new Date(project.submissionDate.seconds * 1000), 'PPp')
@@ -325,255 +304,6 @@ function ProjectManagementTab() {
   );
 }
 
-
-function ScheduleManagementTab() {
-  const firestore = useFirestore();
-  const { toast } = useToast();
-  const scheduleQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'schedule'), orderBy('sortTime', 'asc'));
-  }, [firestore]);
-
-  const { data: schedule, isLoading, error } = useCollection<ScheduleEvent>(scheduleQuery);
-  
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentEvent, setCurrentEvent] = useState<Partial<ScheduleEvent> | null>(null);
-
-  const handleAddNew = () => {
-    setCurrentEvent({type: 'default'});
-    setIsDialogOpen(true);
-  };
-  
-  const handleEdit = (event: ScheduleEvent) => {
-    setCurrentEvent(event);
-    setIsDialogOpen(true);
-  };
-  
-  const handleDelete = async (eventId: string) => {
-    if (!firestore) return;
-    try {
-      await deleteDoc(doc(firestore, 'schedule', eventId));
-      toast({ title: 'Event Deleted', description: 'The schedule has been updated.' });
-    } catch (e: any) {
-      toast({ variant: 'destructive', title: 'Error deleting event', description: e.message });
-    }
-  };
-
-  const createSortableTime = (timeStr: string): string => {
-    if (!timeStr) return '';
-    const parts = timeStr.toLowerCase().split(' - ');
-    if (parts.length < 2) return timeStr;
-  
-    const dayPart = parts[0];
-    const timePart = parts[1];
-    const dayNumber = dayPart.includes('1') ? '1' : '2';
-  
-    const timeMatch = timePart.match(/(\d{1,2}):(\d{2})\s*(am|pm)/);
-    if (!timeMatch) return `day${dayNumber}-error`;
-  
-    let hours = parseInt(timeMatch[1], 10);
-    const minutes = timeMatch[2];
-    const modifier = timeMatch[3];
-  
-    if (modifier === 'pm' && hours < 12) {
-      hours += 12;
-    }
-    if (modifier === 'am' && hours === 12) {
-      // Midnight case
-      hours = 0;
-    }
-  
-    return `day${dayNumber}-${String(hours).padStart(2, '0')}${minutes}`;
-  };
-
-  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!firestore || !currentEvent || !currentEvent.time || !currentEvent.title || !currentEvent.description) {
-        toast({ variant: 'destructive', title: 'Missing Fields', description: 'Please fill out all required fields.' });
-        return;
-    }
-
-    setIsSubmitting(true);
-    
-    const sortTime = createSortableTime(currentEvent.time);
-
-    const eventData: Omit<ScheduleEvent, 'id'> = {
-        time: currentEvent.time,
-        title: currentEvent.title,
-        description: currentEvent.description,
-        speaker: currentEvent.speaker || '',
-        sortTime: sortTime,
-        type: currentEvent.type || 'default',
-    };
-
-    try {
-        if (currentEvent.id) {
-            const eventRef = doc(firestore, 'schedule', currentEvent.id);
-            await setDoc(eventRef, eventData, { merge: true });
-            toast({ title: 'Event Updated', description: 'The schedule has been successfully updated.' });
-        } else {
-            await addDoc(collection(firestore, 'schedule'), eventData);
-            toast({ title: 'Event Added', description: 'A new event has been added to the schedule.' });
-        }
-        setIsDialogOpen(false);
-        setCurrentEvent(null);
-    } catch (error: any) {
-        toast({
-            variant: 'destructive',
-            title: 'Operation Failed',
-            description: error.message || 'An unknown error occurred.',
-        });
-    } finally {
-        setIsSubmitting(false);
-    }
-  };
-
-  const eventTypes = [
-    { value: 'default', label: 'Default' },
-    { value: 'milestone', label: 'Milestone' },
-    { value: 'workshop', label: 'Workshop' },
-    { value: 'talk', label: 'Talk' },
-    { value: 'social', label: 'Social' },
-    { value: 'flag', label: 'Flag' },
-    { value: 'code', label: 'Code' },
-    { value: 'coffee', label: 'Coffee' },
-    { value: 'megaphone', label: 'Megaphone' },
-    { value: 'presentation', label: 'Presentation' },
-    { value: 'trophy', label: 'Trophy' },
-  ];
-
-
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Schedule Management</CardTitle>
-          <CardDescription>View, add, edit, or delete schedule events.</CardDescription>
-        </div>
-        <Button onClick={handleAddNew}><PlusCircle className="mr-2 h-4 w-4" /> Add Event</Button>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Time</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Speaker</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isLoading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <TableRow key={i}>
-                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-40" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-20" /></TableCell>
-                  <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                  <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
-                </TableRow>
-              ))
-            ) : schedule && schedule.length > 0 ? (
-              schedule.map((event) => (
-                <TableRow key={event.id}>
-                  <TableCell className="font-medium">{event.time}</TableCell>
-                  <TableCell>{event.title}</TableCell>
-                  <TableCell><span className='capitalize'>{event.type}</span></TableCell>
-                  <TableCell>{event.speaker || 'N/A'}</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button variant="outline" size="icon" onClick={() => handleEdit(event)}><Edit className="h-4 w-4" /></Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button variant="destructive" size="icon"><Trash2 className="h-4 w-4" /></Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently delete this event
-                            from the schedule.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(event.id)}>Continue</AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-                <TableRow>
-                    <TableCell colSpan={5} className="text-center h-24">
-                        {error ? `Error: ${error.message}` : 'No schedule events found. Click "Add Event" to create one.'}
-                    </TableCell>
-                </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{currentEvent?.id ? 'Edit Event' : 'Add New Event'}</DialogTitle>
-              <DialogDescription>
-                Fill in the details for the schedule item.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleFormSubmit} className="space-y-4 py-4">
-                <div>
-                    <Label htmlFor="event-time">Time</Label>
-                    <Input id="event-time" value={currentEvent?.time || ''} onChange={(e) => setCurrentEvent({...currentEvent, time: e.target.value})} placeholder="e.g., Day 1 - 09:00 AM" required />
-                </div>
-                <div>
-                    <Label htmlFor="event-title">Title</Label>
-                    <Input id="event-title" value={currentEvent?.title || ''} onChange={(e) => setCurrentEvent({...currentEvent, title: e.target.value})} placeholder="e.g., Opening Ceremony" required />
-                </div>
-                <div>
-                    <Label htmlFor="event-description">Description</Label>
-                    <Textarea id="event-description" value={currentEvent?.description || ''} onChange={(e) => setCurrentEvent({...currentEvent, description: e.target.value})} placeholder="Describe the event" required />
-                </div>
-                 <div>
-                    <Label htmlFor="event-type">Type</Label>
-                     <Select
-                        value={currentEvent?.type || 'default'}
-                        onValueChange={(value) => setCurrentEvent({...currentEvent, type: value as any})}
-                    >
-                        <SelectTrigger id="event-type">
-                            <SelectValue placeholder="Select event type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {eventTypes.map((type) => (
-                                <SelectItem key={type.value} value={type.value}>
-                                    {type.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div>
-                    <Label htmlFor="event-speaker">Speaker (Optional)</Label>
-                    <Input id="event-speaker" value={currentEvent?.speaker || ''} onChange={(e) => setCurrentEvent({...currentEvent, speaker: e.target.value})} placeholder="e.g., Jane Doe" />
-                </div>
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button type="button" variant="secondary">Cancel</Button>
-                    </DialogClose>
-                    <Button type="submit" disabled={isSubmitting}>
-                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {currentEvent?.id ? 'Save Changes' : 'Create Event'}
-                    </Button>
-                </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-    </Card>
-  );
-}
-
 export default function AdminPage() {
   return (
     <div className="container py-12">
@@ -584,11 +314,10 @@ export default function AdminPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="schedule" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="announcements" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="announcements">Announcements</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="projects">Projects</TabsTrigger>
         </TabsList>
         <TabsContent value="announcements" className="mt-6">
@@ -596,9 +325,6 @@ export default function AdminPage() {
         </TabsContent>
         <TabsContent value="users" className="mt-6">
           <UserManagementTab />
-        </TabsContent>
-        <TabsContent value="schedule" className="mt-6">
-           <ScheduleManagementTab />
         </TabsContent>
         <TabsContent value="projects" className="mt-6">
           <ProjectManagementTab />

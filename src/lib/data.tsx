@@ -1,5 +1,5 @@
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
-import type { Sponsor, Project, ProjectIdea } from './types';
+import type { Sponsor, Project, ProjectIdea, ScheduleEvent } from './types';
 
 export const sponsors: Sponsor[] = [
   { name: 'Innovate Inc.', icon: <Briefcase className="h-10 w-10 text-muted-foreground" /> },
@@ -16,8 +16,23 @@ export const sponsors: Sponsor[] = [
   { name: 'SynthLabs', icon: <FlaskConical className="h-10 w-10 text-muted-foreground" /> },
 ];
 
-// This is now legacy data. All schedule management is done via the admin panel and Firestore.
-export const schedule = [];
+export const schedule: ScheduleEvent[] = [
+    { id: '1', time: 'Day 1 - 09:00 AM', title: 'Registration & Breakfast', description: 'Check-in, grab your swag, and fuel up for the day.', type: 'default', icon: Coffee },
+    { id: '2', time: 'Day 1 - 10:00 AM', title: 'Opening Ceremony', description: 'Kick-off speeches and introduction to the hackathon theme.', type: 'milestone', icon: Milestone },
+    { id: '3', time: 'Day 1 - 11:00 AM', title: 'Hacking Begins', description: 'Start your engines! Let the coding commence.', type: 'flag', icon: Flag },
+    { id: '4', time: 'Day 1 - 01:00 PM', title: 'Lunch', description: 'Refuel and connect with fellow hackers.', type: 'social', icon: Pizza },
+    { id: '5', time: 'Day 1 - 02:00 PM', title: 'Workshop: Intro to Genkit', description: 'Learn the basics of building AI-powered apps with Genkit.', type: 'workshop', icon: Wrench },
+    { id: '6', time: 'Day 1 - 04:00 PM', title: 'Tech Talk: Scaling with Firebase', description: 'Discover how to build scalable applications with Firebase.', type: 'talk', icon: Mic },
+    { id: '7', time: 'Day 1 - 07:00 PM', title: 'Dinner', description: 'Enjoy a delicious dinner on us.', type: 'social', icon: Pizza },
+    { id: '8', time: 'Day 1 - 09:00 PM', title: 'Mini-Event: Code Trivia', description: 'Test your knowledge and win prizes.', type: 'social', icon: Code },
+    { id: '9', time: 'Day 2 - 12:00 AM', title: 'Midnight Milestone', description: 'Project check-in and late-night snacks.', type: 'milestone', icon: Milestone },
+    { id: '10', time: 'Day 2 - 08:00 AM', title: 'Breakfast', description: 'Good morning! Time for the final push.', type: 'default', icon: Coffee },
+    { id: '11', time: 'Day 2 - 11:00 AM', title: 'Hacking Ends', description: 'Pencils down! Submit your projects.', type: 'flag', icon: Flag },
+    { id: '12', time: 'Day 2 - 11:30 AM', title: 'Project Expo & Judging', description: 'Showcase your project to judges and attendees.', type: 'presentation', icon: Presentation },
+    { id: '13', time: 'Day 2 - 01:00 PM', title: 'Lunch', description: 'Celebrate your hard work with a final meal together.', type: 'social', icon: Pizza },
+    { id: '14', time: 'Day 2 - 02:30 PM', title: 'Closing Ceremony & Awards', description: 'Announcing the winners and closing remarks.', type: 'milestone', icon: Trophy },
+];
+
 
 export const projects: Project[] = [
   { id: '1', name: 'EcoTrack', team: ['Alice', 'Bob'], description: 'A mobile app to track and reduce personal carbon footprint using gamification.', githubUrl: '#', demoUrl: '#' },
@@ -280,3 +295,4 @@ export const projectIdeas: ProjectIdea[] = [
 ];
 
     
+
