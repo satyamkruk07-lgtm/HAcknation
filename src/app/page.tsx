@@ -20,27 +20,6 @@ import { Footer } from '@/components/footer';
 
 const heroImage = PlaceHolderImages.find(p => p.id === "hero");
 
-const hardcodedAnnouncements = [
-    {
-      id: 1,
-      type: 'Info',
-      time: '10 minutes ago',
-      content: 'Welcome to HackNation! Check-in is now open at the main hall.',
-    },
-    {
-      id: 2,
-      type: 'Update',
-      time: '5 minutes ago',
-      content: 'The "Intro to AI" workshop has been moved to Room 202.',
-    },
-    {
-      id: 3,
-      type: 'Info',
-      time: 'Just now',
-      content: 'Lunch is being served in the main cafeteria. Enjoy the pizza!',
-    },
-  ];
-
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
@@ -142,59 +121,6 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="announcements" className="py-20 bg-background">
-          <div className="container">
-            <h2 className="mb-8 text-center font-headline text-3xl font-bold">
-              Live Announcements
-            </h2>
-            <div className="mx-auto max-w-2xl">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flow-root">
-                    <ul className="-mb-8">
-                      {hardcodedAnnouncements.map((announcement, announcementIdx) => (
-                        <li key={announcement.id}>
-                          <div className="relative pb-8">
-                            {announcementIdx !== hardcodedAnnouncements.length - 1 ? (
-                              <span
-                                className="absolute left-5 top-5 -ml-px h-full w-0.5 bg-border"
-                                aria-hidden="true"
-                              />
-                            ) : null}
-                            <div className="relative flex items-start space-x-3">
-                              <div className="relative">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground ring-8 ring-background">
-                                  <Megaphone
-                                    className="h-5 w-5"
-                                    aria-hidden="true"
-                                  />
-                                </div>
-                              </div>
-                              <div className="min-w-0 flex-1 py-1.5">
-                                <div className="text-sm text-muted-foreground">
-                                  <Badge variant={announcement.type === 'Update' ? 'default' : 'secondary'}>{announcement.type}</Badge>
-                                  <span className="ml-2 whitespace-nowrap">
-                                    {announcement.time}
-                                  </span>
-                                </div>
-                                <div className="mt-2">
-                                  <p className="text-foreground">
-                                    {announcement.content}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
-        
         <section id="sponsors" className="py-16 bg-background">
           <div className="container">
             <h2 className="text-center text-3xl font-headline font-bold mb-12">
