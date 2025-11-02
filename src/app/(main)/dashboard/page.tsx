@@ -106,8 +106,8 @@ export default function DashboardPage() {
               <h2 className="mb-4 font-headline text-2xl font-bold">Quick Actions</h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {features.map((feature) => (
-                  <Link href={feature.href} key={feature.name}>
-                    <Card className="group h-full transition-all hover:border-accent hover:shadow-md">
+                  <Link href={feature.href} key={feature.name} className="group block">
+                    <Card className="h-full transition-all duration-300 ease-in-out group-hover:shadow-2xl group-hover:-translate-y-2">
                       <CardContent className="p-6">
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-4">
@@ -133,7 +133,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Announcements */}
-            <Card>
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 font-headline">
                   <Megaphone className="h-6 w-6 text-accent" />
@@ -188,7 +188,7 @@ export default function DashboardPage() {
           <div className="space-y-8">
             {/* Next Event */}
             {nextEvent && (
-              <Card className="bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground">
+              <Card className="bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-3 text-xl">
                     <Clock className="h-6 w-6" />
@@ -208,7 +208,7 @@ export default function DashboardPage() {
             )}
 
             {/* My Project */}
-            <Card>
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 font-headline">
                   <FileText className="h-6 w-6 text-accent" />
@@ -224,7 +224,7 @@ export default function DashboardPage() {
             </Card>
             
             {/* Sponsors */}
-            <Card>
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-3 font-headline">
                     <HeartHandshake className="h-6 w-6 text-accent" />
