@@ -1,3 +1,4 @@
+
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
 import type { Sponsor, Announcement, ScheduleEvent, Project, ProjectIdea } from './types';
 
@@ -25,7 +26,7 @@ export const announcements: Announcement[] = [
 export const schedule: ScheduleEvent[] = [
   { id: 1, time: 'Day 1 - 09:00 AM', title: 'Opening Ceremony', description: 'Kick-off and welcome address.', type: 'milestone', icon: Flag },
   { id: 2, time: 'Day 1 - 10:00 AM', title: 'Hacking Begins', description: 'Let the innovation start!', type: 'milestone', icon: Code },
-  { id: 3, time: 'Day 1 - 11:00 AM', title: 'Workshop: React State Management', description: 'By Jane Doe from Innovate Inc.', type: 'workshop', icon: Wrench, speaker: 'Jane Doe' },
+  { id: 3, time: 'Day 1 - 11:00 AM', title: 'Workshop: React State Management', description: 'By Sartaj Khan(HOD) from Innovate Inc.', type: 'workshop', icon: Wrench, speaker: 'Sartaj Khan(HOD)' },
   { id: 4, time: 'Day 1 - 01:00 PM', title: 'Lunch Break', description: 'Pizza and networking.', type: 'social', icon: Pizza },
   { id: 5, time: 'Day 1 - 03:00 PM', title: 'Talk: The Future of Web Dev', description: 'By John Smith from CodeCrafters.', type: 'talk', icon: Mic, speaker: 'John Smith' },
   { id: 6, time: 'Day 1 - 07:00 PM', title: 'Dinner', description: 'Refuel for a long night of coding.', type: 'social', icon: Coffee },
