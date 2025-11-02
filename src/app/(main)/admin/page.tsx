@@ -47,6 +47,17 @@ import {
   DialogTrigger,
   DialogClose
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -284,7 +295,7 @@ function ProjectManagementTab() {
               projects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell className="font-medium">{project.name}</TableCell>
-                  <TableCell>{(project.teamMembers || []).join(', ')}</TableCell>
+                  <TableCell>{(project.teamMembers || project.studentNames || []).join(', ')}</TableCell>
                   <TableCell>
                     {project.submissionDate
                       ? format(new Date(project.submissionDate.seconds * 1000), 'PPp')
@@ -340,7 +351,7 @@ function ScheduleManagementTab() {
   };
   
   const handleDelete = async (eventId: string) => {
-    if (!firestore || !window.confirm('Are you sure you want to delete this event?')) return;
+    if (!firestore) return;
     try {
       await deleteDoc(doc(firestore, 'schedule', eventId));
       toast({ title: 'Event Deleted', description: 'The schedule has been updated.' });
@@ -365,11 +376,10 @@ function ScheduleManagementTab() {
     const minutes = timeMatch[2];
     const modifier = timeMatch[3];
 
-    if (modifier === 'pm' && hours < 12) {
+    if (hours === 12) {
+      hours = modifier === 'am' ? 0 : 12;
+    } else if (modifier === 'pm') {
       hours += 12;
-    }
-    if (modifier === 'am' && hours === 12) { // Handle midnight
-      hours = 0;
     }
 
     return `day${dayNumber}-${String(hours).padStart(2, '0')}${minutes}`;
@@ -458,7 +468,24 @@ function ScheduleManagementTab() {
                   <TableCell>{event.speaker || 'N/A'}</TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button variant="outline" size="icon" onClick={() => handleEdit(event)}><Edit className="h-4 w-4" /></Button>
-                    <Button variant="destructive" size="icon" onClick={() => handleDelete(event.id)}><Trash2 className="h-4 w-4" /></Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="icon"><Trash2 className="h-4 w-4" /></Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete this event
+                            from the schedule.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(event.id)}>Continue</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </TableCell>
                 </TableRow>
               ))
@@ -507,7 +534,7 @@ function ScheduleManagementTab() {
                              <SelectItem value="milestone">Milestone</SelectItem>
                              <SelectItem value="workshop">Workshop</SelectItem>
                              <SelectItem value="talk">Talk</SelectItem>
-                             <SelectItem value="social">Social</SelectItem>
+                             <SelectItem value-="social">Social</SelectItem>
                              <SelectItem value="flag">Flag</SelectItem>
                              <SelectItem value="code">Code</SelectItem>
                              <SelectItem value="coffee">Coffee</SelectItem>
