@@ -75,16 +75,8 @@ export default function DashboardPage() {
     return query(collection(firestore, 'announcements'), orderBy('timestamp', 'desc'), limit(5));
   }, [firestore]);
 
-  const scheduleQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'schedule'), orderBy('sortTime', 'asc'), limit(1));
-  }, [firestore]);
-
   const { data: announcements, isLoading: areAnnouncementsLoading } = useCollection<Announcement>(announcementsQuery);
-  const { data: schedule, isLoading: isScheduleLoading } = useCollection<ScheduleEvent>(scheduleQuery);
   
-  const nextEvent = schedule?.[0];
-
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/login');
@@ -229,39 +221,6 @@ export default function DashboardPage() {
                   </div>
               </CardContent>
             </Card>
-
-            {/* Next Event */}
-            <Card className="bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
-             <CardHeader>
-                  <CardTitle className="flex items-center gap-3 text-xl">
-                    <Clock className="h-6 w-6" />
-                    <span>
-                      {isScheduleLoading ? <Skeleton className="h-6 w-48 inline-block" /> : nextEvent ? `Up Next: ${nextEvent.title}` : 'Up Next'}
-                    </span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {isScheduleLoading ? (
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </div>
-                  ): nextEvent ? (
-                    <>
-                    <p className="text-sm text-primary-foreground/80">{nextEvent.description}</p>
-                    <div className="mt-3 flex items-center gap-4 text-xs">
-                      <span className="font-semibold">{nextEvent.time}</span>
-                      {nextEvent.speaker && (
-                        <span className="truncate">- {nextEvent.speaker}</span>
-                      )}
-                    </div>
-                    </>
-                  ) : (
-                     <p className="text-sm text-primary-foreground/80">No upcoming events. Stay tuned!</p>
-                  )}
-                </CardContent>
-            </Card>
-
           </div>
 
           {/* Right Column */}
