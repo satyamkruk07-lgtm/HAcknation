@@ -382,12 +382,13 @@ function ScheduleManagementTab() {
     
     const sortTime = createSortableTime(currentEvent.time);
 
-    const eventData = {
+    const eventData: Partial<ScheduleEvent> = {
         time: currentEvent.time,
         title: currentEvent.title,
         description: currentEvent.description,
         speaker: currentEvent.speaker || null,
         sortTime: sortTime,
+        type: currentEvent.type || 'default',
     };
 
     try {
@@ -494,6 +495,11 @@ function ScheduleManagementTab() {
                     <Label htmlFor="event-speaker">Speaker (Optional)</Label>
                     <Input id="event-speaker" value={currentEvent?.speaker || ''} onChange={(e) => setCurrentEvent({...currentEvent, speaker: e.target.value})} placeholder="e.g., Jane Doe" />
                 </div>
+                 <div>
+                    <Label htmlFor="event-type">Type (Optional)</Label>
+                     <Input id="event-type" value={currentEvent?.type || ''} onChange={(e) => setCurrentEvent({...currentEvent, type: e.target.value as any})} placeholder="e.g., workshop, talk, milestone" />
+                     <p className='text-xs text-muted-foreground'>Use keywords like: milestone, workshop, talk, social, flag, code, coffee, megaphone, presentation, trophy.</p>
+                </div>
                 <DialogFooter>
                     <DialogClose asChild>
                         <Button type="button" variant="secondary">Cancel</Button>
@@ -543,5 +549,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
