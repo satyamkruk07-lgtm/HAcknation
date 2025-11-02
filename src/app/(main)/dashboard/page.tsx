@@ -229,10 +229,7 @@ export default function DashboardPage() {
                   </div>
               </CardContent>
             </Card>
-          </div>
 
-          {/* Right Column */}
-          <div className="space-y-8">
             {/* Next Event */}
             <Card className="bg-gradient-to-br from-primary/90 to-primary/70 text-primary-foreground transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
              <CardHeader>
@@ -264,6 +261,12 @@ export default function DashboardPage() {
                   )}
                 </CardContent>
             </Card>
+
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-8">
+            
 
             {/* My Project */}
             <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
