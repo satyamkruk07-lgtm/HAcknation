@@ -22,7 +22,7 @@ export type ScheduleEvent = {
   description: string;
   speaker?: string;
   // The 'type' and 'icon' properties might be deprecated if not used in Firestore model
-  type?: 'workshop' | 'talk' | 'milestone' | 'social';
+  type?: 'workshop' | 'talk' | 'milestone' | 'social' | 'default' | 'flag' | 'code' | 'coffee' | 'megaphone' | 'presentation' | 'trophy' ;
   icon?: LucideIcon;
 };
 
@@ -38,7 +38,7 @@ export type Project = {
 export type SubmittedProject = {
   id: string;
   name: string;
-  studentNames: string[];
+  studentNames?: string[];
   teamMembers?: string[]; // Add optional teamMembers
   description: string;
   githubUrl: string;
@@ -65,4 +65,5 @@ export type ProjectIdea = {
   technologies: string[];
 };
 
+    
     

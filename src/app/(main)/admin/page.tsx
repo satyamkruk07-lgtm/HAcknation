@@ -284,7 +284,7 @@ function ProjectManagementTab() {
               projects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell className="font-medium">{project.name}</TableCell>
-                  <TableCell>{(project.studentNames || project.teamMembers || []).join(', ')}</TableCell>
+                  <TableCell>{(project.teamMembers || project.studentNames || []).join(', ')}</TableCell>
                   <TableCell>
                     {project.submissionDate
                       ? format(new Date(project.submissionDate.seconds * 1000), 'PPp')
@@ -462,7 +462,7 @@ function ScheduleManagementTab() {
             ) : (
                 <TableRow>
                     <TableCell colSpan={5} className="text-center h-24">
-                        {error ? `Error: ${error.message}` : 'No schedule events found.'}
+                        {error ? `Error: ${error.message}` : 'No schedule events found. Click "Add Event" to create one.'}
                     </TableCell>
                 </TableRow>
             )}
@@ -543,3 +543,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
