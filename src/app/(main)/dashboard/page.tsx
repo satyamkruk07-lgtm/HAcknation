@@ -288,8 +288,6 @@ export default function DashboardPage() {
           {/* Right Column */}
           <div className="space-y-8">
             <Countdown />
-
-            {/* My Project */}
             <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 font-headline">
@@ -304,8 +302,6 @@ export default function DashboardPage() {
                 </Button>
               </CardContent>
             </Card>
-            
-            {/* Sponsors */}
             <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-3 font-headline">
