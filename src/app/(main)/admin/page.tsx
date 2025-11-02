@@ -351,27 +351,28 @@ function ScheduleManagementTab() {
 
   const createSortableTime = (timeStr: string): string => {
     if (!timeStr) return '';
-    
     const parts = timeStr.toLowerCase().split(' - ');
-    if (parts.length < 2) return timeStr; 
+    if (parts.length < 2) return timeStr;
 
-    const dayPart = parts[0]; 
-    const timePart = parts[1]; 
-
+    const dayPart = parts[0];
+    const timePart = parts[1];
     const dayNumber = dayPart.includes('1') ? '1' : '2';
 
-    let [time, modifier] = timePart.split(' ');
-    let [hours, minutes] = time.split(':');
+    const timeMatch = timePart.match(/(\d{1,2}):(\d{2})\s*(am|pm)/);
+    if (!timeMatch) return `day${dayNumber}-error`;
 
-    if (hours === '12') {
-        hours = '00';
+    let hours = parseInt(timeMatch[1], 10);
+    const minutes = timeMatch[2];
+    const modifier = timeMatch[3];
+
+    if (modifier === 'pm' && hours < 12) {
+      hours += 12;
+    }
+    if (modifier === 'am' && hours === 12) { // Handle midnight
+      hours = 0;
     }
 
-    if (modifier === 'pm') {
-        hours = (parseInt(hours, 10) + 12).toString();
-    }
-
-    return `day${dayNumber}-${hours.padStart(2, '0')}${minutes}`;
+    return `day${dayNumber}-${String(hours).padStart(2, '0')}${minutes}`;
   };
 
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -569,3 +570,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
