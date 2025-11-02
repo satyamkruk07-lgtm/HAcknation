@@ -17,6 +17,7 @@ export type Announcement = {
 export type ScheduleEvent = {
   id: string; // Changed from number to string for Firestore IDs
   time: string;
+  sortTime: string; // For chronological sorting, e.g., "day1-0900", "day1-1300"
   title: string;
   description: string;
   speaker?: string;

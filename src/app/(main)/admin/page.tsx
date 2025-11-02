@@ -320,8 +320,7 @@ function ScheduleManagementTab() {
   const { toast } = useToast();
   const scheduleQuery = useMemoFirebase(() => {
     if (!firestore) return null;
-    // Assuming a top-level 'schedule' collection for simplicity
-    return query(collection(firestore, 'schedule'), orderBy('time', 'asc'));
+    return query(collection(firestore, 'schedule'), orderBy('sortTime', 'asc'));
   }, [firestore]);
 
   const { data: schedule, isLoading, error } = useCollection<ScheduleEvent>(scheduleQuery);
@@ -350,16 +349,45 @@ function ScheduleManagementTab() {
     }
   };
 
+  const createSortableTime = (timeStr: string): string => {
+    if (!timeStr) return '';
+    
+    const parts = timeStr.toLowerCase().split(' - ');
+    if (parts.length < 2) return timeStr; // Fallback for invalid format
+
+    const dayPart = parts[0]; // "day 1" or "day 2"
+    const timePart = parts[1]; // "hh:mm am/pm"
+
+    const dayNumber = dayPart.includes('1') ? '1' : '2';
+
+    let [time, modifier] = timePart.split(' ');
+    let [hours, minutes] = time.split(':');
+
+    if (hours === '12') {
+        hours = '00';
+    }
+
+    if (modifier === 'pm') {
+        hours = (parseInt(hours, 10) + 12).toString();
+    }
+
+    return `day${dayNumber}-${hours.padStart(2, '0')}${minutes}`;
+  };
+
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!firestore || !currentEvent) return;
+    if (!firestore || !currentEvent || !currentEvent.time) return;
 
     setIsSubmitting(true);
+    
+    const sortTime = createSortableTime(currentEvent.time);
+
     const eventData = {
         time: currentEvent.time,
         title: currentEvent.title,
         description: currentEvent.description,
         speaker: currentEvent.speaker || null,
+        sortTime: sortTime,
     };
 
     try {

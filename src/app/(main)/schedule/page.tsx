@@ -6,7 +6,7 @@ import { collection, query, orderBy } from 'firebase/firestore';
 import type { ScheduleEvent } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Flag, Code, Wrench, Pizza, Mic, Coffee, Megaphone, Milestone, Presentation, Trophy, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { schedule as staticSchedule } from '@/lib/data.tsx';
 
 // Helper to map event type to icon
@@ -15,9 +15,9 @@ const getIconForEvent = (eventType?: string) => {
   if (staticEvent) return staticEvent.icon;
   
   // Fallback icons
-  if (eventType?.includes('workshop')) return Wrench;
-  if (eventType?.includes('talk')) return Mic;
-  if (eventType?.includes('meal') || eventType?.includes('lunch') || eventType?.includes('dinner')) return Pizza;
+  if (eventType?.toLowerCase().includes('workshop')) return staticSchedule.find(e => e.type === 'workshop')?.icon;
+  if (eventType?.toLowerCase().includes('talk')) return staticSchedule.find(e => e.type === 'talk')?.icon;
+  if (eventType?.toLowerCase().includes('meal') || eventType?.toLowerCase().includes('lunch') || eventType?.toLowerCase().includes('dinner')) return staticSchedule.find(e => e.type === 'social')?.icon;
   
   return Clock;
 };
@@ -92,7 +92,7 @@ export default function SchedulePage() {
 
     const scheduleQuery = useMemoFirebase(() => {
         if (!firestore) return null;
-        return query(collection(firestore, 'schedule'), orderBy('time', 'asc'));
+        return query(collection(firestore, 'schedule'), orderBy('sortTime', 'asc'));
     }, [firestore]);
 
     const { data: schedule, isLoading, error } = useCollection<ScheduleEvent>(scheduleQuery);
