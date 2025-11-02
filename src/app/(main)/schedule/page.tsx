@@ -1,115 +1,66 @@
 'use client';
 
 import { useMemo } from 'react';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
-import type { ScheduleEvent } from '@/lib/types';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Clock } from 'lucide-react';
 import { schedule as staticSchedule } from '@/lib/data.tsx';
+import type { ScheduleEvent as ScheduleEventType } from '@/lib/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Clock } from 'lucide-react';
 
-// Helper to map event type to icon
-const getIconForEvent = (eventType?: string) => {
-  const staticEvent = staticSchedule.find(e => e.title.toLowerCase().includes(eventType?.toLowerCase() || ''));
-  if (staticEvent) return staticEvent.icon;
-  
-  // Fallback icons
-  if (eventType?.toLowerCase().includes('workshop')) return staticSchedule.find(e => e.type === 'workshop')?.icon;
-  if (eventType?.toLowerCase().includes('talk')) return staticSchedule.find(e => e.type === 'talk')?.icon;
-  if (eventType?.toLowerCase().includes('meal') || eventType?.toLowerCase().includes('lunch') || eventType?.toLowerCase().includes('dinner')) return staticSchedule.find(e => e.type === 'social')?.icon;
-  
-  return Clock;
-};
-
-
-const ScheduleTimeline = ({ events, isLoading }: { events: ScheduleEvent[], isLoading: boolean }) => {
-
-    if (isLoading) {
-        return (
-             <div className="relative pt-6">
-                <div className="absolute left-6 top-0 h-full w-0.5 bg-border" aria-hidden="true" />
-                <ul className="space-y-8">
-                    {Array.from({length: 4}).map((_, i) => (
-                         <li key={i} className="relative pl-16">
-                             <Skeleton className="absolute left-0 top-1.5 h-10 w-10 rounded-full" />
-                             <div className='space-y-2'>
-                                <Skeleton className="h-4 w-1/4" />
-                                <Skeleton className="h-6 w-3/4" />
-                                <Skeleton className="h-4 w-full" />
-                             </div>
-                         </li>
-                    ))}
-                </ul>
-             </div>
-        )
-    }
-
-    if (events.length === 0) {
-        return (
-            <div className="text-center py-10">
-                <p className="text-muted-foreground">No events scheduled for this day yet.</p>
-            </div>
-        )
-    }
-
+const ScheduleTimeline = ({ events }: { events: ScheduleEventType[] }) => {
+  if (events.length === 0) {
     return (
-        <div className="relative pt-6">
-            <div className="absolute left-6 top-0 h-full w-0.5 bg-border" aria-hidden="true" />
-            <ul className="space-y-8">
-            {events.map((event) => {
-                const EventIcon = getIconForEvent(event.title) || Clock;
-                return (
-                    <li key={event.id} className="relative pl-16 group">
-                        <div
-                            className="absolute left-0 top-1.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground ring-8 ring-background transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg"
-                        >
-                            <EventIcon className="h-5 w-5" aria-hidden="true" />
-                        </div>
-                        <div className="bg-card p-4 rounded-lg border shadow-sm transition-all duration-300 group-hover:shadow-xl group-hover:scale-[1.02] group-hover:-translate-x-1">
-                            <div className="text-sm font-semibold text-muted-foreground">
-                                {/* Extracts time like "09:00 AM" from "Day 1 - 09:00 AM" */}
-                                {event.time.split(' - ')[1] || event.time}
-                            </div>
-                            <h3 className="mt-1 text-lg font-semibold">{event.title}</h3>
-                            <p className="mt-1 text-muted-foreground">{event.description}</p>
-                            {event.speaker && (
-                            <p className="mt-2 text-sm font-medium">
-                                Speaker: {event.speaker}
-                            </p>
-                            )}
-                        </div>
-                    </li>
-                )
-            })}
-            </ul>
-        </div>
+      <div className="text-center py-10">
+        <p className="text-muted-foreground">No events scheduled for this day yet.</p>
+      </div>
     );
+  }
+
+  return (
+    <div className="relative pt-6">
+      <div className="absolute left-6 top-0 h-full w-0.5 bg-border" aria-hidden="true" />
+      <ul className="space-y-8">
+        {events.map((event) => {
+          const EventIcon = event.icon || Clock;
+          return (
+            <li key={event.id} className="relative pl-16 group">
+              <div className="absolute left-0 top-1.5 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground ring-8 ring-background transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg">
+                <EventIcon className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div className="bg-card p-4 rounded-lg border shadow-sm transition-all duration-300 group-hover:shadow-xl group-hover:scale-[1.02] group-hover:-translate-x-1">
+                <div className="text-sm font-semibold text-muted-foreground">
+                  {event.time.split(' - ')[1] || event.time}
+                </div>
+                <h3 className="mt-1 text-lg font-semibold">{event.title}</h3>
+                <p className="mt-1 text-muted-foreground">{event.description}</p>
+                {event.speaker && (
+                  <p className="mt-2 text-sm font-medium">
+                    Speaker: {event.speaker}
+                  </p>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
 };
 
 export default function SchedulePage() {
-    const firestore = useFirestore();
-
-    const scheduleQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
-        return query(collection(firestore, 'schedule'), orderBy('sortTime', 'asc'));
-    }, [firestore]);
-
-    const { data: schedule, isLoading, error } = useCollection<ScheduleEvent>(scheduleQuery);
-    
-    const { day1Events, day2Events } = useMemo(() => {
-        const d1: ScheduleEvent[] = [];
-        const d2: ScheduleEvent[] = [];
-        schedule?.forEach(event => {
-            if (event.time.toLowerCase().startsWith('day 1')) {
-                d1.push(event);
-            } else if (event.time.toLowerCase().startsWith('day 2')) {
-                d2.push(event);
-            }
-        });
-        return { day1Events: d1, day2Events: d2 };
-    }, [schedule]);
-
+  const { day1Events, day2Events } = useMemo(() => {
+    const d1: ScheduleEventType[] = [];
+    const d2: ScheduleEventType[] = [];
+    staticSchedule.forEach(event => {
+      // The static data ID is a number, so we convert it to a string
+      const eventWithStrId = { ...event, id: String(event.id) };
+      if (event.time.toLowerCase().startsWith('day 1')) {
+        d1.push(eventWithStrId);
+      } else if (event.time.toLowerCase().startsWith('day 2')) {
+        d2.push(eventWithStrId);
+      }
+    });
+    return { day1Events: d1, day2Events: d2 };
+  }, []);
 
   return (
     <div className="container py-12">
@@ -125,13 +76,12 @@ export default function SchedulePage() {
             <TabsTrigger value="day2">Day 2</TabsTrigger>
           </TabsList>
           <TabsContent value="day1">
-            <ScheduleTimeline events={day1Events} isLoading={isLoading} />
+            <ScheduleTimeline events={day1Events} />
           </TabsContent>
           <TabsContent value="day2">
-            <ScheduleTimeline events={day2Events} isLoading={isLoading} />
+            <ScheduleTimeline events={day2Events} />
           </TabsContent>
         </Tabs>
-        {error && <p className="text-center text-destructive mt-4">Error loading schedule: {error.message}</p>}
       </div>
     </div>
   );
