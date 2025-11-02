@@ -92,7 +92,7 @@ export default function DashboardPage() {
               Welcome, {user.displayName || 'Hacker'}!
             </h1>
             <p className="mt-2 text-lg text-muted-foreground">
-              Your HackTrack journey starts here. Let&apos;s get building!
+              Your HackNation journey starts here. Let&apos;s get building!
             </p>
           </div>
         </div>

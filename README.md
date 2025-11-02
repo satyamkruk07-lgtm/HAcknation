@@ -1,6 +1,6 @@
-# HackTrack
+# HackNation
 
-This is a Next.js application for the HackTrack hackathon event, built with Firebase and Genkit.
+This is a Next.js application for the HackNation hackathon event, built with Firebase and Genkit.
 
 ## Core Features
 

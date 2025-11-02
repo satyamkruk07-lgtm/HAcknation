@@ -17,7 +17,7 @@ export const sponsors: Sponsor[] = [
 ];
 
 export const announcements: Announcement[] = [
-  { id: 1, type: 'Info', time: '10 minutes ago', content: 'Welcome to HackTrack! Check-in is now open at the main hall.' },
+  { id: 1, type: 'Info', time: '10 minutes ago', content: 'Welcome to HackNation! Check-in is now open at the main hall.' },
   { id: 2, type: 'Update', time: '5 minutes ago', content: 'The "Intro to AI" workshop has been moved to Room 202.' },
   { id: 3, type: 'Info', time: 'Just now', content: 'Lunch is being served in the main cafeteria. Enjoy the pizza!' },
 ];
@@ -32,7 +32,7 @@ export const schedule: ScheduleEvent[] = [
   { id: 7, time: 'Day 2 - 09:00 AM', title: 'Breakfast & Morning Updates', description: 'Start the day with coffee and announcements.', type: 'social', icon: Megaphone },
   { id: 8, time: 'Day 2 - 12:00 PM', title: 'Submission Deadline', description: 'All projects must be submitted.', type: 'milestone', icon: Milestone },
   { id: 9, time: 'Day 2 - 01:00 PM', title: 'Judging Begins', description: 'Present your projects to the judges.', type: 'milestone', icon: Presentation },
-  { id: 10, time: 'Day 2 - 04:00 PM', title: 'Closing Ceremony & Awards', description: 'Announcing the winners of HackTrack!', type: 'milestone', icon: Trophy },
+  { id: 10, time: 'Day 2 - 04:00 PM', title: 'Closing Ceremony & Awards', description: 'Announcing the winners of HackNation!', type: 'milestone', icon: Trophy },
 ];
 
 export const projects: Project[] = [

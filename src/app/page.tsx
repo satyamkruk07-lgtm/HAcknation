@@ -43,7 +43,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-black/80" />
           <div className="container text-center relative">
             <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl text-primary-foreground">
-              HackTrack
+              HackNation
             </h1>
             <p className="mx-auto mt-4 max-w-[700px] text-lg md:text-xl text-primary-foreground/80">
               Innovate. Collaborate. Create. The future is in your hands.
@@ -70,10 +70,10 @@ export default function Home() {
           <div className="container grid gap-12 md:grid-cols-2">
             <div>
               <h2 className="font-headline text-3xl font-bold">
-                About HackTrack
+                About HackNation
               </h2>
               <p className="mt-4 text-muted-foreground text-lg">
-                HackTrack is the country's most prestigious hackathon, bringing
+                HackNation is the country's most prestigious hackathon, bringing
                 together the brightest minds to solve real-world problems
                 through technology. Over 48 hours, participants will form
                 teams, brainstorm ideas, and build a project from scratch with

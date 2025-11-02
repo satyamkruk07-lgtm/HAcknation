@@ -37,7 +37,7 @@ const prompt = ai.definePrompt({
   name: 'chatPrompt',
   input: {schema: ChatInputSchema},
   output: {schema: ChatOutputSchema},
-  prompt: `You are a helpful AI assistant for participants in a hackathon called HackTrack. Your role is to help them with their projects. You can help them brainstorm ideas, refine features, suggest technologies, and provide code snippets. Be encouraging and supportive.
+  prompt: `You are a helpful AI assistant for participants in a hackathon called HackNation. Your role is to help them with their projects. You can help them brainstorm ideas, refine features, suggest technologies, and provide code snippets. Be encouraging and supportive.
 
 Here is the conversation history:
 {{#each messages}}

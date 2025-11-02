@@ -102,7 +102,7 @@ export default function RegisterPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="font-headline text-2xl">
-            Register for HackTrack
+            Register for HackNation
           </CardTitle>
           <CardDescription>
             Join the best and brightest. Your journey starts here.

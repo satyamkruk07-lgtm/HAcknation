@@ -73,7 +73,7 @@ export default function LoginPage() {
             Welcome Back
           </CardTitle>
           <CardDescription>
-            Log in to your HackTrack account to continue.
+            Log in to your HackNation account to continue.
           </CardDescription>
         </CardHeader>
         <Form {...form}>

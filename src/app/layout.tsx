@@ -18,7 +18,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'HackTrack',
+  title: 'HackNation',
   description: 'The premier national level hackathon for innovators and creators.',
 };
 
