@@ -6,7 +6,7 @@
  * Public read access is granted to certain collections like 'events' and 'announcements', but write access is strictly controlled.
  *
  * Data Structure:
- * - /users/{userId}: Stores personal user profiles; access is restricted to the owner for writes, but readable by any signed-in user for team-finding purposes.
+ * - /users/{userId}: Stores personal user profiles; access is restricted to the owner for writes, but readable by any signed-in user for team-finding purposes. Admins can read all user profiles.
  * - /events/{eventId}: Stores event details; publicly readable.
  * - /events/{eventId}/scheduleItems/{scheduleItemId}: Stores schedule items for events; publicly readable.
  * - /announcements: Stores announcements for events; readable by authenticated users.
@@ -18,7 +18,7 @@
  * - /roles_event_admin/{userId}: Collection to store event administrator roles; existence of document indicates admin role.
  *
  * Key Security Decisions:
- * - User listing is allowed for any authenticated user to facilitate team formation.
+ * - User listing is allowed for any authenticated user to facilitate team formation. Admins can list all users for management.
  * - Public read access is granted to 'events' and 'scheduleItems'.
  * - Authenticated users can read 'announcements'.
  * - Only team members can access the team projects.
@@ -33,11 +33,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description: Secure user profiles; only the owner can read or write their own profile.
+     * @description: Secure user profiles; only the owner can read or write their own profile. Admins can read any profile.
      * @path: /users/{userId}
      * @allow: (create) User 'user123' can create /users/user123.
      * @deny: (create) User 'user456' cannot create /users/user123.
-     * @principle: Enforces document ownership for all operations.
+     * @principle: Enforces document ownership for all operations, with admin read override.
      */
     match /users/{userId} {
       function isSignedIn() {
@@ -48,12 +48,18 @@ service cloud.firestore {
         return isSignedIn() && request.auth.uid == userId;
       }
 
-      allow get: if isOwner(userId);
-      allow list: if isSignedIn(); // Allow authenticated users to list profiles for team building.
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isSignedIn(); // Allow authenticated users to list profiles for team building. Admins have a more specific rule below.
       allow create: if isOwner(userId);
       allow update: if isOwner(userId) && request.resource.data.id == resource.data.id; // Enforce immutability
       allow delete: if isOwner(userId) && resource != null; // Check document existence before deletion.
     }
+
+    // Specific rule for admins to list all users, overriding the general list rule for /users.
+    match /users/{userId} {
+        allow list: if isAdmin();
+    }
+
 
     /**
      * @description: Allow public read access to events; restrict write access.
@@ -96,7 +102,7 @@ service cloud.firestore {
       }
 
       allow get, list: if isSignedIn();
-      allow create: if isSignedIn();
+      allow create: if isAdmin();
       allow update: if isAdmin() && resource != null;
       allow delete: if isAdmin() && resource != null;
     }
@@ -215,7 +221,7 @@ service cloud.firestore {
       * @description: Check if the user is an admin.
       */
     function isAdmin() {
-       return exists(/databases/$(database)/documents/roles_event_admin/$(request.auth.uid));
+       return request.auth != null && (request.auth.token.email == 'kalyanikri1111@gmail.com' || request.auth.token.email == 'frgtpeople@gmail.com');
     }
   }
 }
