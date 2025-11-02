@@ -380,6 +380,7 @@ function ScheduleManagementTab() {
       hours += 12;
     }
     if (modifier === 'am' && hours === 12) {
+      // Midnight case
       hours = 0;
     }
   
