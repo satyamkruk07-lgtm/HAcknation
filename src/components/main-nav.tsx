@@ -19,6 +19,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, User as UserIcon, LayoutGrid, Shield } from 'lucide-react';
 
+const adminEmails = ['kalyanikri1111@gmail.com', 'frgtpeople@gmail.com'];
+
 export function MainNav() {
   const pathname = usePathname();
   const { user, auth, isUserLoading } = useUser();
@@ -36,6 +38,8 @@ export function MainNav() {
       .map((n) => n[0])
       .join('');
   };
+  
+  const isAdmin = user && user.email && adminEmails.includes(user.email);
 
   return (
     <div className="flex w-full items-center justify-between">
@@ -79,12 +83,14 @@ export function MainNav() {
                   <span>Profile</span>
                 </Link>
               </DropdownMenuItem>
-               <DropdownMenuItem asChild>
-                <Link href="/admin">
-                  <Shield className="mr-2 h-4 w-4" />
-                  <span>Admin</span>
-                </Link>
-              </DropdownMenuItem>
+               {isAdmin && (
+                <DropdownMenuItem asChild>
+                  <Link href="/admin">
+                    <Shield className="mr-2 h-4 w-4" />
+                    <span>Admin</span>
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
