@@ -32,7 +32,7 @@ export default function AiDiscussionPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {ideas.map((idea, index) => (
-            <Card key={index} className="flex flex-col">
+            <Card key={index} className="flex flex-col transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
               <CardHeader>
                 <CardTitle className="flex items-start gap-3">
                     <Lightbulb className="h-6 w-6 mt-1 text-accent flex-shrink-0" />
