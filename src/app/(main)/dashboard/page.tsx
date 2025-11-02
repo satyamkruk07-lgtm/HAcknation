@@ -16,6 +16,8 @@ import {
   HeartHandshake,
   Megaphone,
   FileText,
+  MessageSquare,
+  Zap,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { sponsors } from '@/lib/data.tsx';
@@ -50,6 +52,24 @@ const features = [
     icon: Lightbulb,
   },
 ];
+
+const hackathonTips = [
+    {
+        icon: Zap,
+        title: "Keep Your Idea Simple",
+        description: "Focus on a core feature. It's better to have one polished feature than five buggy ones. You only have 48 hours!"
+    },
+    {
+        icon: MessageSquare,
+        title: "Communicate with Your Team",
+        description: "Talk regularly. Set clear roles. Use tools like Git for code and Discord for communication to stay in sync."
+    },
+    {
+        icon: Lightbulb,
+        title: "Don't Be Afraid to Pivot",
+        description: "If your initial idea isn't working or you think of something better, it's okay to change direction. Adaptability is key."
+    }
+]
 
 function Countdown() {
     const deadline = new Date('2025-11-13T11:00:00');
@@ -283,6 +303,33 @@ export default function DashboardPage() {
                   </div>
               </CardContent>
             </Card>
+
+            {/* Hackathon Tips */}
+            <div>
+              <h2 className="mb-4 font-headline text-2xl font-bold">Hackathon Tips</h2>
+              <div className="grid grid-cols-1 gap-6">
+                {hackathonTips.map((tip, index) => (
+                   <Card key={index} className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                            <tip.icon className="h-6 w-6" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-base">
+                              {tip.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {tip.description}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                ))}
+              </div>
+            </div>
+
           </div>
 
           {/* Right Column */}
