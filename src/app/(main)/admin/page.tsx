@@ -295,7 +295,7 @@ function ProjectManagementTab() {
               projects.map((project) => (
                 <TableRow key={project.id}>
                   <TableCell className="font-medium">{project.name}</TableCell>
-                  <TableCell>{(project.teamMembers || project.studentNames || []).join(', ')}</TableCell>
+                  <TableCell>{(project.teamMembers || []).join(', ')}</TableCell>
                   <TableCell>
                     {project.submissionDate
                       ? format(new Date(project.submissionDate.seconds * 1000), 'PPp')
@@ -364,24 +364,25 @@ function ScheduleManagementTab() {
     if (!timeStr) return '';
     const parts = timeStr.toLowerCase().split(' - ');
     if (parts.length < 2) return timeStr;
-
+  
     const dayPart = parts[0];
     const timePart = parts[1];
     const dayNumber = dayPart.includes('1') ? '1' : '2';
-
+  
     const timeMatch = timePart.match(/(\d{1,2}):(\d{2})\s*(am|pm)/);
     if (!timeMatch) return `day${dayNumber}-error`;
-
+  
     let hours = parseInt(timeMatch[1], 10);
     const minutes = timeMatch[2];
     const modifier = timeMatch[3];
-
-    if (hours === 12) {
-      hours = modifier === 'am' ? 0 : 12;
-    } else if (modifier === 'pm') {
+  
+    if (modifier === 'pm' && hours < 12) {
       hours += 12;
     }
-
+    if (modifier === 'am' && hours === 12) {
+      hours = 0;
+    }
+  
     return `day${dayNumber}-${String(hours).padStart(2, '0')}${minutes}`;
   };
 
@@ -426,6 +427,20 @@ function ScheduleManagementTab() {
         setIsSubmitting(false);
     }
   };
+
+  const eventTypes = [
+    { value: 'default', label: 'Default' },
+    { value: 'milestone', label: 'Milestone' },
+    { value: 'workshop', label: 'Workshop' },
+    { value: 'talk', label: 'Talk' },
+    { value: 'social', label: 'Social' },
+    { value: 'flag', label: 'Flag' },
+    { value: 'code', label: 'Code' },
+    { value: 'coffee', label: 'Coffee' },
+    { value: 'megaphone', label: 'Megaphone' },
+    { value: 'presentation', label: 'Presentation' },
+    { value: 'trophy', label: 'Trophy' },
+  ];
 
 
   return (
@@ -530,17 +545,11 @@ function ScheduleManagementTab() {
                             <SelectValue placeholder="Select event type" />
                         </SelectTrigger>
                         <SelectContent>
-                             <SelectItem value="default">Default</SelectItem>
-                             <SelectItem value="milestone">Milestone</SelectItem>
-                             <SelectItem value="workshop">Workshop</SelectItem>
-                             <SelectItem value="talk">Talk</SelectItem>
-                             <SelectItem value-="social">Social</SelectItem>
-                             <SelectItem value="flag">Flag</SelectItem>
-                             <SelectItem value="code">Code</SelectItem>
-                             <SelectItem value="coffee">Coffee</SelectItem>
-                             <SelectItem value="megaphone">Megaphone</SelectItem>
-                             <SelectItem value="presentation">Presentation</SelectItem>
-                             <SelectItem value="trophy">Trophy</SelectItem>
+                            {eventTypes.map((type) => (
+                                <SelectItem key={type.value} value={type.value}>
+                                    {type.label}
+                                </SelectItem>
+                            ))}
                         </SelectContent>
                     </Select>
                 </div>
@@ -597,5 +606,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
