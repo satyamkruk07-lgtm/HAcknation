@@ -191,14 +191,19 @@ function CreateAnnouncementForm() {
 
 function UserManagementTab() {
   const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
   const [selectedUser, setSelectedUser] = useState<UserAccount | null>(null);
 
-  const usersQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'));
-  }, [firestore]);
+  const isAdmin = user?.email && ['kalyanikri1111@gmail.com', 'frgtpeople@gmail.com'].includes(user.email);
 
-  const { data: users, isLoading } = useCollection<UserAccount>(usersQuery);
+  const usersQuery = useMemoFirebase(() => {
+    if (!firestore || !isAdmin) return null; // Only create query if user is an admin
+    return query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'));
+  }, [firestore, isAdmin]);
+
+  const { data: users, isLoading: isUsersLoading } = useCollection<UserAccount>(usersQuery);
+  const isLoading = isUserLoading || (isAdmin && isUsersLoading);
+
 
   return (
     <>
@@ -247,7 +252,7 @@ function UserManagementTab() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center">
-                    No users found.
+                    {!isAdmin && !isUserLoading ? "You don't have permission to view users." : "No users found."}
                   </TableCell>
                 </TableRow>
               )}
@@ -457,3 +462,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    

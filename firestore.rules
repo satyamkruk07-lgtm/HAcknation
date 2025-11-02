@@ -49,17 +49,11 @@ service cloud.firestore {
       }
 
       allow get: if isOwner(userId) || isAdmin();
-      allow list: if isSignedIn(); // Allow authenticated users to list profiles for team building. Admins have a more specific rule below.
+      allow list: if isAdmin(); // Only admins can list all users.
       allow create: if isOwner(userId);
       allow update: if isOwner(userId) && request.resource.data.id == resource.data.id; // Enforce immutability
       allow delete: if isOwner(userId) && resource != null; // Check document existence before deletion.
     }
-
-    // Specific rule for admins to list all users, overriding the general list rule for /users.
-    match /users/{userId} {
-        allow list: if isAdmin();
-    }
-
 
     /**
      * @description: Allow public read access to events; restrict write access.
@@ -222,3 +216,5 @@ service cloud.firestore {
     }
   }
 }
+
+    
