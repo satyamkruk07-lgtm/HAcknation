@@ -24,7 +24,6 @@ export const schedule: ScheduleEvent[] = [
     { id: '5', time: 'Day 1 - 02:00 PM', title: 'Workshop: Intro to Genkit', description: 'Learn the basics of building AI-powered apps with Genkit.', type: 'workshop', icon: Wrench },
     { id: '6', time: 'Day 1 - 04:00 PM', title: 'Tech Talk: Scaling with Firebase', description: 'Discover how to build scalable applications with Firebase.', type: 'talk', icon: Mic },
     { id: '7', time: 'Day 1 - 07:00 PM', title: 'Dinner', description: 'Enjoy a delicious dinner on us.', type: 'social', icon: Pizza },
-    { id: '8', time: 'Day 1 - 09:00 PM', title: 'Mini-Event: Code Trivia', description: 'Test your knowledge and win prizes.', type: 'social', icon: Code },
     { id: '9', time: 'Day 2 - 12:00 AM', title: 'Midnight Milestone', description: 'Project check-in and late-night snacks.', type: 'milestone', icon: Milestone },
     { id: '10', time: 'Day 2 - 08:00 AM', title: 'Breakfast', description: 'Good morning! Time for the final push.', type: 'default', icon: Coffee },
     { id: '11', time: 'Day 2 - 11:00 AM', title: 'Hacking Ends', description: 'Pencils down! Submit your projects.', type: 'flag', icon: Flag },
@@ -295,4 +294,5 @@ export const projectIdeas: ProjectIdea[] = [
 ];
 
     
+
 
