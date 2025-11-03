@@ -330,20 +330,8 @@ function UserManagementTab() {
             </DialogHeader>
             <div className="grid gap-4 py-4">
                <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Status</Label>
-                <div className="col-span-3">
-                    {selectedUser.emailVerified ? (
-                        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
-                          <CheckCircle className="mr-1 h-3 w-3" />
-                          Verified
-                        </Badge>
-                      ) : (
-                        <Badge variant="destructive" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">
-                           <XCircle className="mr-1 h-3 w-3" />
-                          Unverified
-                        </Badge>
-                      )}
-                </div>
+                <Label className="text-right">Contact No.</Label>
+                <span className="col-span-3">{selectedUser.phoneNumber || 'Not provided'}</span>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label className="text-right">College</Label>
