@@ -1,3 +1,4 @@
+
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
 import type { Sponsor, Project, ProjectIdea, ScheduleEvent, Conductor } from './types';
 
@@ -307,7 +308,7 @@ export const conductors: Conductor[] = [
         id: "2",
         name: "Ms. Kalyani Kumari",
         role: "Student",
-        imageUrl: "https://images.unsplash.com/photo-1627328950087-ce4ed2b5896a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bW91bnRhaW4lMjBib3l8ZW58MHx8fHwxNzYyMTg5NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+        imageUrl: "https://images.unsplash.com/photo-1610916113640-d6332ff87ddf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNnx8bW91bnRhaW4lMjBnaXJsfGVufDB8fHx8MTc2MjE4OTM3Mnww&ixlib=rb-4.1.0&q=80&w=1080",
         email: "satyam.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/satyam-kumar-87913b168/",
         qualification: "M.Tech in CSE",
@@ -354,6 +355,8 @@ export const conductors: Conductor[] = [
     
 
 
+
+    
 
     
 
