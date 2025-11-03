@@ -66,3 +66,14 @@ export type ProjectIdea = {
   description: string;
   technologies: string[];
 };
+
+export type Conductor = {
+  id: string;
+  name: string;
+  role: string;
+  imageUrl: string;
+  email: string;
+  linkedin: string;
+  qualification: string;
+  skills: string[];
+}

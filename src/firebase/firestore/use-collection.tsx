@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Query,
   onSnapshot,
@@ -8,6 +8,7 @@ import {
   FirestoreError,
   QuerySnapshot,
   CollectionReference,
+  getDocs,
 } from 'firebase/firestore';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
@@ -23,6 +24,7 @@ export interface UseCollectionResult<T> {
   data: WithId<T>[] | null; // Document data with ID, or null.
   isLoading: boolean;       // True if loading.
   error: FirestoreError | Error | null; // Error object, or null.
+  mutate: () => Promise<void>; // Function to manually re-fetch the collection
 }
 
 /* Internal implementation of Query:
@@ -60,6 +62,30 @@ export function useCollection<T = any>(
   const [data, setData] = useState<StateDataType>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<FirestoreError | Error | null>(null);
+
+  const fetchData = useCallback(async (ref: CollectionReference<DocumentData> | Query<DocumentData>) => {
+    setIsLoading(true);
+    try {
+      const snapshot = await getDocs(ref);
+      const results: ResultItemType[] = snapshot.docs.map(doc => ({ ...(doc.data() as T), id: doc.id }));
+      setData(results);
+      setError(null);
+    } catch (err: any) {
+        const path: string =
+          ref.type === 'collection'
+            ? (ref as CollectionReference).path
+            : (ref as unknown as InternalQuery)._query.path.canonicalString()
+
+        const contextualError = new FirestorePermissionError({
+          operation: 'list',
+          path,
+        });
+        setError(contextualError);
+        errorEmitter.emit('permission-error', contextualError);
+    } finally {
+        setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!memoizedTargetRefOrQuery) {
@@ -107,8 +133,16 @@ export function useCollection<T = any>(
 
     return () => unsubscribe();
   }, [memoizedTargetRefOrQuery]); // Re-run if the target query/reference changes.
+  
+  const mutate = useCallback(async () => {
+    if (memoizedTargetRefOrQuery) {
+      await fetchData(memoizedTargetRefOrQuery);
+    }
+  }, [memoizedTargetRefOrQuery, fetchData]);
+
   if(memoizedTargetRefOrQuery && !memoizedTargetRefOrQuery.__memo) {
     throw new Error(memoizedTargetRefOrQuery + ' was not properly memoized using useMemoFirebase');
   }
-  return { data, isLoading, error };
+
+  return { data, isLoading, error, mutate };
 }

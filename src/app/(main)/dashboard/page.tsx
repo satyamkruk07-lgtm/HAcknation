@@ -30,7 +30,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { sponsors } from '@/lib/data.tsx';
 import { Badge } from '@/components/ui/badge';
-import type { Announcement } from '@/lib/types';
+import type { Announcement, Conductor } from '@/lib/types';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
@@ -92,14 +92,6 @@ const hackathonTips = [
         description: "Create a rough schedule. Allocate time for brainstorming, building, debugging, and preparing your presentation."
     }
 ]
-
-const conductors = [
-  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1', imageUrl: 'https://images.unsplash.com/photo-1627328950087-ce4ed2b5896a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bW91bnRhaW4lMjBib3l8ZW58MHx8fHwxNzYyMTg5NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080', email: 'kumar.satyam@example.com', linkedin: 'https://linkedin.com/in/kumarsatyam', qualification: 'B.Tech in Computer Science', skills: ['Next.js', 'Firebase', 'Genkit', 'AI/ML'] },
-  { name: 'Kalyani Kumari', role: 'Student', seed: 'conductor2', imageUrl: 'https://images.unsplash.com/photo-1654414883391-24e17446e4d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtb3VudGFpbiUyMGdpcmx8ZW58MHx8fHwxNzYyMTg5MzcyfDA&ixlib=rb-4.1.0&q=80&w=1080', email: 'kalyani.kumari@example.com', linkedin: 'https://linkedin.com/in/kalyanikumari', qualification: 'B.Tech in Information Technology', skills: ['UI/UX Design', 'React', 'Figma', 'Frontend Dev'] },
-  { name: 'Paramjeet Singh', role: 'Faculty', seed: 'conductor3', imageUrl: `https://picsum.photos/seed/conductor3/200/200`, email: 'paramjeet.singh@example.com', linkedin: 'https://linkedin.com/in/paramjeetsingh', qualification: 'M.Tech, PhD in AI', skills: ['Machine Learning', 'Python', 'Research', 'Academic Writing'] },
-  { name: 'Akshat Sharma', role: 'Faculty', seed: 'conductor4', imageUrl: `https://picsum.photos/seed/conductor4/200/200`, email: 'akshat.sharma@example.com', linkedin: 'https://linkedin.com/in/akshatsharma', qualification: 'M.Sc in Software Engineering', skills: ['Cloud Computing', 'AWS', 'DevOps', 'System Design'] },
-  { name: 'Anshul Namdev', role: 'Faculty', seed: 'conductor5', imageUrl: `https://picsum.photos/seed/conductor5/200/200`, email: 'anshul.namdev@example.com', linkedin: 'https://linkedin.com/in/anshulnamdev', qualification: 'MCA', skills: ['Cyber Security', 'Networking', 'Ethical Hacking', 'C++'] },
-];
 
 
 function Countdown() {
@@ -194,14 +186,20 @@ export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const router = useRouter();
-  const [selectedConductor, setSelectedConductor] = useState<(typeof conductors)[0] | null>(null);
+  const [selectedConductor, setSelectedConductor] = useState<Conductor | null>(null);
 
   const announcementsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
     return query(collection(firestore, 'announcements'), orderBy('timestamp', 'desc'), limit(5));
   }, [firestore, user]);
 
+  const conductorsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'conductors'));
+  }, [firestore]);
+
   const { data: announcements, isLoading: areAnnouncementsLoading } = useCollection<Announcement>(announcementsQuery);
+  const { data: conductors, isLoading: areConductorsLoading } = useCollection<Conductor>(conductorsQuery);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -209,7 +207,7 @@ export default function DashboardPage() {
     }
   }, [user, isUserLoading, router]);
 
-  if (isUserLoading || !user) {
+  if (isUserLoading || !user || areConductorsLoading) {
     return (
       <div className="container py-12">
         <div className="space-y-4">
@@ -229,6 +227,9 @@ export default function DashboardPage() {
       </div>
     );
   }
+
+  const topConductors = conductors?.slice(0, 2) || [];
+  const bottomConductors = conductors?.slice(2, 5) || [];
 
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
@@ -452,11 +453,11 @@ export default function DashboardPage() {
             <div className="flex flex-col items-center gap-8">
                 {/* Top row with 2 people, centered */}
                 <div className="flex justify-center gap-16">
-                    {conductors.slice(0, 2).map((conductor) => (
-                        <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
+                    {topConductors.map((conductor) => (
+                        <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
                             <button onClick={() => setSelectedConductor(conductor)} className="rounded-full">
                                 <Image
-                                    src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.seed}/200/200`}
+                                    src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/128/128`}
                                     alt={`Portrait of ${conductor.name}`}
                                     width={128}
                                     height={128}
@@ -473,11 +474,11 @@ export default function DashboardPage() {
                 </div>
                 {/* Bottom row with 3 people */}
                 <div className="flex justify-center gap-16">
-                    {conductors.slice(2, 5).map((conductor) => (
-                        <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
+                    {bottomConductors.map((conductor) => (
+                        <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
                              <button onClick={() => setSelectedConductor(conductor)} className="rounded-full">
                                 <Image
-                                    src={conductor.imageUrl}
+                                    src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/128/128`}
                                     alt={`Portrait of ${conductor.name}`}
                                     width={128}
                                     height={128}
@@ -500,7 +501,7 @@ export default function DashboardPage() {
           <DialogContent className="sm:max-w-md">
             <DialogHeader className="items-center text-center">
                 <Image
-                    src={selectedConductor.imageUrl}
+                    src={selectedConductor.imageUrl || `https://picsum.photos/seed/${selectedConductor.id}/96/96`}
                     alt={selectedConductor.name}
                     width={96}
                     height={96}
