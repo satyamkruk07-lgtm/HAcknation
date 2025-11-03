@@ -28,7 +28,19 @@ const nextConfig: NextConfig = {
         hostname: 'www.shivalikcollege.edu.in',
         port: '',
         pathname: '/**',
-      }
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   allowedDevOrigins: ["https://*.cloudworkstations.dev"]
