@@ -679,15 +679,17 @@ export default function AdminPage() {
 
 
   useEffect(() => {
-    if (isLoading) {
-      return; 
+    // Only perform actions once everything has loaded.
+    if (!isLoading) {
+      if (!user) {
+        // If there's no user, redirect to login.
+        router.push('/login');
+      } else if (!isAdmin) {
+        // If there is a user, but they are not an admin, redirect to dashboard.
+        router.push('/dashboard');
+      }
     }
-    if (!user) {
-      router.push('/login'); 
-    } else if (!isAdmin) {
-      router.push('/dashboard'); 
-    }
-  }, [user, isLoading, isAdmin, router]);
+  }, [user, isAdmin, isLoading, router]);
 
 
   if (isLoading || !user || !isAdmin) {
