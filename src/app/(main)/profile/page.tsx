@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useUser, useFirestore, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore, useMemoFirebase, useStorage } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter } from 'next/navigation';
 import { useDoc } from '@/firebase/firestore/use-doc';
 
@@ -27,11 +28,12 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Loader2, Cpu } from 'lucide-react';
+import { Loader2, Cpu, Upload } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { UserAccount } from '@/lib/types';
 import { updateProfile } from 'firebase/auth';
+import Image from 'next/image';
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -51,16 +53,19 @@ type ProfileFormData = z.infer<typeof profileFormSchema>;
 export default function ProfilePage() {
   const { user, auth, isUserLoading, mutate: mutateUser } = useUser();
   const firestore = useFirestore();
+  const storage = useStorage();
   const router = useRouter();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const userDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null;
     return doc(firestore, 'users', user.uid);
   }, [firestore, user?.uid]);
 
-  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserAccount>(userDocRef);
+  const { data: userProfile, isLoading: isProfileLoading, mutate: mutateProfile } = useDoc<UserAccount>(userDocRef);
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileFormSchema),
@@ -98,6 +103,48 @@ export default function ProfilePage() {
       });
     }
   }, [userProfile, user, form, isProfileLoading]);
+  
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    if (file.size > 2 * 1024 * 1024) { // 2MB limit
+      toast({
+        variant: 'destructive',
+        title: 'File too large',
+        description: 'Please upload an image smaller than 2MB.',
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const storageRef = ref(storage, `user_avatars/${user.uid}/${file.name}`);
+      const uploadResult = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(uploadResult.ref);
+
+      await setDoc(userDocRef, { photoURL: downloadURL }, { merge: true });
+      if(auth.currentUser) {
+        await updateProfile(auth.currentUser, { photoURL: downloadURL });
+      }
+      
+      await mutateUser(); // Refresh auth state
+      await mutateProfile(); // Refresh firestore state
+
+      toast({
+        title: 'Image uploaded successfully!',
+      });
+
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Upload failed',
+        description: error.message || 'Could not upload your image.',
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const onSubmit = async (data: ProfileFormData) => {
     if (!user || !userDocRef || !auth.currentUser) {
@@ -119,14 +166,12 @@ export default function ProfilePage() {
         phoneNumber: data.phoneNumber,
       };
 
-      // The useDoc hook will automatically update on its own after this setDoc call.
       await setDoc(userDocRef, updatedData, { merge: true });
 
       if (auth.currentUser.displayName !== data.name || auth.currentUser.phoneNumber !== data.phoneNumber) {
         await updateProfile(auth.currentUser, { displayName: data.name, phoneNumber: data.phoneNumber });
       }
       
-      // We manually call mutateUser to refresh the auth state from useUser hook
       await mutateUser();
 
       toast({
@@ -176,10 +221,36 @@ export default function ProfilePage() {
       <div className="container py-12">
         <Card className="mx-auto max-w-3xl overflow-hidden p-6 shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1">
             <div className="flex items-center gap-6">
-                <div className="relative h-32 w-32">
-                  <div className="flex h-32 w-32 items-center justify-center rounded-full bg-primary/10 border-4 border-background">
-                    <Cpu className="h-16 w-16 text-accent animate-pulse" />
-                  </div>
+                <div className="relative h-32 w-32 group">
+                    <Image 
+                        src={userProfile?.photoURL || user.photoURL || `https://picsum.photos/seed/${user.uid}/200/200`}
+                        alt={userProfile?.name || user.displayName || 'User Avatar'}
+                        width={128}
+                        height={128}
+                        className="rounded-full border-4 border-background object-cover h-32 w-32"
+                        data-ai-hint="person portrait"
+                    />
+                     <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      {isUploading ? (
+                        <Loader2 className="h-8 w-8 text-white animate-spin" />
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-12 w-12 text-white hover:bg-white/20"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <Upload className="h-6 w-6" />
+                        </Button>
+                      )}
+                    </div>
+                    <Input 
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/png, image/jpeg, image/gif"
+                      onChange={handleImageUpload}
+                    />
                 </div>
                 <div>
                     <CardTitle className="font-headline text-3xl">{userProfile?.name || user.displayName}</CardTitle>
@@ -263,7 +334,7 @@ export default function ProfilePage() {
                             </FormItem>
                         )}
                         />
-                        <Button type="submit" disabled={isSubmitting}>
+                        <Button type="submit" disabled={isSubmitting || isUploading}>
                         {isSubmitting && (
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         )}

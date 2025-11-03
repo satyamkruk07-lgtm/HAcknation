@@ -4,6 +4,7 @@ import React, { DependencyList, createContext, useContext, ReactNode, useMemo } 
 import { FirebaseApp } from 'firebase/app';
 import { Firestore } from 'firebase/firestore';
 import { Auth } from 'firebase/auth';
+import { FirebaseStorage } from 'firebase/storage';
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener'
 
 interface FirebaseProviderProps {
@@ -11,6 +12,7 @@ interface FirebaseProviderProps {
   firebaseApp: FirebaseApp;
   firestore: Firestore;
   auth: Auth;
+  storage: FirebaseStorage;
 }
 
 // Combined state for the Firebase context
@@ -18,6 +20,7 @@ export interface FirebaseContextState {
   firebaseApp: FirebaseApp;
   firestore: Firestore;
   auth: Auth;
+  storage: FirebaseStorage;
 }
 
 // React Context
@@ -31,6 +34,7 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   firebaseApp,
   firestore,
   auth,
+  storage
 }) => {
   // Memoize the context value
   const contextValue = useMemo((): FirebaseContextState => {
@@ -38,8 +42,9 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
       firebaseApp,
       firestore,
       auth,
+      storage
     };
-  }, [firebaseApp, firestore, auth]);
+  }, [firebaseApp, firestore, auth, storage]);
 
   return (
     <FirebaseContext.Provider value={contextValue}>
@@ -74,6 +79,12 @@ export const useFirestore = (): Firestore => {
   const { firestore } = useFirebase();
   return firestore;
 };
+
+/** Hook to access Firebase Storage instance. */
+export const useStorage = (): FirebaseStorage => {
+    const { storage } = useFirebase();
+    return storage;
+}
 
 /** Hook to access Firebase App instance. */
 export const useFirebaseApp = (): FirebaseApp => {
