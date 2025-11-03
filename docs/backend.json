@@ -262,7 +262,8 @@
   "auth": {
     "providers": [
       "password",
-      "anonymous"
+      "anonymous",
+      "google.com"
     ]
   },
   "firestore": {
@@ -439,3 +440,5 @@
     "reasoning": "The Firestore data structure is designed to support the HackTrack application's features, including event schedules, registration, live updates, submission platform, judging, and team formation. The structure emphasizes authorization independence and supports secure list operations. It leverages path-based ownership for user-specific data and membership maps for collaborative entities.\n\nAuthorization Independence (CRITICAL): Achieved primarily through denormalization. For example, teams store the `eventId` directly, avoiding the need to `get()` the event document to check authorization.  Projects include the `teamId`.\n\nQAPs (Rules are not Filters): Supported through structural segregation. The `users/{userId}/teams` collection ensures only the user can list their own teams. The `events/{eventId}/announcements` collection allows listing announcements scoped to an event without filtering.\n\nThe top-level collections are `events`, `users` and `roles_admin`. Events contain event-specific information, Users contain personal profiles and roles_admin contains the user ID when the user has admin rights.\n\nAccess Modeling: Path-based ownership is used for `users/{userId}/teams` to store teams created by each user. The `members` map is not explicitly used in this design but could be added to the `Team` entity for collaborative features if required in the future.\n\nClarity of Intent: Paths are named semantically to reflect the data they contain (e.g., `events/{eventId}/scheduleItems/{scheduleItemId}`)."
   }
 }
+
+    
