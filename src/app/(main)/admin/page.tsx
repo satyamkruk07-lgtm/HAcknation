@@ -541,14 +541,21 @@ export default function AdminPage() {
   const isAdmin = user?.email && adminEmails.includes(user.email);
 
   useEffect(() => {
-    if (!isUserLoading && !user) {
-        router.push('/login');
-    } else if (!isUserLoading && user && !isAdmin) {
-        router.push('/dashboard');
+    // This effect handles redirection based on auth state and role.
+    if (isUserLoading) {
+      return; // Do nothing while auth state is loading.
     }
+    if (!user) {
+      router.push('/login'); // If no user, send to login.
+    } else if (!isAdmin) {
+      router.push('/dashboard'); // If user is not an admin, send to dashboard.
+    }
+    // If user is an admin, they are allowed to stay on this page.
   }, [user, isUserLoading, isAdmin, router]);
 
-  if (isUserLoading || !isAdmin) {
+
+  if (isUserLoading || !user || !isAdmin) {
+    // Show a loading spinner while we verify auth and admin status, or if redirection is in progress.
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -556,6 +563,7 @@ export default function AdminPage() {
     );
   }
 
+  // Render the admin content only if the user is a verified admin.
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
