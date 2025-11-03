@@ -168,7 +168,7 @@ service cloud.firestore {
      * @principle Secure global site settings.
      */
     match /site_settings/{settingId} {
-        allow get, list: if isSignedIn();
+        allow get, list: if isAdmin() || isSignedIn();
         allow create, update, delete: if isAdmin();
     }
 
@@ -266,5 +266,3 @@ service cloud.firestore {
     }
   }
 }
-
-    
