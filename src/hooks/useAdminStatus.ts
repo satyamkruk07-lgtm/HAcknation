@@ -28,6 +28,14 @@ export function useAdminStatus() {
       setIsAdminLoading(false);
       return;
     }
+
+    // --- TEMPORARY OVERRIDE ---
+    // Hardcode kalyanikri1111@gmail.com as an admin.
+    if (user.email === 'kalyanikri1111@gmail.com') {
+        setIsAdmin(true);
+        setIsAdminLoading(false);
+        return;
+    }
     
     // If we have a user, check their admin status.
     const checkAdminStatus = async () => {
