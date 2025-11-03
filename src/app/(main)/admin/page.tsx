@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ExternalLink, Github, Loader2, Trash2, User as UserIcon } from 'lucide-react';
+import { ExternalLink, Github, Loader2, Trash2, User as UserIcon, Download } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -206,13 +206,47 @@ function UserManagementTab() {
   const { data: users, isLoading: isUsersLoading } = useCollection<UserAccount>(usersQuery);
   const isLoading = isUserLoading || (isAdmin && isUsersLoading);
 
+  const downloadCSV = (data: UserAccount[], filename: string) => {
+    if (!data || data.length === 0) {
+      alert('No data to download.');
+      return;
+    }
+    const headers = ['Name', 'Email', 'College', 'Registration Date', 'Skills', 'Bio'];
+    const csvContent = [
+      headers.join(','),
+      ...data.map(item => [
+        `"${item.name || ''}"`,
+        `"${item.email || ''}"`,
+        `"${item.college || ''}"`,
+        `"${item.registrationDate ? format(new Date(item.registrationDate), 'PPp') : ''}"`,
+        `"${(item.skills || []).join('; ')}"`,
+        `"${(item.bio || '').replace(/"/g, '""')}"`
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <>
       <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
-        <CardHeader>
-          <CardTitle className="font-headline text-2xl">User Management</CardTitle>
-          <CardDescription>View and manage registered users.</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="font-headline text-2xl">User Management</CardTitle>
+            <CardDescription>View and manage registered users.</CardDescription>
+          </div>
+          <Button onClick={() => downloadCSV(users || [], 'users.csv')} disabled={!users || users.length === 0}>
+            <Download className="mr-2 h-4 w-4" />
+            Download CSV
+          </Button>
         </CardHeader>
         <CardContent>
           <Table>
@@ -346,13 +380,48 @@ function ProjectManagementTab() {
     }
   };
 
+  const downloadCSV = (data: SubmittedProject[], filename: string) => {
+    if (!data || data.length === 0) {
+      alert('No data to download.');
+      return;
+    }
+    const headers = ['Project Name', 'Team Members', 'Description', 'GitHub URL', 'Demo URL', 'Submission Date'];
+    const csvContent = [
+      headers.join(','),
+      ...data.map(item => [
+        `"${item.name || ''}"`,
+        `"${(item.teamMembers || item.studentNames || []).join('; ')}"`,
+        `"${(item.description || '').replace(/"/g, '""')}"`,
+        `"${item.githubUrl || ''}"`,
+        `"${item.demoUrl || ''}"`,
+        `"${item.submissionDate ? format(new Date(item.submissionDate.seconds * 1000), 'PPp') : ''}"`
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
 
   return (
     <>
       <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
-        <CardHeader>
-          <CardTitle>Project Management</CardTitle>
-          <CardDescription>View and manage all project submissions.</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Project Management</CardTitle>
+            <CardDescription>View and manage all project submissions.</CardDescription>
+          </div>
+           <Button onClick={() => downloadCSV(projects || [], 'projects.csv')} disabled={!projects || projects.length === 0}>
+            <Download className="mr-2 h-4 w-4" />
+            Download CSV
+          </Button>
         </CardHeader>
         <CardContent>
           <Table>
@@ -440,10 +509,10 @@ export default function AdminPage() {
   const isAdmin = user?.email && adminEmails.includes(user.email);
 
   useEffect(() => {
-    if (!isUserLoading) {
-      if (!isAdmin) {
+    if (!isUserLoading && !user) {
         router.push('/login');
-      }
+    } else if (!isUserLoading && user && !isAdmin) {
+        router.push('/dashboard');
     }
   }, [user, isUserLoading, isAdmin, router]);
 
