@@ -52,24 +52,20 @@ service cloud.firestore {
     }
 
     /**
-     * @description Allows a user to read and write their own profile data.
+     * @description Allows a user to read and write their own profile data. Admins can list all users.
      * @path /users/{userId}
      * @allow (get): A user can read their own profile.
-     *  Example: `get` request with `auth.uid == 'user123'` on `/users/user123`.
      * @allow (create): A user can create their own profile.  The `id` field must match the `auth.uid`.
-     *  Example: `create` request with `auth.uid == 'user123'` creating `/users/user123`.
      * @allow (update, delete): A user can update or delete their own profile.
-     *  Example: `update` request with `auth.uid == 'user123'` on `/users/user123`.
-     * @deny (get, create, update, delete): Any other user attempting to access this data will be rejected.
-     *  Example: `get` request with `auth.uid == 'user456'` on `/users/user123`.
-     * @principle Enforces document ownership for user profiles.  The user's `id` must match their `auth.uid`.
+     * @allow (list): Only an admin can list all users.
+     * @principle Enforces document ownership for user profiles, with an exception for admin listing.
      */
     match /users/{userId} {
       allow get: if isOwner(userId);
       allow create: if isOwner(userId) && request.resource.data.id == request.auth.uid;
       allow update: if isOwner(userId) && resource.data.id == request.resource.data.id;
       allow delete: if isExistingOwner(userId);
-      allow list: if false; // Prevent listing of all users.
+      allow list: if isAdmin();
     }
     
     /**
@@ -223,5 +219,3 @@ service cloud.firestore {
     }
   }
 }
-
-    
