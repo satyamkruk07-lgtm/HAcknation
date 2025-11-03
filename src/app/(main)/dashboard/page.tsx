@@ -397,26 +397,6 @@ export default function DashboardPage() {
                 ))}
               </div>
             </div>
-            
-             {/* Our Sponsors */}
-            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1 mt-8">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-3 font-headline">
-                    <HeartHandshake className="h-6 w-6 text-accent" />
-                    <span>Our Sponsors</span>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 gap-x-4 items-center justify-items-center">
-                    {sponsors.map((sponsor) => (
-                        <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-2">
-                            {React.cloneElement(sponsor.icon, { className: "h-10 w-10 text-muted-foreground" })}
-                            <span className="font-semibold text-sm text-muted-foreground">{sponsor.name}</span>
-                        </div>
-                    ))}
-                    </div>
-                </CardContent>
-            </Card>
           </div>
 
           {/* Right Column */}
@@ -435,6 +415,25 @@ export default function DashboardPage() {
                   <Link href="/submit">Submit Your Project</Link>
                 </Button>
               </CardContent>
+            </Card>
+            {/* Our Sponsors */}
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-3 font-headline">
+                    <HeartHandshake className="h-6 w-6 text-accent" />
+                    <span>Our Sponsors</span>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-8 gap-x-4 items-center justify-items-center">
+                    {sponsors.map((sponsor) => (
+                        <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-2">
+                            {React.cloneElement(sponsor.icon, { className: "h-10 w-10 text-muted-foreground" })}
+                            <span className="font-semibold text-sm text-muted-foreground">{sponsor.name}</span>
+                        </div>
+                    ))}
+                    </div>
+                </CardContent>
             </Card>
           </div>
         </div>
