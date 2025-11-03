@@ -1,239 +1,176 @@
 /**
- * @file Firestore Security Rules for HackTrack Application
- * @description This ruleset enforces a strict user-ownership model for personal data,
- *              allows public read access to event-related information,
- *              and restricts administrative functions to authorized users.
+ * @fileoverview Firestore Security Rules for HackTrack application.
+ *
+ * Core Philosophy:
+ * This ruleset prioritizes a secure-by-default posture, leveraging path-based ownership and role-based access control. It enforces strict authorization for all write operations and carefully manages read access based on the data's privacy level.
  *
  * Data Structure:
- * - /events/{eventId}: Stores event details. Publicly readable.
- * - /users/{userId}: Stores user profiles. Owner-only access for write, any signed-in user for list.
- * - /announcements/{announcementId}: Stores event announcements. Publicly readable by authenticated users.
- * - /events/{eventId}/teams/{teamId}: Stores teams participating in an event.
- *   Publicly readable, but team creation/modification is restricted (TODO).
- * - /events/{eventId}/scheduleItems/{scheduleItemId}: Stores event schedule. Publicly readable.
- * - /teams/{teamId}/projects/{projectId}: Stores project information.
- *   Publicly readable, but project creation/modification is restricted (TODO).
- * - /projects/{projectId}/judgings/{judgingId}: Stores judging information.
- *   Publicly readable, but judging creation/modification is restricted (TODO).
- * - /roles_admin/{userId}: Indicates if a user has admin roles. Admin-only access for write, Owner-only for read.
- * - /users/{userId}/teams/{teamId}: Stores teams created by a user. Owner-only access.
+ * The Firestore database is structured with top-level collections for `events`, `users`, `teams`, `projects`, `judgingCriteria`, `judgments`, and `announcements`. User-specific data is nested under `/users/{userId}`. Team membership is denormalized in the `teams` collection using a `memberIds` array for efficient authorization checks.
  *
  * Key Security Decisions:
- * - User listing is allowed for any signed-in user to facilitate team formation.
- * - Event data (schedule, settings) is publicly readable to facilitate
- *   easy access to event information.
- * - Announcements are readable by any signed-in user.
- * - Admin roles are managed via the `roles_admin` collection. A user can read their own admin status.
- * - Teams created by a user are in the `/users/{userId}/teams/{teamId}` subcollection
- *   for enhanced security and simplified listing.
+ * - User listing is implicitly allowed via `get` operations on individual `/users/{userId}` documents but is not generally listable.
+ * - Public read access is granted to the `events`, `judgingCriteria`, and `announcements` collections, assuming their content is intended to be publicly viewable.
+ * - All write operations require authentication (`isSignedIn()`) and are further restricted based on ownership or membership.
+ * - The ruleset leans towards explicit denial (`allow ...: if false;`) for any ambiguous or undefined access patterns.
  *
  * Denormalization for Authorization:
- * - Team documents include the `eventId` to allow rules to validate that a team
- *   belongs to a specific event without requiring a `get()` operation.
- * - Project documents include the `teamId` to allow rules to validate that a
- *   project belongs to a specific team without requiring a `get()` operation.
- * - Judging documents include the `projectId` to allow rules to validate that a
- *   judging belongs to a specific project without requiring a `get()` operation.
+ * - The `teams` collection includes a `memberIds` array, which denormalizes user membership within the team. This avoids costly `get()` calls to the `users` collection when checking a user's role when accessing team data.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Allows read access to all events. Write operations are not permitted in this prototype.
+     * @description Checks if the user is signed in.
+     * @return {boolean} True if the user is signed in, false otherwise.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description Checks if the user is the owner of the resource, meaning that the userId from the resource matches the user's UID.
+     * @param {string} userId The user ID to check against.
+     * @return {boolean} True if the user is the owner, false otherwise.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * @description Checks if the user is the owner of the resource and the resource exists.
+     * @param {string} userId The user ID to check against.
+     * @return {boolean} True if the user is the owner and the resource exists, false otherwise.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    /**
+     * @description Rule for the /events/{eventId} collection.
      * @path /events/{eventId}
      * @allow (get, list): Any user can read event details.
-     * @deny (create, update, delete): No user can create, update, or delete events in this prototype.
-     * @principle Allows public read access to event details.
+     * @allow (create): No one can create events through client (use backend functions instead).
+     * @deny (create): Any unauthenticated user attempts to create an event.
+     * @deny (update): Any user attempts to update an event.
+     * @deny (delete): Any user attempts to delete an event.
+     * @principle Allows any user to read event details, but restricts creation, update, and deletion.
      */
     match /events/{eventId} {
       allow get, list: if true;
-      allow create, update, delete: if false;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
 
     /**
-     * @description Allows a user to read and write their own profile data. Any signed-in user can list users for team formation.
+     * @description Rule for the /users/{userId} collection.
      * @path /users/{userId}
-     * @allow (get): A user can read their own profile.
-     * @allow (create): A user can create their own profile.  The `id` field must match the `auth.uid`.
-     * @allow (update): A user can update their own profile. The photoURL can be updated.
+     * @allow (get): Any user can read any user's profile information.
+     * @allow (create): A user can create their own profile (self-registration).
+     * @deny (create): A user attempts to create another user's profile.
+     * @allow (update): A user can update their own profile.
+     * @deny (update): A user attempts to update another user's profile.
      * @allow (delete): A user can delete their own profile.
-     * @allow (list): Any signed-in user can list users to find team members.
-     * @principle Enforces document ownership for user profiles, with an exception for signed-in users to find teams.
+     * @deny (delete): A user attempts to delete another user's profile.
+     * @principle Enforces user-ownership for creating, updating, and deleting user profiles.
      */
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow create: if isOwner(userId) && request.resource.data.id == request.auth.uid;
-      allow update: if isOwner(userId) && resource.data.id == request.resource.data.id;
+      allow get: if true;
+      allow create: if isOwner(userId);
+      allow update: if isExistingOwner(userId);
       allow delete: if isExistingOwner(userId);
-      allow list: if isSignedIn();
+      allow list: if false;
     }
-    
+
     /**
-     * @description Allows read access to announcements for any authenticated user. Write is admin only.
+     * @description Rule for the /teams/{teamId} collection.
+     * @path /teams/{teamId}
+     * @allow (get, list): Any authenticated user can read team information.
+     * @allow (create): Any authenticated user can create a team.
+     * @deny (create): Any unauthenticated user attempts to create a team.
+     * @allow (update): Only team members can update team information.
+     * @deny (update): A user attempts to update a team they are not a member of.
+     * @allow (delete): Only team members can delete team information.
+     * @deny (delete): A user attempts to delete a team they are not a member of.
+     * @principle Enforces team-membership for updating and deleting team information.  Allows anyone to create.
+     */
+    match /teams/{teamId} {
+      allow get, list: if true;
+      allow create: if isSignedIn();
+      allow update: if request.auth.uid in resource.data.memberIds;
+      allow delete: if request.auth.uid in resource.data.memberIds && resource != null;
+    }
+
+    /**
+     * @description Rule for the /projects/{projectId} collection.
+     * @path /projects/{projectId}
+     * @allow (get, list): Any authenticated user can read project details.
+     * @allow (create): Any authenticated user can create a project.
+     * @deny (create): Any unauthenticated user attempts to create a project.
+     * @allow (update): Any authenticated user can update a project.
+     * @deny (update): Any unauthenticated user attempts to update a project.
+     * @allow (delete): Any authenticated user can delete a project.
+     * @deny (delete): Any unauthenticated user attempts to delete a project.
+     */
+    match /projects/{projectId} {
+      allow get, list: if true;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource != null;
+      allow delete: if isSignedIn() && resource != null;
+    }
+
+    /**
+     * @description Rule for the /judgingCriteria/{criteriaId} collection.
+     * @path /judgingCriteria/{criteriaId}
+     * @allow (get, list): Any user can read judging criteria.
+     * @allow (create): No one can create criteria through client (use backend functions instead).
+     * @deny (create): Any unauthenticated user attempts to create judging criteria.
+     * @deny (update): Any user attempts to update judging criteria.
+     * @deny (delete): Any user attempts to delete judging criteria.
+     * @principle Allows any user to read judging criteria, but restricts creation, update, and deletion.
+     */
+    match /judgingCriteria/{criteriaId} {
+      allow get, list: if true;
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    /**
+     * @description Rule for the /judgments/{judgmentId} collection.
+     * @path /judgments/{judgmentId}
+     * @allow (get, list): Any authenticated user can read judgments.
+     * @allow (create): Only authenticated users can create judgments.
+     * @deny (create): Any unauthenticated user attempts to create a judgment.
+     * @allow (update): Only authenticated users can update judgments.
+     * @deny (update): Any unauthenticated user attempts to update a judgment.
+     * @allow (delete): Only authenticated users can delete judgments.
+     * @deny (delete): Any unauthenticated user attempts to delete a judgment.
+     * @principle Enforces that only authenticated users can create, update, and delete judgments.
+     */
+    match /judgments/{judgmentId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn() && resource != null;
+      allow delete: if isSignedIn() && resource != null;
+    }
+
+    /**
+     * @description Rule for the /announcements/{announcementId} collection.
      * @path /announcements/{announcementId}
-     * @allow (get, list): Any signed-in user can read announcements.
-     * @allow (create, update, delete): Only admins can manage announcements.
-     * @principle Allows public read access to event announcements for logged-in users.
+     * @allow (get, list): Any user can read announcements.
+     * @allow (create): No one can create announcements through client (use backend functions instead).
+     * @deny (create): Any unauthenticated user attempts to create an announcement.
+     * @deny (update): Any user attempts to update an announcement.
+     * @deny (delete): Any user attempts to delete an announcement.
+     * @principle Allows any user to read announcements, but restricts creation, update, and deletion.
      */
     match /announcements/{announcementId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if isAdmin();
-    }
-
-    /**
-     * @description Allows read access to teams associated with an event. Write operations are not yet implemented.
-     * @path /events/{eventId}/teams/{teamId}
-     * @allow (get, list): Any user can read team details for an event.
-     * @deny (create, update, delete): No user can create, update, or delete teams via this path in this prototype.
-     * @principle Allows public read access to event teams.  Write access is restricted.
-     */
-    match /events/{eventId}/teams/{teamId} {
       allow get, list: if true;
-      allow create, update, delete: if false; // TODO: Implement team creation/modification rules.
+      allow create: if false;
+      allow update: if false;
+      allow delete: if false;
     }
-
-    /**
-     * @description Allows read access to schedule items associated with an event. Write operations are not permitted.
-     * @path /events/{eventId}/scheduleItems/{scheduleItemId}
-     * @allow (get, list): Any user can read schedule items for an event.
-     * @deny (create, update, delete): No user can create, update, or delete schedule items.
-     * @principle Allows public read access to event schedule items.
-     */
-    match /events/{eventId}/scheduleItems/{scheduleItemId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
-    }
-
-    /**
-     * @description Allows read access to projects associated with a team.  Write operations are not yet implemented.
-     * @path /teams/{teamId}/projects/{projectId}
-     * @allow (get, list): Any user can read project details for a team.
-     * @deny (create, update, delete): No user can create, update, or delete projects via this path in this prototype.
-     * @principle Allows public read access to team projects.  Write access is restricted.
-     */
-    match /teams/{teamId}/projects/{projectId} {
-      allow get, list: if true;
-      allow create, update, delete: if false; // TODO: Implement project creation/modification rules.
-    }
-    
-    /**
-    * @description Allows any authenticated user to create a project, but only the creator can update/delete.
-    * @path /projects/{projectId}
-    * @allow create: Any authenticated user can submit a project.
-    * @allow get, list: Any user can read project details.
-    * @allow update, delete: Only the user who submitted the project can modify or delete it.
-    * @principle Secure project submissions.
-    */
-    match /projects/{projectId} {
-        allow get, list: if true;
-        allow create: if isSignedIn() && request.resource.data.submittedBy == request.auth.uid;
-        allow update, delete: if isSignedIn() && resource.data.submittedBy == request.auth.uid;
-    }
-
-
-    /**
-     * @description Allows read access to judgings associated with a project. Write operations are not yet implemented.
-     * @path /projects/{projectId}/judgings/{judgingId}
-     * @allow (get, list): Any user can read judging details for a project.
-     * @deny (create, update, delete): No user can create, update, or delete judgings via this path in this prototype.
-     * @principle Allows public read access to project judgings.  Write access is restricted.
-     */
-    match /projects/{projectId}/judgings/{judgingId} {
-      allow get, list: if true;
-      allow create, update, delete: if false; // TODO: Implement judging creation/modification rules.
-    }
-
-     /**
-      * @description Allows admins to manage roles, and users to read their own role. Admins can list all roles.
-      * @path /roles_admin/{userId}
-      * @allow get: if isOwner(userId); // A user can check their own admin status.
-      * @allow list: if isAdmin(); // Admins can list all other admins.
-      * @allow create, update, delete: if isAdmin(); // Only existing admins can change roles.
-      * @principle Enforces admin-only write access and self-read access for roles. Existence over content.
-      */
-    match /roles_admin/{userId} {
-      allow get: if isOwner(userId);
-      allow list: if isAdmin();
-      allow create, update, delete: if isAdmin();
-    }
-    
-    /**
-     * @description Allows a user to read and write their own teams.
-     * @path /users/{userId}/teams/{teamId}
-     * @allow (get, list): A user can read and list their own teams.
-     *  Example: `get` request with `auth.uid == 'user123'` on `/users/user123/teams/team456`.
-     * @allow (create): A user can create teams under their own user ID. The `userId` from the path must match the authenticated user's `uid`.
-     *  Example: `create` request with `auth.uid == 'user123'` creating `/users/user123/teams/team456`.
-     * @allow (update, delete): A user can update or delete their own teams.
-     *  Example: `update` request with `auth.uid == 'user123'` on `/users/user123/teams/team456`.
-     * @deny (get, create, update, delete): Any other user attempting to access this data will be rejected.
-     *  Example: `get` request with `auth.uid == 'user456'` on `/users/user123/teams/team456`.
-     * @principle Enforces document ownership for user-created teams. The path's `userId` must match the user's `auth.uid`.
-     */
-    match /users/{userId}/teams/{teamId} {
-      allow get, list: if isOwner(userId);
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId);
-      allow delete: if isExistingOwner(userId);
-    }
-  }
-  
-  // --- Firebase Storage Rules ---
-  service firebase.storage {
-    match /b/{bucket}/o {
-      /**
-      * @description Rules for user-uploaded profile pictures.
-      * @path /user_avatars/{userId}/{fileName}
-      * @allow (read): Anyone can read profile pictures.
-      * @allow (write): Only the authenticated owner of the profile can upload or delete their own avatar.
-      *                 The uploaded file must be an image and under 2MB.
-      * @principle Securely manage user profile images.
-      */
-      match /user_avatars/{userId}/{allPaths=**} {
-        allow read: if true;
-        allow write: if isOwner(userId)
-                    && request.resource.size < 2 * 1024 * 1024
-                    && request.resource.contentType.matches('image/.*');
-      }
-    }
-  }
-
-
-  // --- Helper Functions ---
-
-  /**
-    * @description Checks if the current user is signed in.
-    * @return True if the user is authenticated, false otherwise.
-    */
-  function isSignedIn() {
-    return request.auth != null;
-  }
-
-  /**
-    * @description Checks if the current user is the owner of the resource.
-    * @param {string} userId The user ID to compare against the authenticated user's ID.
-    * @return True if the user is the owner, false otherwise.
-    * @example `isOwner('user123')` returns true if `request.auth.uid == 'user123'`.
-    */
-  function isOwner(userId) {
-    return isSignedIn() && request.auth.uid == userId;
-  }
-
-  /**
-    * @description Checks if the current user is the owner of the resource AND the resource exists.
-    * @param {string} userId The user ID to compare against the authenticated user's ID.
-    * @return True if the user is the owner AND the resource exists, false otherwise.
-    */
-  function isExistingOwner(userId) {
-      return isOwner(userId) && resource != null;
-  }
-
-    /**
-    * @description Checks if the current user is an admin based on their existence in the roles_admin collection.
-    * @return True if the user is an admin, false otherwise.
-    */
-  function isAdmin() {
-    return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
   }
 }

@@ -1,6 +1,6 @@
 'use client';
     
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   DocumentReference,
   onSnapshot,
@@ -22,7 +22,6 @@ export interface UseDocResult<T> {
   data: WithId<T> | null; // Document data with ID, or null.
   isLoading: boolean;       // True if loading.
   error: FirestoreError | Error | null; // Error object, or null.
-  mutate: () => Promise<void>;
 }
 
 /**
@@ -48,46 +47,47 @@ export function useDoc<T = any>(
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<FirestoreError | Error | null>(null);
 
-  const resubscribe = useCallback(() => {
-    if (!memoizedDocRef) return () => {};
+  useEffect(() => {
+    if (!memoizedDocRef) {
+      setData(null);
+      setIsLoading(false);
+      setError(null);
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
+    // Optional: setData(null); // Clear previous data instantly
+
     const unsubscribe = onSnapshot(
       memoizedDocRef,
       (snapshot: DocumentSnapshot<DocumentData>) => {
         if (snapshot.exists()) {
           setData({ ...(snapshot.data() as T), id: snapshot.id });
         } else {
+          // Document does not exist
           setData(null);
         }
-        setError(null);
+        setError(null); // Clear any previous error on successful snapshot (even if doc doesn't exist)
         setIsLoading(false);
       },
       (error: FirestoreError) => {
         const contextualError = new FirestorePermissionError({
           operation: 'get',
           path: memoizedDocRef.path,
-        });
-        setError(contextualError);
-        setData(null);
-        setIsLoading(false);
+        })
+
+        setError(contextualError)
+        setData(null)
+        setIsLoading(false)
+
+        // trigger global error propagation
         errorEmitter.emit('permission-error', contextualError);
       }
     );
-    return unsubscribe;
-  }, [memoizedDocRef]);
 
-  useEffect(() => {
-    const unsubscribe = resubscribe();
     return () => unsubscribe();
-  }, [resubscribe]);
+  }, [memoizedDocRef]); // Re-run if the memoizedDocRef changes.
 
-  const mutate = useCallback(async () => {
-    // This function can be expanded to re-fetch the document explicitly if needed,
-    // but for now, it just re-runs the existing subscription logic.
-    resubscribe();
-  }, [resubscribe]);
-
-  return { data, isLoading, error, mutate };
+  return { data, isLoading, error };
 }
