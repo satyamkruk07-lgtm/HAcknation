@@ -26,6 +26,7 @@ import type { Announcement } from '@/lib/types';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
+import { ShivalikLogo } from '@/components/logo-shivalik';
 
 const features = [
   {
@@ -199,21 +200,13 @@ export default function DashboardPage() {
     );
   }
 
-  const logoUrl = "https://www.shivalikcollege.edu.in/wp-content/uploads/2023/10/logo-sce.png";
-
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
         {/* Header */}
         <div className="mb-12">
           <div className="flex flex-col items-center text-center">
-             <Image 
-                src={logoUrl}
-                alt="College Logo"
-                width={150}
-                height={39}
-                className="mb-4 h-12 w-auto object-contain"
-             />
+             <ShivalikLogo className="mb-4 h-12 w-auto object-contain" />
             <h1 className="font-headline text-2xl font-bold">
               Welcome, {user.displayName || 'Hacker'}!
             </h1>
