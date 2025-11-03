@@ -220,17 +220,17 @@ function UserManagementTab() {
       alert('No data to download.');
       return;
     }
-    const headers = ['Name', 'Email', 'College', 'Registration Date', 'Skills', 'Bio', 'Email Verified'];
+    const headers = ['Name', 'Email', 'College', 'Contact No.', 'Registration Date', 'Skills', 'Bio'];
     const csvContent = [
       headers.join(','),
       ...data.map(item => [
         `"${item.name || ''}"`,
         `"${item.email || ''}"`,
         `"${item.college || ''}"`,
+        `"${item.phoneNumber || ''}"`,
         `"${item.registrationDate ? format(new Date(item.registrationDate), 'PPp') : ''}"`,
         `"${(item.skills || []).join('; ')}"`,
         `"${(item.bio || '').replace(/"/g, '""')}"`,
-        `"${item.emailVerified ? 'Yes' : 'No'}"`
       ].join(','))
     ].join('\n');
 
