@@ -348,7 +348,7 @@ export const conductors: Conductor[] = [
         id: "6",
         name: "Mr. Anshul Namdev",
         role: "Faculty",
-        imageUrl: `https://picsum.photos/seed/6/128/128`,
+        imageUrl: `https://images.unsplash.com/photo-1555436169-6abd9c5532c3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0ZWFjaGVyJTIwbWVufGVufDB8fHx8MTc2MjE5NTk4Mnww&ixlib=rb-4.1.0&q=80&w=1080`,
         email: "anshul.namdev@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/anshul-namdev",
         qualification: "M.Tech in CSE",
@@ -377,3 +377,6 @@ export const conductors: Conductor[] = [
 
     
 
+
+
+    
