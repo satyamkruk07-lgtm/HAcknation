@@ -218,13 +218,19 @@ export default function DashboardPage() {
                     </a>
                 </Button>
             </div>
-            <div className="text-center">
-              <h1 className="text-5xl font-bold font-headline tracking-tighter text-destructive">
-                Shivalik
-              </h1>
-              <p className="text-xl text-foreground font-bold">
-                College of Engineering
-              </p>
+            <div className="flex justify-center items-center gap-4">
+              <div className="text-center">
+                <h1 className="text-5xl font-bold font-headline tracking-tighter text-destructive">
+                  Shivalik
+                </h1>
+                <p className="text-xl text-foreground font-bold">
+                  College of Engineering
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-xl font-bold text-destructive uppercase">NAAC</p>
+                <p className="text-xl font-normal">Grade</p>
+              </div>
             </div>
         </div>
 
