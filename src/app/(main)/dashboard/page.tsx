@@ -82,8 +82,8 @@ const hackathonTips = [
 ]
 
 const conductors = [
-  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1', imageUrl: 'https://images.unsplash.com/photo-1549421222-23c71a39678e?ixid=M3w3NDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE3NjIxMjI3Mjd8&ixlib=rb-4.0.3' },
-  { name: 'Kalyani Kumari', role: 'Student', seed: 'conductor2' },
+  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1', imageUrl: 'https://images.unsplash.com/photo-1552374196-c4e7cc224247?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE3NjIxODg1Nzh8&ixlib=rb-4.0.3' },
+  { name: 'Kalyani Kumari', role: 'Student', seed: 'conductor2', imageUrl: 'https://images.unsplash.com/photo-1552376432-27da8aaf5c78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxnaXJsJTIwaGlkZGVufGVufDB8fHx8MTc2MjE4ODY4OHww&ixlib=rb-4.1.0&q=80&w=1080' },
   { name: 'Paramjeet Singh', role: 'Faculty', seed: 'conductor3' },
   { name: 'Akshat Sharma', role: 'Faculty', seed: 'conductor4' },
   { name: 'Anshul Namdev', role: 'Faculty', seed: 'conductor5' },
@@ -482,5 +482,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
