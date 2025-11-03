@@ -82,7 +82,7 @@ const hackathonTips = [
 ]
 
 const conductors = [
-  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1', imageUrl: 'https://images.unsplash.com/photo-1552374196-c4e7cc224247?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE3NjIxODg1Nzh8&ixlib=rb-4.0.3' },
+  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1', imageUrl: 'https://images.unsplash.com/photo-1552374196-c4e7cc224247?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE3NjIxODg1Nzh8&ixlib=rb-4.0.3&q=80&w=1080' },
   { name: 'Kalyani Kumari', role: 'Student', seed: 'conductor2', imageUrl: 'https://images.unsplash.com/photo-1552376432-27da8aaf5c78?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxnaXJsJTIwaGlkZGVufGVufDB8fHx8MTc2MjE4ODY4OHww&ixlib=rb-4.1.0&q=80&w=1080' },
   { name: 'Paramjeet Singh', role: 'Faculty', seed: 'conductor3' },
   { name: 'Akshat Sharma', role: 'Faculty', seed: 'conductor4' },
@@ -446,7 +446,7 @@ export default function DashboardPage() {
                                 alt={`Portrait of ${conductor.name}`}
                                 width={128}
                                 height={128}
-                                className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105"
+                                className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover"
                                 data-ai-hint="person portrait"
                             />
                             <div className="mt-2">
@@ -465,7 +465,7 @@ export default function DashboardPage() {
                                 alt={`Portrait of ${conductor.name}`}
                                 width={128}
                                 height={128}
-                                className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105"
+                                className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover"
                                 data-ai-hint="person portrait"
                             />
                             <div className="mt-2">
