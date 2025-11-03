@@ -75,6 +75,15 @@ const hackathonTips = [
     }
 ]
 
+const conductors = [
+  { name: 'Dr. Satyam', seed: 'conductor1' },
+  { name: 'Dr. Neha', seed: 'conductor2' },
+  { name: 'Prof. Ankit', seed: 'conductor3' },
+  { name: 'Prof. Sneha', seed: 'conductor4' },
+  { name: 'Dr. Raj', seed: 'conductor5' },
+];
+
+
 function Countdown() {
     const deadline = new Date('2025-11-13T11:00:00');
     const [timeLeft, setTimeLeft] = useState<{
@@ -374,6 +383,29 @@ export default function DashboardPage() {
                         </div>
                       </CardContent>
                     </Card>
+                ))}
+              </div>
+            </div>
+
+             {/* Conducted By Section */}
+            <div className="mt-8">
+              <h2 className="mb-6 font-headline text-2xl font-bold text-center">Conducted By</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-8">
+                {conductors.map((conductor) => (
+                  <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
+                    <Image
+                      src={`https://picsum.photos/seed/${conductor.seed}/200/200`}
+                      alt={`Portrait of ${conductor.name}`}
+                      width={100}
+                      height={100}
+                      className="rounded-full border-4 border-background shadow-md"
+                      data-ai-hint="person portrait"
+                    />
+                    <div className="mt-2">
+                      <h3 className="font-semibold text-sm">Name: {conductor.name}</h3>
+                      <p className="text-xs text-muted-foreground">Faculty</p>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
