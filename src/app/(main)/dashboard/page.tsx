@@ -387,6 +387,25 @@ export default function DashboardPage() {
               </div>
             </div>
 
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-3 font-headline">
+                    <HeartHandshake className="h-6 w-6 text-accent" />
+                    <span>Our Sponsors</span>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-4 gap-y-6 gap-x-4 items-center justify-items-center">
+                    {sponsors.map((sponsor) => (
+                        <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-2">
+                            {React.cloneElement(sponsor.icon, { className: "h-8 w-8 text-muted-foreground" })}
+                            <span className="font-semibold text-xs text-muted-foreground">{sponsor.name}</span>
+                        </div>
+                    ))}
+                    </div>
+                </CardContent>
+            </Card>
+
              {/* Conducted By Section */}
             <div className="mt-8">
                 <h2 className="mb-8 font-headline text-2xl font-bold text-center">Conducted By</h2>
@@ -451,30 +470,14 @@ export default function DashboardPage() {
                 </Button>
               </CardContent>
             </Card>
-            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-3 font-headline">
-                    <HeartHandshake className="h-6 w-6 text-accent" />
-                    <span>Our Sponsors</span>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-3 gap-y-8 gap-x-4 items-center justify-items-center">
-                    {sponsors.map((sponsor) => (
-                        <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-2">
-                            {sponsor.icon}
-                            <span className="font-semibold text-sm text-muted-foreground">{sponsor.name}</span>
-                        </div>
-                    ))}
-                    </div>
-                </CardContent>
-            </Card>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+    
 
     
 

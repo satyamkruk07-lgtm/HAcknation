@@ -2,18 +2,18 @@ import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megapho
 import type { Sponsor, Project, ProjectIdea, ScheduleEvent } from './types';
 
 export const sponsors: Sponsor[] = [
-  { name: 'Innovate Inc.', icon: <Briefcase className="h-10 w-10 text-muted-foreground" /> },
-  { name: 'CodeCrafters', icon: <Code className="h-10 w-10 text-muted-foreground" /> },
-  { name: 'DevSolutions', icon: <GitFork className="h-10 w-10 text-muted-foreground" /> },
-  { name: 'FutureForge', icon: <HardHat className="h-10 w-10 text-muted-foreground" /> },
-  { name: 'NextGen EDU', icon: <GraduationCap className="h-10 w-10 text-muted-foreground" /> },
-  { name: 'Data Dynamos', icon: <Database className="h-10 w-10 text-muted-foreground" /> },
-  { name: 'Server Systems', icon: <Server className="h-10 w-10 text-muted-foreground" /> },
-  { name: 'CloudNet', icon: <Cloud className="h-10 w-10 text-muted-foreground" /> },
-  { name: 'QuantumLeap', icon: <Atom className="h-10 w-10 text-muted-foreground" /> },
-  { name: 'TestWorks', icon: <TestTube className="h-10 w-10 text-muted-foreground" /> },
-  { name: 'AI Alchemists', icon: <BrainCircuit className="h-10 w-10 text-muted-foreground" /> },
-  { name: 'SynthLabs', icon: <FlaskConical className="h-10 w-10 text-muted-foreground" /> },
+  { name: 'Innovate Inc.', icon: <Briefcase /> },
+  { name: 'CodeCrafters', icon: <Code /> },
+  { name: 'DevSolutions', icon: <GitFork /> },
+  { name: 'FutureForge', icon: <HardHat /> },
+  { name: 'NextGen EDU', icon: <GraduationCap /> },
+  { name: 'Data Dynamos', icon: <Database /> },
+  { name: 'Server Systems', icon: <Server /> },
+  { name: 'CloudNet', icon: <Cloud /> },
+  { name: 'QuantumLeap', icon: <Atom /> },
+  { name: 'TestWorks', icon: <TestTube /> },
+  { name: 'AI Alchemists', icon: <BrainCircuit /> },
+  { name: 'SynthLabs', icon: <FlaskConical /> },
 ];
 
 export const schedule: ScheduleEvent[] = [
@@ -296,3 +296,6 @@ export const projectIdeas: ProjectIdea[] = [
 
 
 
+
+
+    
