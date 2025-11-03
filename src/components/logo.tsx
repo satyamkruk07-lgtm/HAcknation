@@ -13,7 +13,7 @@ export function Logo() {
   const href = !isUserLoading && user ? '/dashboard' : '/';
 
   return (
-    <Link href={href} className="flex items-center space-x-2" aria-disabled={isUserLoading}>
+    <Link href={href} className="flex items-center space-x-2">
       <Rocket className="h-6 w-6 text-accent" />
       <span className="font-bold font-headline text-lg">HackNation</span>
     </Link>
