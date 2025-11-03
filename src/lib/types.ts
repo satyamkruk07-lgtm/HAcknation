@@ -52,6 +52,7 @@ export type UserAccount = {
   email: string;
   name:string;
   registrationDate: string;
+  emailVerified?: boolean;
   college?: string;
   skills?: string[];
   bio?: string;

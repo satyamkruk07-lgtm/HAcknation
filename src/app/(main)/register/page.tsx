@@ -90,6 +90,7 @@ export default function RegisterPage() {
         name: data.name,
         photoURL: user.photoURL,
         registrationDate: new Date().toISOString(),
+        emailVerified: user.emailVerified, // This will be false initially
       });
 
       // Redirect to login with a success message
