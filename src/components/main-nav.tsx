@@ -1,15 +1,13 @@
-
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
 import { Button } from './ui/button';
-import { useUser, useAuth, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { useUser, useAuth } from '@/firebase';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { signOut } from 'firebase/auth';
-import { collection } from 'firebase/firestore';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,18 +24,9 @@ export function MainNav() {
   const pathname = usePathname();
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
-  const firestore = useFirestore();
+  const { isAdmin, isAdminLoading } = useAdminStatus();
   const { toast } = useToast();
 
-  const adminUsersQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return collection(firestore, 'roles_admin');
-  }, [firestore]);
-
-  const { data: adminUsers, isLoading: isAdminLoading } = useCollection<{id: string}>(adminUsersQuery);
-  const adminIds = useMemo(() => adminUsers?.map(u => u.id) || [], [adminUsers]);
-
-  const isAdmin = user?.uid && adminIds.includes(user.uid);
   const isLoading = isUserLoading || isAdminLoading;
 
 

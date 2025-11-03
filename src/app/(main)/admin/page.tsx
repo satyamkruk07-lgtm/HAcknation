@@ -1,8 +1,8 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebase';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
 import {
   Card,
@@ -192,18 +192,9 @@ function CreateAnnouncementForm() {
 
 function UserManagementTab() {
   const firestore = useFirestore();
-  const { user, isUserLoading } = useUser();
+  const { isUserLoading } = useUser();
+  const { isAdmin, isAdminLoading } = useAdminStatus();
   const [selectedUser, setSelectedUser] = useState<UserAccount | null>(null);
-
-  const adminUsersQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return collection(firestore, 'roles_admin');
-  }, [firestore]);
-
-  const { data: adminUsers } = useCollection<{id: string}>(adminUsersQuery);
-  const adminIds = useMemo(() => adminUsers?.map(u => u.id) || [], [adminUsers]);
-
-  const isAdmin = user?.uid && adminIds.includes(user.uid);
 
   const usersQuery = useMemoFirebase(() => {
     if (!firestore || !isAdmin) return null; // Only create query if user is an admin
@@ -211,7 +202,7 @@ function UserManagementTab() {
   }, [firestore, isAdmin]);
 
   const { data: users, isLoading: isUsersLoading } = useCollection<UserAccount>(usersQuery);
-  const isLoading = isUserLoading || (isAdmin && isUsersLoading);
+  const isLoading = isUserLoading || isAdminLoading || (isAdmin && isUsersLoading);
 
   const downloadCSV = (data: UserAccount[], filename: string) => {
     if (!data || data.length === 0) {
@@ -546,18 +537,9 @@ function ProjectManagementTab() {
 
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
-  const firestore = useFirestore();
+  const { isAdmin, isAdminLoading } = useAdminStatus();
   const router = useRouter();
 
-  const adminUsersQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return collection(firestore, 'roles_admin');
-  }, [firestore]);
-
-  const { data: adminUsers, isLoading: isAdminLoading } = useCollection<{id: string}>(adminUsersQuery);
-  const adminIds = useMemo(() => adminUsers?.map(u => u.id) || [], [adminUsers]);
-
-  const isAdmin = user?.uid && adminIds.includes(user.uid);
   const isLoading = isUserLoading || isAdminLoading;
 
 
@@ -611,5 +593,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    

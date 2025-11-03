@@ -6,7 +6,7 @@
  *
  * Data Structure:
  * - /events/{eventId}: Stores event details. Publicly readable.
- * - /users/{userId}: Stores user profiles. Owner-only access.
+ * - /users/{userId}: Stores user profiles. Owner-only access for write, any signed-in user for list.
  * - /announcements/{announcementId}: Stores event announcements. Publicly readable by authenticated users.
  * - /events/{eventId}/teams/{teamId}: Stores teams participating in an event.
  *   Publicly readable, but team creation/modification is restricted (TODO).
@@ -15,15 +15,15 @@
  *   Publicly readable, but project creation/modification is restricted (TODO).
  * - /projects/{projectId}/judgings/{judgingId}: Stores judging information.
  *   Publicly readable, but judging creation/modification is restricted (TODO).
- * - /roles_admin/{userId}: Indicates if a user has admin roles. Admin-only access.
+ * - /roles_admin/{userId}: Indicates if a user has admin roles. Admin-only access for write, Owner-only for read.
  * - /users/{userId}/teams/{teamId}: Stores teams created by a user. Owner-only access.
  *
  * Key Security Decisions:
- * - User listing is implicitly denied.  Only individual user profiles can be read.
+ * - User listing is allowed for any signed-in user to facilitate team formation.
  * - Event data (schedule items) is publicly readable to facilitate
  *   easy access to event information.
  * - Announcements are readable by any signed-in user.
- * - Admin roles are managed via the `roles_admin` collection.
+ * - Admin roles are managed via the `roles_admin` collection. A user can read their own admin status.
  * - Teams created by a user are in the `/users/{userId}/teams/{teamId}` subcollection
  *   for enhanced security and simplified listing.
  *
@@ -144,20 +144,16 @@ service cloud.firestore {
     }
 
      /**
-      * @description Allows only existing admin users to read, create, update, and delete.
+      * @description Allows admins to manage roles, and users to read their own role.
       * @path /roles_admin/{userId}
-      * @allow get: if isAdmin();
-      * @allow create: if isAdmin();
-      * @allow update: if isAdmin();
-      * @allow delete: if isAdmin();
-      * @deny list: if true; //No listing
-      * @principle Enforces admin-only access to the roles_admin collection. Existence over content.
+      * @allow get: if isOwner(userId); // A user can check their own admin status.
+      * @allow create, update, delete: if isAdmin(); // Only existing admins can change roles.
+      * @deny list: if true; // No listing all admins.
+      * @principle Enforces admin-only write access and self-read access for roles. Existence over content.
       */
     match /roles_admin/{userId} {
-      allow get: if isAdmin();
-      allow create: if isAdmin();
-      allow update: if isAdmin();
-      allow delete: if isAdmin();
+      allow get: if isOwner(userId);
+      allow create, update, delete: if isAdmin();
       allow list: if false; // Prevent listing of all admins.
     }
 
