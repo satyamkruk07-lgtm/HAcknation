@@ -1,22 +1,11 @@
 /**
- * @fileoverview Firestore Security Rules for HackTrack application.
+ * @fileoverview Firestore and Cloud Storage Security Rules for HackTrack application.
  *
  * Core Philosophy:
  * This ruleset prioritizes a secure-by-default posture, leveraging path-based ownership and role-based access control. It enforces strict authorization for all write operations and carefully manages read access based on the data's privacy level.
- *
- * Data Structure:
- * The Firestore database is structured with top-level collections for `events`, `users`, `teams`, `projects`, `judgingCriteria`, `judgments`, and `announcements`. User-specific data is nested under `/users/{userId}`. Team membership is denormalized in the `teams` collection using a `memberIds` array for efficient authorization checks.
- *
- * Key Security Decisions:
- * - User listing is implicitly allowed via `get` operations on individual `/users/{userId}` documents but is not generally listable.
- * - Public read access is granted to the `events`, `judgingCriteria`, and `announcements` collections, assuming their content is intended to be publicly viewable.
- * - All write operations require authentication (`isSignedIn()`) and are further restricted based on ownership or membership.
- * - The ruleset leans towards explicit denial (`allow ...: if false;`) for any ambiguous or undefined access patterns.
- *
- * Denormalization for Authorization:
- * - The `teams` collection includes a `memberIds` array, which denormalizes user membership within the team. This avoids costly `get()` calls to the `users` collection when checking a user's role when accessing team data.
  */
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -48,52 +37,24 @@ service cloud.firestore {
 
     /**
      * @description Rule for the /events/{eventId} collection.
-     * @path /events/{eventId}
-     * @allow (get, list): Any user can read event details.
-     * @allow (create): No one can create events through client (use backend functions instead).
-     * @deny (create): Any unauthenticated user attempts to create an event.
-     * @deny (update): Any user attempts to update an event.
-     * @deny (delete): Any user attempts to delete an event.
-     * @principle Allows any user to read event details, but restricts creation, update, and deletion.
      */
     match /events/{eventId} {
       allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow create, update, delete: if false;
     }
 
     /**
      * @description Rule for the /users/{userId} collection.
-     * @path /users/{userId}
-     * @allow (get): Any user can read any user's profile information.
-     * @allow (create): A user can create their own profile (self-registration).
-     * @deny (create): A user attempts to create another user's profile.
-     * @allow (update): A user can update their own profile.
-     * @deny (update): A user attempts to update another user's profile.
-     * @allow (delete): A user can delete their own profile.
-     * @deny (delete): A user attempts to delete another user's profile.
-     * @principle Enforces user-ownership for creating, updating, and deleting user profiles.
      */
     match /users/{userId} {
       allow get: if true;
       allow create: if isOwner(userId);
-      allow update: if isExistingOwner(userId);
-      allow delete: if isExistingOwner(userId);
+      allow update, delete: if isExistingOwner(userId);
       allow list: if false;
     }
 
     /**
      * @description Rule for the /teams/{teamId} collection.
-     * @path /teams/{teamId}
-     * @allow (get, list): Any authenticated user can read team information.
-     * @allow (create): Any authenticated user can create a team.
-     * @deny (create): Any unauthenticated user attempts to create a team.
-     * @allow (update): Only team members can update team information.
-     * @deny (update): A user attempts to update a team they are not a member of.
-     * @allow (delete): Only team members can delete team information.
-     * @deny (delete): A user attempts to delete a team they are not a member of.
-     * @principle Enforces team-membership for updating and deleting team information.  Allows anyone to create.
      */
     match /teams/{teamId} {
       allow get, list: if true;
@@ -104,73 +65,50 @@ service cloud.firestore {
 
     /**
      * @description Rule for the /projects/{projectId} collection.
-     * @path /projects/{projectId}
-     * @allow (get, list): Any authenticated user can read project details.
-     * @allow (create): Any authenticated user can create a project.
-     * @deny (create): Any unauthenticated user attempts to create a project.
-     * @allow (update): Any authenticated user can update a project.
-     * @deny (update): Any unauthenticated user attempts to update a project.
-     * @allow (delete): Any authenticated user can delete a project.
-     * @deny (delete): Any unauthenticated user attempts to delete a project.
      */
     match /projects/{projectId} {
       allow get, list: if true;
       allow create: if isSignedIn();
-      allow update: if isSignedIn() && resource != null;
-      allow delete: if isSignedIn() && resource != null;
+      allow update, delete: if isSignedIn() && resource != null;
     }
 
     /**
      * @description Rule for the /judgingCriteria/{criteriaId} collection.
-     * @path /judgingCriteria/{criteriaId}
-     * @allow (get, list): Any user can read judging criteria.
-     * @allow (create): No one can create criteria through client (use backend functions instead).
-     * @deny (create): Any unauthenticated user attempts to create judging criteria.
-     * @deny (update): Any user attempts to update judging criteria.
-     * @deny (delete): Any user attempts to delete judging criteria.
-     * @principle Allows any user to read judging criteria, but restricts creation, update, and deletion.
      */
     match /judgingCriteria/{criteriaId} {
       allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow create, update, delete: if false;
     }
 
     /**
      * @description Rule for the /judgments/{judgmentId} collection.
-     * @path /judgments/{judgmentId}
-     * @allow (get, list): Any authenticated user can read judgments.
-     * @allow (create): Only authenticated users can create judgments.
-     * @deny (create): Any unauthenticated user attempts to create a judgment.
-     * @allow (update): Only authenticated users can update judgments.
-     * @deny (update): Any unauthenticated user attempts to update a judgment.
-     * @allow (delete): Only authenticated users can delete judgments.
-     * @deny (delete): Any unauthenticated user attempts to delete a judgment.
-     * @principle Enforces that only authenticated users can create, update, and delete judgments.
      */
     match /judgments/{judgmentId} {
       allow get, list: if isSignedIn();
-      allow create: if isSignedIn();
-      allow update: if isSignedIn() && resource != null;
-      allow delete: if isSignedIn() && resource != null;
+      allow create, update, delete: if isSignedIn();
     }
 
     /**
      * @description Rule for the /announcements/{announcementId} collection.
-     * @path /announcements/{announcementId}
-     * @allow (get, list): Any user can read announcements.
-     * @allow (create): No one can create announcements through client (use backend functions instead).
-     * @deny (create): Any unauthenticated user attempts to create an announcement.
-     * @deny (update): Any user attempts to update an announcement.
-     * @deny (delete): Any user attempts to delete an announcement.
-     * @principle Allows any user to read announcements, but restricts creation, update, and deletion.
      */
     match /announcements/{announcementId} {
       allow get, list: if true;
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+      allow create, update, delete: if false;
+    }
+  }
+}
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Only authenticated users can access Storage
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // User-specific folder for avatars
+    match /user_avatars/{userId}/{fileName} {
+      // Allow user to read, write, and delete their own files
+      allow read, write, delete: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
