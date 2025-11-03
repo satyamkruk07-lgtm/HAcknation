@@ -29,15 +29,7 @@ export function useAdminStatus() {
       return;
     }
 
-    // --- TEMPORARY OVERRIDE ---
-    // Hardcode kalyanikri1111@gmail.com as an admin.
-    if (user.email === 'kalyanikri1111@gmail.com') {
-        setIsAdmin(true);
-        setIsAdminLoading(false);
-        return;
-    }
-    
-    // If we have a user, check their admin status.
+    // If we have a user, check their admin status from Firestore.
     const checkAdminStatus = async () => {
       if (!firestore) {
           setIsAdmin(false);
