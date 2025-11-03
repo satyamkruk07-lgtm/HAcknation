@@ -38,7 +38,12 @@ const profileFormSchema = z.object({
   college: z.string().optional(),
   skills: z.string().optional(),
   bio: z.string().optional(),
-  phoneNumber: z.string().optional(),
+  phoneNumber: z.string().optional().refine(
+    (val) => !val || /^\+91[1-9][0-9]{9}$/.test(val),
+    {
+      message: 'Phone number must be a valid Indian number (e.g., +919876543210)',
+    }
+  ),
 });
 
 type ProfileFormData = z.infer<typeof profileFormSchema>;
@@ -207,7 +212,7 @@ export default function ProfilePage() {
                             <FormItem>
                               <FormLabel>Phone Number</FormLabel>
                               <FormControl>
-                                <Input type="tel" placeholder="+1 234 567 890" {...field} />
+                                <Input type="tel" placeholder="+919876543210" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
