@@ -1,9 +1,10 @@
 
 'use client';
 
+import React from 'react';
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -368,7 +369,7 @@ export default function DashboardPage() {
             </Card>
 
             {/* Hackathon Tips */}
-            <div>
+            <div className="space-y-8">
               <h2 className="mb-4 font-headline text-2xl font-bold">Hackathon Tips</h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {hackathonTips.map((tip, index) => (
@@ -392,53 +393,6 @@ export default function DashboardPage() {
                 ))}
               </div>
             </div>
-
-
-             {/* Conducted By Section */}
-            <div className="mt-8">
-                <h2 className="mb-8 font-headline text-2xl font-bold text-center">Conducted By</h2>
-                <div className="flex flex-col items-center gap-8">
-                    {/* Top row with 2 people, centered */}
-                    <div className="flex justify-center gap-16">
-                        {conductors.slice(0, 2).map((conductor) => (
-                            <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
-                                <Image
-                                    src={`https://picsum.photos/seed/${conductor.seed}/200/200`}
-                                    alt={`Portrait of ${conductor.name}`}
-                                    width={128}
-                                    height={128}
-                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105"
-                                    data-ai-hint="person portrait"
-                                />
-                                <div className="mt-2">
-                                    <h3 className="font-semibold text-base">Name: {conductor.name}</h3>
-                                    <p className="text-sm text-muted-foreground">Faculty</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    {/* Bottom row with 3 people */}
-                    <div className="flex justify-center gap-16">
-                        {conductors.slice(2, 5).map((conductor) => (
-                            <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
-                                <Image
-                                    src={`https://picsum.photos/seed/${conductor.seed}/200/200`}
-                                    alt={`Portrait of ${conductor.name}`}
-                                    width={128}
-                                    height={128}
-                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105"
-                                    data-ai-hint="person portrait"
-                                />
-                                <div className="mt-2">
-                                    <h3 className="font-semibold text-base">Name: {conductor.name}</h3>
-                                    <p className="text-sm text-muted-foreground">Faculty</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
           </div>
 
           {/* Right Column */}
@@ -479,6 +433,52 @@ export default function DashboardPage() {
             </Card>
           </div>
         </div>
+
+        {/* Conducted By Section */}
+        <div className="mt-12 flex flex-col items-center">
+            <h2 className="mb-8 font-headline text-2xl font-bold text-center">Conducted By</h2>
+            <div className="flex flex-col items-center gap-8">
+                {/* Top row with 2 people, centered */}
+                <div className="flex justify-center gap-16">
+                    {conductors.slice(0, 2).map((conductor) => (
+                        <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
+                            <Image
+                                src={`https://picsum.photos/seed/${conductor.seed}/200/200`}
+                                alt={`Portrait of ${conductor.name}`}
+                                width={128}
+                                height={128}
+                                className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105"
+                                data-ai-hint="person portrait"
+                            />
+                            <div className="mt-2">
+                                <h3 className="font-semibold text-base">Name: {conductor.name}</h3>
+                                <p className="text-sm text-muted-foreground">Faculty</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                {/* Bottom row with 3 people */}
+                <div className="flex justify-center gap-16">
+                    {conductors.slice(2, 5).map((conductor) => (
+                        <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
+                            <Image
+                                src={`https://picsum.photos/seed/${conductor.seed}/200/200`}
+                                alt={`Portrait of ${conductor.name}`}
+                                width={128}
+                                height={128}
+                                className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105"
+                                data-ai-hint="person portrait"
+                            />
+                            <div className="mt-2">
+                                <h3 className="font-semibold text-base">Name: {conductor.name}</h3>
+                                <p className="text-sm text-muted-foreground">Faculty</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+
       </div>
     </div>
   );
