@@ -678,32 +678,39 @@ export default function AdminPage() {
   const isLoading = isUserLoading || isAdminLoading;
 
   useEffect(() => {
+    // Only perform actions once everything has loaded
     if (isLoading) {
-      return; // Do nothing while loading
+      return; // Wait until loading is complete
     }
+
+    // If there's no user, redirect to login
     if (!user) {
       router.push('/login');
-    } else if (!isAdmin) {
+      return;
+    }
+
+    // If there is a user but they are not an admin, redirect to dashboard
+    if (!isAdmin) {
       router.push('/dashboard');
     }
   }, [user, isAdmin, isLoading, router]);
 
-  // Show a loader while we are determining the user's auth and admin status.
+  // Show a unified loader while we are determining the user's auth and admin status.
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
-  // If after loading, the user is not an admin, we render nothing,
-  // as the useEffect will handle the redirection.
+  // If after loading, the user is not an admin, render nothing.
+  // The useEffect above will handle the redirection.
   if (!isAdmin) {
     return null;
   }
   
-  // Only render the admin content if the user is an admin and everything has loaded.
+  // Only render the admin content if the user is confirmed to be an admin.
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
@@ -738,3 +745,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
