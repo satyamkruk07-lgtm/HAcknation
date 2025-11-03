@@ -312,14 +312,14 @@ export const conductors: Conductor[] = [
         imageUrl: "https://images.unsplash.com/photo-1610916113640-d6332ff87ddf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNnx8bW91bnRhaW4lMjBnaXJsfGVufDB8fHx8MTc2MjE4OTM3Mnww&ixlib=rb-4.1.0&q=80&w=1080",
         email: "satyam.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/satyam-kumar-87913b168/",
-        qualification: "M.Tech in CSE",
-        skills: ["Web Development", "React", "Node.js", "Firebase"],
+        qualification: "BCA",
+        skills: ["Event Management", "Public Speaking", "Canva", "Photoshop"],
         phone: "9661175197"
     },
     {
         id: "3",
         name: "Mr. Sartaj Khan",
-        role: "Head of Department",
+        role: "Head of BCA Department",
         imageUrl: `https://images.unsplash.com/photo-1745571479595-8e198f251c95?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNnx8b2xkJTIwdGVhY2hlciUyMG1hbnxlbnwwfHx8fDE3NjIxOTU2Njd8MA&ixlib=rb-4.1.0&q=80&w=1080`,
         email: "kalyani.kumari@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/kalyani-kumari-b97280249/",
@@ -334,7 +334,7 @@ export const conductors: Conductor[] = [
         imageUrl: `https://images.unsplash.com/photo-1599992454196-937d155e063d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNXx8Ym95JTIwaGlkZGVufGVufDB8fHx8MTc2MjE5NjAyMXww&ixlib=rb-4.1.0&q=80&w=1080`,
         email: "manas.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/manas-kumar-87913b168/",
-        qualification: "B.Tech in CSE",
+        qualification: "M.Tech in CSE",
         skills: ["Competitive Programming", "Java", "C++", "DSA"],
         phone: "8923859863"
     },
@@ -345,7 +345,7 @@ export const conductors: Conductor[] = [
         imageUrl: `https://images.unsplash.com/photo-1480827625140-981096152bdc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMXx8bmljZSUyMGxvb2t8ZW58MHx8fHwxNzYyMTk2Mjg0fDA&ixlib=rb-4.1.0&q=80&w=1080`,
         email: "rakhi@shivalikcollege.eduin",
         linkedin: "https://www.linkedin.com/in/rakhi-/",
-        qualification: "MBA in Marketing",
+        qualification: "M.Tech in CSE",
         skills: ["Digital Marketing", "SEO", "Content Writing", "Social Media"],
         phone: "7355128710"
     },
@@ -384,6 +384,8 @@ export const conductors: Conductor[] = [
     
 
 
+
+    
 
     
 
