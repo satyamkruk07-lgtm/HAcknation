@@ -229,7 +229,7 @@ export default function DashboardPage() {
               </div>
               <div className="text-center">
                 <p className="text-xl font-bold text-destructive uppercase">NAAC</p>
-                <p className="text-xl font-normal">Grade</p>
+                <p className="text-xl font-bold">Grade</p>
               </div>
             </div>
         </div>
