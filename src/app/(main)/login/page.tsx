@@ -60,8 +60,6 @@ const GoogleIcon = () => (
     </svg>
   );
 
-const adminEmails = ['kalyanikri1111@gmail.com', 'frgtpeople@gmail.com'];
-
 export default function LoginPage() {
   const auth = useAuth();
   const firestore = useFirestore();
@@ -96,10 +94,8 @@ export default function LoginPage() {
       const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
       const user = userCredential.user;
       
-      const isAdmin = user.email && adminEmails.includes(user.email);
-
-      if (user.emailVerified || isAdmin) {
-        // SUCCESS: Email is verified OR user is an admin, proceed to dashboard.
+      if (user.emailVerified) {
+        // SUCCESS: Email is verified, proceed to dashboard.
         router.push('/dashboard');
       } else {
         // FAIL: Email is not verified.
