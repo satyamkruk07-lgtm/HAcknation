@@ -389,25 +389,47 @@ export default function DashboardPage() {
 
              {/* Conducted By Section */}
             <div className="mt-8">
-              <h2 className="mb-6 font-headline text-2xl font-bold text-center">Conducted By</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-4 gap-y-8">
-                {conductors.map((conductor) => (
-                  <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
-                    <Image
-                      src={`https://picsum.photos/seed/${conductor.seed}/200/200`}
-                      alt={`Portrait of ${conductor.name}`}
-                      width={100}
-                      height={100}
-                      className="rounded-full border-4 border-background shadow-md"
-                      data-ai-hint="person portrait"
-                    />
-                    <div className="mt-2">
-                      <h3 className="font-semibold text-sm">Name: {conductor.name}</h3>
-                      <p className="text-xs text-muted-foreground">Faculty</p>
+                <h2 className="mb-8 font-headline text-2xl font-bold text-center">Conducted By</h2>
+                <div className="flex flex-col items-center gap-8">
+                    {/* Top row with 2 people, centered */}
+                    <div className="flex justify-center gap-16">
+                        {conductors.slice(0, 2).map((conductor) => (
+                            <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
+                                <Image
+                                    src={`https://picsum.photos/seed/${conductor.seed}/200/200`}
+                                    alt={`Portrait of ${conductor.name}`}
+                                    width={128}
+                                    height={128}
+                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105"
+                                    data-ai-hint="person portrait"
+                                />
+                                <div className="mt-2">
+                                    <h3 className="font-semibold text-base">Name: {conductor.name}</h3>
+                                    <p className="text-sm text-muted-foreground">Faculty</p>
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                  </div>
-                ))}
-              </div>
+                    {/* Bottom row with 3 people */}
+                    <div className="flex justify-center gap-16">
+                        {conductors.slice(2, 5).map((conductor) => (
+                            <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
+                                <Image
+                                    src={`https://picsum.photos/seed/${conductor.seed}/200/200`}
+                                    alt={`Portrait of ${conductor.name}`}
+                                    width={128}
+                                    height={128}
+                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105"
+                                    data-ai-hint="person portrait"
+                                />
+                                <div className="mt-2">
+                                    <h3 className="font-semibold text-base">Name: {conductor.name}</h3>
+                                    <p className="text-sm text-muted-foreground">Faculty</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
 
           </div>
@@ -453,5 +475,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     
