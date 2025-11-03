@@ -303,7 +303,7 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/dr-devesh-kumar-0a849725/",
         qualification: "BCA",
         skills: ["Machine Learning", "Data Science", "AI", "Python"],
-        phone: "7060550243"
+        phone: "+917060550243"
     },
     {
         id: "2",
@@ -314,7 +314,7 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/satyam-kumar-87913b168/",
         qualification: "BCA",
         skills: ["Event Management", "Public Speaking", "Canva", "Photoshop"],
-        phone: "9661175197"
+        phone: "+919661175197"
     },
     {
         id: "3",
@@ -353,12 +353,12 @@ export const conductors: Conductor[] = [
         id: "6",
         name: "Mr. Anshul Namdev",
         role: "Faculty",
-        imageUrl: `https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwcm9mZXNzaW9uYWwlMjBib3l8ZW58MHx8fHwxNzYyMTk2NzE3fDA&ixlib=rb-4.1.0&q=80&w=1080`,
+        imageUrl: `https://images.unsplash.com/photo-1574281570877-bd815ebb50a4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx0ZWFjaGVyJTIwbWVufGVufDB8fHx8MTc2MjE5NTk4Mnww&ixlib=rb-4.1.0&q=80&w=1080`,
         email: "anshul.namdev@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/anshul-namdev",
         qualification: "M.Tech in CSE",
         skills: ["Cloud Computing", "AWS", "DevOps", "Docker"],
-        phone: "9076994339"
+        phone: "+91 9076994339"
     }
 ];
 
@@ -396,5 +396,7 @@ export const conductors: Conductor[] = [
     
 
 
+
+    
 
     
