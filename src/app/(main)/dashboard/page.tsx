@@ -224,6 +224,10 @@ export default function DashboardPage() {
 
   const topConductors = conductors.slice(0, 2);
   const bottomConductors = conductors.slice(2);
+  
+  const handleConductorSelect = (conductor: Conductor) => {
+    setSelectedConductor(conductor);
+  };
 
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
@@ -449,7 +453,11 @@ export default function DashboardPage() {
                 <div className="flex justify-center gap-16">
                     {topConductors.map((conductor) => (
                         <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
-                            <button onClick={() => setSelectedConductor(conductor)} className="rounded-full">
+                            <button 
+                                onClick={() => handleConductorSelect(conductor)} 
+                                onTouchEnd={(e) => { e.preventDefault(); handleConductorSelect(conductor); }}
+                                className="rounded-full"
+                            >
                                 <Image
                                     src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/128/128`}
                                     alt={`Portrait of ${conductor.name}`}
@@ -470,7 +478,11 @@ export default function DashboardPage() {
                 <div className="flex justify-center gap-16 flex-wrap">
                     {bottomConductors.map((conductor) => (
                         <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
-                             <button onClick={() => setSelectedConductor(conductor)} className="rounded-full">
+                             <button 
+                                onClick={() => handleConductorSelect(conductor)}
+                                onTouchEnd={(e) => { e.preventDefault(); handleConductorSelect(conductor); }}
+                                className="rounded-full"
+                             >
                                 <Image
                                     src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/128/128`}
                                     alt={`Portrait of ${conductor.name}`}
