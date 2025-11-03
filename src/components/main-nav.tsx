@@ -3,11 +3,13 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
 import { Button } from './ui/button';
-import { useUser, useAuth } from '@/firebase';
+import { useUser, useAuth, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { signOut } from 'firebase/auth';
+import { collection } from 'firebase/firestore';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,17 +22,30 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, User as UserIcon, LayoutGrid, Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const adminEmails = ['kalyanikri1111@gmail.com', 'frgtpeople@gmail.com'];
-
 export function MainNav() {
   const pathname = usePathname();
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
+  const firestore = useFirestore();
   const { toast } = useToast();
+
+  const adminUsersQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return collection(firestore, 'roles_admin');
+  }, [firestore]);
+
+  const { data: adminUsers, isLoading: isAdminLoading } = useCollection<{id: string}>(adminUsersQuery);
+  const adminIds = useMemo(() => adminUsers?.map(u => u.id) || [], [adminUsers]);
+
+  const isAdmin = user?.uid && adminIds.includes(user.uid);
+  const isLoading = isUserLoading || isAdminLoading;
+
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
+      // Redirect to home page after logout to ensure clean state
+      window.location.href = '/';
     } catch (error: any) {
       toast({
         variant: 'destructive',
@@ -47,8 +62,6 @@ export function MainNav() {
       .map((n) => n[0])
       .join('');
   };
-  
-  const isAdmin = user && user.email && adminEmails.includes(user.email);
 
   return (
     <div className="flex w-full items-center justify-between">
@@ -56,7 +69,7 @@ export function MainNav() {
         <Logo />
       </div>
       <div className="flex items-center gap-4">
-        {isUserLoading ? (
+        {isLoading ? (
           <div className="h-10 w-24 animate-pulse rounded-md bg-muted" />
         ) : user ? (
           <DropdownMenu>

@@ -60,36 +60,7 @@ export default function TeamsPage() {
   }, [firestore, user]);
 
   const { data: teamProfiles, isLoading } = useCollection<UserAccount>(usersCollectionQuery);
-
-  const sortedProfiles = useMemo(() => {
-    if (!teamProfiles) return null;
-
-    let profiles = [...teamProfiles];
-    
-    // Define the special profiles
-    const kalyaniProfile = profiles.find(p => p.email === 'kalyanikri1111@gmail.com');
-    const satyamProfile = profiles.find(p => p.email === 'frgtpeople@gmail.com');
-
-    // Filter out the special profiles from the main list
-    profiles = profiles.filter(p => p.id !== kalyaniProfile?.id && p.id !== satyamProfile?.id);
-    
-    // Filter out other specific users
-    profiles = profiles.filter(profile => {
-        const namesToFilter = ['priyanshu singh', 'djlnac', 'grace'];
-        if (profile.name && namesToFilter.includes(profile.name.toLowerCase())) {
-            return false;
-        }
-        return true;
-    });
-
-    const finalSortedList = [];
-    if (kalyaniProfile) finalSortedList.push(kalyaniProfile);
-    if (satyamProfile) finalSortedList.push(satyamProfile);
-    finalSortedList.push(...profiles);
-
-    return finalSortedList;
-  }, [teamProfiles]);
-
+  
   if (isUserLoading || isLoading || !user) {
     return (
         <div className="container py-12">
@@ -125,15 +96,8 @@ export default function TeamsPage() {
           Looking for a Team
         </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {sortedProfiles && sortedProfiles.map((profile) => {
-            let imageUrl;
-            if (profile.email === 'frgtpeople@gmail.com') {
-                imageUrl = 'https://images.unsplash.com/photo-1748636271716-472728fdb86f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyMHx8c3RhdHVlJTIwb2YlMjBsaWJ8ZW58MHx8fHwxNzYyMDI4MTM3fDA&ixlib=rb-4.1.0&q=80&w=1080';
-            } else if (profile.email === 'kalyanikri1111@gmail.com') {
-                 imageUrl = 'https://images.unsplash.com/photo-1748636271716-472728fdb86f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyMHx8c3RhdHVlJTIwb2YlMjBsaWJ8ZW58MHx8fHwxNzYyMDI4MTM3fDA&ixlib=rb-4.1.0&q=80&w=1080';
-            } else {
-                imageUrl = profile.photoURL || `https://picsum.photos/seed/${profile.id}/200/200`;
-            }
+          {teamProfiles && teamProfiles.map((profile) => {
+            const imageUrl = profile.photoURL || `https://picsum.photos/seed/${profile.id}/200/200`;
 
             return (
               <Card key={profile.id} className="flex flex-col transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">

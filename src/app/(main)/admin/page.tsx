@@ -58,8 +58,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 
-const adminEmails = ['kalyanikri1111@gmail.com', 'frgtpeople@gmail.com'];
-
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
   const { user } = useUser();
@@ -196,7 +194,15 @@ function UserManagementTab() {
   const { user, isUserLoading } = useUser();
   const [selectedUser, setSelectedUser] = useState<UserAccount | null>(null);
 
-  const isAdmin = user?.email && adminEmails.includes(user.email);
+  const adminUsersQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return collection(firestore, 'roles_admin');
+  }, [firestore]);
+
+  const { data: adminUsers } = useCollection<{id: string}>(adminUsersQuery);
+  const adminIds = useMemo(() => adminUsers?.map(u => u.id) || [], [adminUsers]);
+
+  const isAdmin = user?.uid && adminIds.includes(user.uid);
 
   const usersQuery = useMemoFirebase(() => {
     if (!firestore || !isAdmin) return null; // Only create query if user is an admin
@@ -273,7 +279,7 @@ function UserManagementTab() {
                 ))
               ) : users && users.length > 0 ? (
                 users.map((user) => {
-                  const isVerified = user.emailVerified || (user.email && adminEmails.includes(user.email));
+                  const isVerified = user.emailVerified;
                   return (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.name}</TableCell>
@@ -338,7 +344,7 @@ function UserManagementTab() {
                <div className="grid grid-cols-4 items-center gap-4">
                 <Label className="text-right">Status</Label>
                 <div className="col-span-3">
-                    {selectedUser.emailVerified || (selectedUser.email && adminEmails.includes(selectedUser.email)) ? (
+                    {selectedUser.emailVerified ? (
                         <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
                           <CheckCircle className="mr-1 h-3 w-3" />
                           Verified
@@ -539,26 +545,34 @@ function ProjectManagementTab() {
 
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
+  const firestore = useFirestore();
   const router = useRouter();
 
-  const isAdmin = user?.email && adminEmails.includes(user.email);
+  const adminUsersQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return collection(firestore, 'roles_admin');
+  }, [firestore]);
+
+  const { data: adminUsers, isLoading: isAdminLoading } = useCollection<{id: string}>(adminUsersQuery);
+  const adminIds = useMemo(() => adminUsers?.map(u => u.id) || [], [adminUsers]);
+
+  const isAdmin = user?.uid && adminIds.includes(user.uid);
+  const isLoading = isUserLoading || isAdminLoading;
+
 
   useEffect(() => {
-    // This effect handles redirection based on auth state and role.
-    if (isUserLoading) {
-      return; // Do nothing while auth state is loading.
+    if (isLoading) {
+      return; 
     }
     if (!user) {
-      router.push('/login'); // If no user, send to login.
+      router.push('/login'); 
     } else if (!isAdmin) {
-      router.push('/dashboard'); // If user is not an admin, send to dashboard.
+      router.push('/dashboard'); 
     }
-    // If user is an admin, they are allowed to stay on this page.
-  }, [user, isUserLoading, isAdmin, router]);
+  }, [user, isLoading, isAdmin, router]);
 
 
-  if (isUserLoading || !user || !isAdmin) {
-    // Show a loading spinner while we verify auth and admin status, or if redirection is in progress.
+  if (isLoading || !user || !isAdmin) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -566,7 +580,6 @@ export default function AdminPage() {
     );
   }
 
-  // Render the admin content only if the user is a verified admin.
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
