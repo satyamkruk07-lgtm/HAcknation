@@ -1,34 +1,58 @@
 'use client';
 
-import { useFirestore, useUser, useMemoFirebase } from '@/firebase';
-import { useDoc } from '@/firebase/firestore/use-doc';
-import { doc } from 'firebase/firestore';
+import { useState, useEffect } from 'react';
+import { useFirestore, useUser } from '@/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 /**
  * A hook to efficiently check if the current user has admin privileges.
+ * This version uses a one-time `getDoc` call to avoid race conditions.
  * @returns An object containing `isAdmin` (boolean) and `isAdminLoading` (boolean).
  */
 export function useAdminStatus() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
 
-  // Memoize the document reference to prevent re-renders.
-  // This ref is only created if we have a user ID.
-  const adminDocRef = useMemoFirebase(() => {
-    if (!firestore || !user?.uid) return null;
-    return doc(firestore, 'roles_admin', user.uid);
-  }, [firestore, user?.uid]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdminLoading, setIsAdminLoading] = useState(true);
 
-  // useDoc will listen to this single document.
-  // data will be non-null if the document exists (i.e., user is an admin).
-  // isLoading is true while the document is being fetched.
-  const { data: adminDoc, isLoading: isAdminDocLoading } = useDoc(adminDocRef);
+  useEffect(() => {
+    // Don't do anything until the main user loading is complete.
+    if (isUserLoading) {
+      return;
+    }
 
-  // The user is an admin if the admin document exists.
-  const isAdmin = !!adminDoc;
+    // If there is no user, they are definitely not an admin.
+    if (!user) {
+      setIsAdmin(false);
+      setIsAdminLoading(false);
+      return;
+    }
+    
+    // If we have a user, check their admin status.
+    const checkAdminStatus = async () => {
+      if (!firestore) {
+          setIsAdmin(false);
+          setIsAdminLoading(false);
+          return;
+      }
+      const adminDocRef = doc(firestore, 'roles_admin', user.uid);
+      try {
+        const adminDocSnap = await getDoc(adminDocRef);
+        // The user is an admin if the document exists.
+        setIsAdmin(adminDocSnap.exists());
+      } catch (error) {
+        console.error("Error checking admin status:", error);
+        setIsAdmin(false);
+      } finally {
+        setIsAdminLoading(false);
+      }
+    };
 
-  // The overall loading state depends on both the user auth check and the Firestore doc read.
-  const isAdminLoading = isUserLoading || isAdminDocLoading;
+    checkAdminStatus();
+    
+  }, [user, isUserLoading, firestore]);
 
-  return { isAdmin, isAdminLoading };
+
+  return { isAdmin, isAdminLoading: isUserLoading || isAdminLoading };
 }
