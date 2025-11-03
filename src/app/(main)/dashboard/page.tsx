@@ -208,8 +208,8 @@ export default function DashboardPage() {
              <Image 
                 src="https://www.shivalikcollege.edu.in/wp-content/uploads/2023/10/logo-sce.png"
                 alt="Shivalik Logo"
-                width={250}
-                height={54}
+                width={180}
+                height={39}
                 className="mb-4"
              />
             <h1 className="font-headline text-2xl font-bold">
