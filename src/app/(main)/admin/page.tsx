@@ -245,7 +245,6 @@ function UserManagementTab() {
     document.body.removeChild(link);
   };
   
-  const adminEmails = ['kalyanikri1111@gmail.com', 'frgtpeople@gmail.com'];
 
   return (
     <>
@@ -284,13 +283,12 @@ function UserManagementTab() {
                 ))
               ) : users && users.length > 0 ? (
                 users.map((user) => {
-                  const isVerified = user.emailVerified || (user.email && adminEmails.includes(user.email));
                   return (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
-                        {isVerified ? (
+                        {user.emailVerified ? (
                           <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
                             <CheckCircle className="mr-1 h-3 w-3" />
                             Verified
@@ -595,7 +593,7 @@ function ConductorManagementTab() {
                 linkedin: selectedConductor.linkedin,
                 qualification: selectedConductor.qualification,
                 imageUrl: selectedConductor.imageUrl,
-                skills: selectedConductor.skills.join(', '),
+                skills: (selectedConductor.skills || []).join(', '),
             });
         }
     }, [selectedConductor, form]);
@@ -770,3 +768,5 @@ export default function AdminPage() {
   // The redirection is handled by the useEffect.
   return null;
 }
+
+    
