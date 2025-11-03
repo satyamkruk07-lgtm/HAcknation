@@ -302,7 +302,7 @@ export const conductors: Conductor[] = [
         email: "devesh.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/dr-devesh-kumar-0a849725/",
         qualification: "BCA",
-        skills: ["Machine Learning", "Data Science", "AI", "Python"],
+        skills: ["Python", "C"],
         phone: "+917060550243"
     },
     {
@@ -313,7 +313,7 @@ export const conductors: Conductor[] = [
         email: "satyam.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/satyam-kumar-87913b168/",
         qualification: "BCA",
-        skills: ["Event Management", "Public Speaking", "Canva", "Photoshop"],
+        skills: ["Python", "C"],
         phone: "9661175197"
     },
     {
@@ -404,3 +404,6 @@ export const conductors: Conductor[] = [
     
 
 
+
+
+    
