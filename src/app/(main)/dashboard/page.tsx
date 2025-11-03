@@ -73,33 +73,44 @@ const hackathonTips = [
 
 function Countdown() {
     const deadline = new Date('2025-11-13T11:00:00');
-    const [timeLeft, setTimeLeft] = useState({
-        days: 0,
-        hours: 0,
-        minutes: 0,
-        seconds: 0,
-    });
+    const [timeLeft, setTimeLeft] = useState<{
+        days: number;
+        hours: number;
+        minutes: number;
+        seconds: number;
+    } | null>(null);
 
     useEffect(() => {
-        const timer = setInterval(() => {
+        const calculateTimeLeft = () => {
             const now = new Date();
             const difference = deadline.getTime() - now.getTime();
 
             if (difference > 0) {
-                setTimeLeft({
+                return {
                     days: Math.floor(difference / (1000 * 60 * 60 * 24)),
                     hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
                     minutes: Math.floor((difference / 1000 / 60) % 60),
                     seconds: Math.floor((difference / 1000) % 60),
-                });
-            } else {
-                setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-                clearInterval(timer);
+                };
             }
+            return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+        };
+        
+        setTimeLeft(calculateTimeLeft());
+
+        const timer = setInterval(() => {
+            setTimeLeft(calculateTimeLeft());
         }, 1000);
 
         return () => clearInterval(timer);
     }, [deadline]);
+
+    const renderTimeValue = (value: number | undefined) => {
+        if (value === undefined) {
+            return <Skeleton className="h-8 w-12" />;
+        }
+        return <div className="text-3xl font-bold font-mono">{String(value).padStart(2, '0')}</div>;
+    }
 
     return (
         <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
@@ -112,19 +123,19 @@ function Countdown() {
             <CardContent>
                 <div className="grid grid-cols-4 gap-2 text-center">
                     <div>
-                        <div className="text-3xl font-bold font-mono">{String(timeLeft.days).padStart(2, '0')}</div>
+                        {renderTimeValue(timeLeft?.days)}
                         <div className="text-xs text-muted-foreground">DAYS</div>
                     </div>
                     <div>
-                        <div className="text-3xl font-bold font-mono">{String(timeLeft.hours).padStart(2, '0')}</div>
+                        {renderTimeValue(timeLeft?.hours)}
                         <div className="text-xs text-muted-foreground">HOURS</div>
                     </div>
                     <div>
-                        <div className="text-3xl font-bold font-mono">{String(timeLeft.minutes).padStart(2, '0')}</div>
+                        {renderTimeValue(timeLeft?.minutes)}
                         <div className="text-xs text-muted-foreground">MINUTES</div>
                     </div>
                     <div>
-                        <div className="text-3xl font-bold font-mono">{String(timeLeft.seconds).padStart(2, '0')}</div>
+                        {renderTimeValue(timeLeft?.seconds)}
                         <div className="text-xs text-muted-foreground">SECONDS</div>
                     </div>
                 </div>
