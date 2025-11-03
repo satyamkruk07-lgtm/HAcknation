@@ -58,6 +58,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+import { makeAdminAction, removeAdminAction } from '@/lib/actions';
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -535,6 +536,140 @@ function ProjectManagementTab() {
   );
 }
 
+function AdminManagementTab() {
+  const firestore = useFirestore();
+  const { toast } = useToast();
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const adminRolesQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'roles_admin'));
+  }, [firestore]);
+
+  const { data: admins, isLoading, error } = useCollection<{ email: string }>(adminRolesQuery);
+
+  const handleMakeAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setIsSubmitting(true);
+    const result = await makeAdminAction(email);
+    setIsSubmitting(false);
+
+    if (result.success) {
+      toast({
+        title: 'Success!',
+        description: result.message,
+      });
+      setEmail('');
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: result.message,
+      });
+    }
+  };
+
+  const handleRemoveAdmin = async (uid: string) => {
+    const result = await removeAdminAction(uid);
+    if (result.success) {
+      toast({
+        title: 'Success!',
+        description: result.message,
+      });
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: result.message,
+      });
+    }
+  };
+
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+        <CardHeader>
+          <CardTitle>Make User an Admin</CardTitle>
+          <CardDescription>
+            Enter the email of a registered user to grant them admin privileges.
+          </CardDescription>
+        </CardHeader>
+        <form onSubmit={handleMakeAdmin}>
+          <CardContent>
+            <Label htmlFor="admin-email">User Email</Label>
+            <Input
+              id="admin-email"
+              type="email"
+              placeholder="user@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Make Admin
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
+
+      <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+        <CardHeader>
+          <CardTitle>Current Admins</CardTitle>
+          <CardDescription>
+            The following users have admin privileges.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Email</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center">
+                    <Loader2 className="mx-auto h-6 w-6 animate-spin" />
+                  </TableCell>
+                </TableRow>
+              ) : admins && admins.length > 0 ? (
+                admins.map((admin) => (
+                  <TableRow key={admin.id}>
+                    <TableCell>{admin.email || 'N/A'}</TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemoveAdmin(admin.id)}
+                      >
+                        Remove Admin
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center">
+                    No admins found. Add the first one manually in Firebase Console.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
   const { isAdmin, isAdminLoading } = useAdminStatus();
@@ -574,10 +709,11 @@ export default function AdminPage() {
         </div>
 
         <Tabs defaultValue="announcements" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-background/50 border shadow-inner">
+          <TabsList className="grid w-full grid-cols-4 bg-background/50 border shadow-inner">
             <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
             <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
+            <TabsTrigger value="admins" className="data-[state=active]:shadow-inner">Admins</TabsTrigger>
           </TabsList>
           <TabsContent value="announcements" className="mt-6">
             <CreateAnnouncementForm />
@@ -587,6 +723,9 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="projects" className="mt-6">
             <ProjectManagementTab />
+          </TabsContent>
+           <TabsContent value="admins" className="mt-6">
+            <AdminManagementTab />
           </TabsContent>
         </Tabs>
       </div>

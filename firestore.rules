@@ -144,17 +144,17 @@ service cloud.firestore {
     }
 
      /**
-      * @description Allows admins to manage roles, and users to read their own role.
+      * @description Allows admins to manage roles, and users to read their own role. Admins can list all roles.
       * @path /roles_admin/{userId}
       * @allow get: if isOwner(userId); // A user can check their own admin status.
+      * @allow list: if isAdmin(); // Admins can list all other admins.
       * @allow create, update, delete: if isAdmin(); // Only existing admins can change roles.
-      * @deny list: if true; // No listing all admins.
       * @principle Enforces admin-only write access and self-read access for roles. Existence over content.
       */
     match /roles_admin/{userId} {
       allow get: if isOwner(userId);
+      allow list: if isAdmin();
       allow create, update, delete: if isAdmin();
-      allow list: if false; // Prevent listing of all admins.
     }
 
     /**
