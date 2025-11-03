@@ -161,14 +161,14 @@ service cloud.firestore {
     }
     
     /**
-     * @description Allows admins to manage global site settings. Anyone can read them.
+     * @description Allows admins to manage global site settings. Logged-in users can read them.
      * @path /site_settings/{settingId}
-     * @allow (get, list): Any user can read site settings (like logos).
+     * @allow (get, list): Any signed-in user can read site settings (like logos).
      * @allow (create, update, delete): Only admins can manage site settings.
      * @principle Secure global site settings.
      */
     match /site_settings/{settingId} {
-        allow get, list: if true;
+        allow get, list: if isSignedIn();
         allow create, update, delete: if isAdmin();
     }
 
@@ -266,3 +266,5 @@ service cloud.firestore {
     }
   }
 }
+
+    
