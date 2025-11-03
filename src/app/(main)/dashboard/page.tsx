@@ -25,6 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import type { Announcement, ScheduleEvent } from '@/lib/types';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
+import Image from 'next/image';
 
 const features = [
   {
@@ -96,6 +97,7 @@ function Countdown() {
             return { days: 0, hours: 0, minutes: 0, seconds: 0 };
         };
         
+        // Run only on client
         setTimeLeft(calculateTimeLeft());
 
         const timer = setInterval(() => {
@@ -103,7 +105,7 @@ function Countdown() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [deadline]);
+    }, []);
 
     const renderTimeValue = (value: number | undefined) => {
         if (value === undefined || timeLeft === null) {
@@ -202,7 +204,14 @@ export default function DashboardPage() {
       <div className="container py-12">
         {/* Header */}
         <div className="mb-12">
-          <div>
+          <div className="flex flex-col items-center text-center">
+             <Image 
+                src="https://storage.googleapis.com/aifire-422811.appspot.com/uploads/shivalik-logo.png"
+                alt="Shivalik Logo"
+                width={250}
+                height={54}
+                className="mb-4"
+             />
             <h1 className="font-headline text-2xl font-bold">
               Welcome, {user.displayName || 'Hacker'}!
             </h1>
