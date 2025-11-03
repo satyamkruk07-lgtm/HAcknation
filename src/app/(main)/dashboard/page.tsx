@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
@@ -204,7 +205,7 @@ export default function DashboardPage() {
       <div className="container py-12">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold font-headline tracking-tighter text-destructive">Shivalik</h1>
-          <p className="text-xl text-muted-foreground">College of Engineering</p>
+          <p className="text-xl font-bold text-foreground">College of Engineering</p>
         </div>
 
         {/* Header */}
