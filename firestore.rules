@@ -58,7 +58,7 @@ service cloud.firestore {
       allow get: if true;
       allow create: if isOwner(userId);
       allow update, delete: if isExistingOwner(userId);
-      allow list: if isAdmin();
+      allow list: if isSignedIn();
     }
     
     /**
