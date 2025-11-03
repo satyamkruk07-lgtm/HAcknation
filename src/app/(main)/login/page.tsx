@@ -63,7 +63,7 @@ const GoogleIcon = () => (
 export default function LoginPage() {
   const auth = useAuth();
   const firestore = useFirestore();
-  const { user: currentUser, isUserLoading } = useUser();
+  const { user: currentUser } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -78,12 +78,12 @@ export default function LoginPage() {
     }
   }, [searchParams]);
 
+  // This useEffect will redirect already logged-in and verified users.
   useEffect(() => {
-    // Only redirect if the user is loaded AND their email is verified
-    if (!isUserLoading && currentUser && currentUser.emailVerified) {
+    if (currentUser && currentUser.emailVerified) {
       router.push('/dashboard');
     }
-  }, [currentUser, isUserLoading, router]);
+  }, [currentUser, router]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -100,15 +100,16 @@ export default function LoginPage() {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
       
-      if (!userCredential.user.emailVerified) {
+      if (userCredential.user.emailVerified) {
+        // SUCCESS: Email is verified, proceed to dashboard.
+        router.push('/dashboard');
+      } else {
+        // FAIL: Email is not verified.
         setError('Please verify your email address before logging in. A new verification link has been sent to your email.');
         await sendEmailVerification(userCredential.user);
-        // Sign out the user immediately so they don't get redirected
+        // Immediately sign the user out.
         await signOut(auth);
-        return;
       }
-      
-      // The useEffect hook will handle the redirect on successful and verified login.
 
     } catch (error: any) {
       let errorMessage = 'An unknown error occurred.';
@@ -161,7 +162,9 @@ export default function LoginPage() {
             emailVerified: user.emailVerified,
           });
         }
-        // Redirect is handled by the useEffect hook
+        // Redirection for Google sign-in is handled by the useEffect that listens for currentUser
+        // because Google sign-in automatically verifies the user.
+        router.push('/dashboard');
     } catch(error: any) {
         let errorMessage = 'An unknown error occurred.';
         switch (error.code) {
@@ -291,4 +294,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
     
