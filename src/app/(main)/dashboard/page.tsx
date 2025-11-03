@@ -222,8 +222,8 @@ export default function DashboardPage() {
     );
   }
 
-  const topConductors = conductors.slice(0, 3);
-  const bottomConductors = conductors.slice(3, 6);
+  const topConductors = conductors.slice(0, 2);
+  const bottomConductors = conductors.slice(2);
 
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
@@ -445,7 +445,7 @@ export default function DashboardPage() {
         <div className="mt-12 flex flex-col items-center">
             <h2 className="mb-8 font-headline text-2xl font-bold text-center">Conducted By</h2>
             <div className="flex flex-col items-center gap-8">
-                {/* Top row with 3 people */}
+                {/* Top row with 2 people */}
                 <div className="flex justify-center gap-16">
                     {topConductors.map((conductor) => (
                         <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
@@ -466,8 +466,8 @@ export default function DashboardPage() {
                         </div>
                     ))}
                 </div>
-                {/* Bottom row with 3 people */}
-                <div className="flex justify-center gap-16">
+                {/* Bottom row with 4 people */}
+                <div className="flex justify-center gap-16 flex-wrap">
                     {bottomConductors.map((conductor) => (
                         <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
                              <button onClick={() => setSelectedConductor(conductor)} className="rounded-full">
