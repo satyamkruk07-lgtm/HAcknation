@@ -206,7 +206,7 @@ export default function DashboardPage() {
         <div className="mb-12">
           <div className="flex flex-col items-center text-center">
              <Image 
-                src="/shivalik-logo.png"
+                src="https://www.shivalikcollege.edu.in/wp-content/uploads/2023/10/logo-sce.png"
                 alt="Shivalik Logo"
                 width={250}
                 height={54}
