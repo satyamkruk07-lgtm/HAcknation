@@ -79,7 +79,7 @@ export default function LoginPage() {
   }, [searchParams]);
 
   useEffect(() => {
-    // Only redirect if the user is loaded and verified
+    // Only redirect if the user is loaded AND their email is verified
     if (!isUserLoading && currentUser && currentUser.emailVerified) {
       router.push('/dashboard');
     }
@@ -105,7 +105,6 @@ export default function LoginPage() {
         await sendEmailVerification(userCredential.user);
         // Sign out the user immediately so they don't get redirected
         await signOut(auth);
-        setIsSubmitting(false); 
         return;
       }
       
@@ -292,5 +291,4 @@ export default function LoginPage() {
     </div>
   );
 }
-
     
