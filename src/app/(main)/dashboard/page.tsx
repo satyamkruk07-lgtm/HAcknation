@@ -26,7 +26,6 @@ import type { Announcement } from '@/lib/types';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const features = [
   {
@@ -165,7 +164,6 @@ export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const router = useRouter();
-  const bannerImage = PlaceHolderImages.find(p => p.id === 'dashboard-banner');
 
   const announcementsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -206,18 +204,6 @@ export default function DashboardPage() {
       <div className="container py-12">
         {/* Header */}
         <div className="mb-12">
-          {bannerImage && (
-            <div className="mb-8 overflow-hidden rounded-lg shadow-lg">
-                <Image
-                    src={bannerImage.imageUrl}
-                    alt={bannerImage.description}
-                    width={1200}
-                    height={300}
-                    className="w-full object-cover"
-                    data-ai-hint={bannerImage.imageHint}
-                />
-            </div>
-          )}
           <div className="flex flex-col items-center text-center">
             <h1 className="font-headline text-2xl font-bold">
               Welcome, {user.displayName || 'Hacker'}!
