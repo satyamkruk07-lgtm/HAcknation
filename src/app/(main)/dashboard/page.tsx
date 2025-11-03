@@ -85,7 +85,7 @@ const hackathonTips = [
 const conductors = [
   { name: 'Kumar Satyam', seed: 'conductor1' },
   { name: 'Kalyani Kumari', seed: 'conductor2' },
-  { name: 'Prof. Ankit', seed: 'conductor3' },
+  { name: 'Paramjeet Singh', seed: 'conductor3' },
   { name: 'Prof. Sneha', seed: 'conductor4' },
   { name: 'Dr. Raj', seed: 'conductor5' },
 ];
