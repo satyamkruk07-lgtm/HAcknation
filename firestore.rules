@@ -52,6 +52,16 @@ service cloud.firestore {
       allow update, delete: if isExistingOwner(userId);
       allow list: if false;
     }
+    
+    /**
+     * @description Rule for the /roles_admin/{adminId} collection.
+     * Only authenticated users can read this collection to verify admin status.
+     * Writes should only be done from a trusted server environment.
+     */
+    match /roles_admin/{adminId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if false; // Disallow client-side writes
+    }
 
     /**
      * @description Rule for the /teams/{teamId} collection.
