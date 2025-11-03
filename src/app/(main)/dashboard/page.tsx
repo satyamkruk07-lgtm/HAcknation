@@ -361,51 +361,30 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-              {/* Hackathon Tips */}
-              <div>
-                <h2 className="mb-4 font-headline text-2xl font-bold">Hackathon Tips</h2>
-                <div className="grid grid-cols-1 gap-6">
-                  {hackathonTips.map((tip, index) => (
-                    <Card key={index} className="group transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
-                        <CardContent className="p-6">
-                          <div className="flex items-start gap-4">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 text-accent transition-transform duration-200 group-hover:scale-105 group-active:scale-110 group-active:shadow-lg group-active:shadow-accent/50">
-                              <tip.icon className="h-6 w-6" />
-                            </div>
-                            <div>
-                              <h3 className="font-semibold text-base">
-                                {tip.title}
-                              </h3>
-                              <p className="text-sm text-muted-foreground">
-                                {tip.description}
-                              </p>
-                            </div>
+            {/* Hackathon Tips */}
+            <div>
+              <h2 className="mb-4 font-headline text-2xl font-bold">Hackathon Tips</h2>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                {hackathonTips.map((tip, index) => (
+                  <Card key={index} className="group transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 text-accent transition-transform duration-200 group-hover:scale-105 group-active:scale-110 group-active:shadow-lg group-active:shadow-accent/50">
+                            <tip.icon className="h-6 w-6" />
                           </div>
-                        </CardContent>
-                      </Card>
-                  ))}
-                </div>
+                          <div>
+                            <h3 className="font-semibold text-base">
+                              {tip.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {tip.description}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                ))}
               </div>
-               {/* Our Sponsors */}
-              <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1 self-end">
-                  <CardHeader>
-                      <CardTitle className="flex items-center gap-3 font-headline">
-                      <HeartHandshake className="h-6 w-6 text-accent" />
-                      <span>Our Sponsors</span>
-                      </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                      <div className="grid grid-cols-4 gap-y-6 gap-x-4 items-center justify-items-center">
-                      {sponsors.map((sponsor) => (
-                          <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-2">
-                              {React.cloneElement(sponsor.icon, { className: "h-8 w-8 text-muted-foreground" })}
-                              <span className="font-semibold text-xs text-muted-foreground">{sponsor.name}</span>
-                          </div>
-                      ))}
-                      </div>
-                  </CardContent>
-              </Card>
             </div>
 
 
@@ -473,9 +452,30 @@ export default function DashboardPage() {
                 </Button>
               </CardContent>
             </Card>
+            {/* Our Sponsors */}
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-3 font-headline">
+                    <HeartHandshake className="h-6 w-6 text-accent" />
+                    <span>Our Sponsors</span>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-8 gap-x-4 items-center justify-items-center">
+                    {sponsors.map((sponsor) => (
+                        <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-2">
+                            {React.cloneElement(sponsor.icon, { className: "h-10 w-10 text-muted-foreground" })}
+                            <span className="font-semibold text-sm text-muted-foreground">{sponsor.name}</span>
+                        </div>
+                    ))}
+                    </div>
+                </CardContent>
+            </Card>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+    
