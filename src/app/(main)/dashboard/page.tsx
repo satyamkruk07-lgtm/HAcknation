@@ -82,7 +82,7 @@ const hackathonTips = [
 ]
 
 const conductors = [
-  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1', imageUrl: 'https://images.unsplash.com/photo-1599842057874-37393e9342df?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE3NjIyNzEwMDF8&ixlib=rb-4.1.0&q=80&w=1080' },
+  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1', imageUrl: 'https://i.imgur.com/gK2D323.jpeg' },
   { name: 'Kalyani Kumari', role: 'Student', seed: 'conductor2', imageUrl: 'https://images.unsplash.com/photo-1654414883391-24e17446e4d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtb3VudGFpbiUyMGdpcmx8ZW58MHx8fHwxNzYyMTg5MzcyfDA&ixlib=rb-4.1.0&q=80&w=1080' },
   { name: 'Paramjeet Singh', role: 'Faculty', seed: 'conductor3' },
   { name: 'Akshat Sharma', role: 'Faculty', seed: 'conductor4' },
@@ -461,7 +461,8 @@ export default function DashboardPage() {
                     {conductors.slice(2, 5).map((conductor) => (
                         <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
                             <Image
-                                src={`https://picsum.photos/seed/${conductor.seed}/200/200`}
+                                src={`https://picsum.photos/seed/${conductor.seed}/200
+/200`}
                                 alt={`Portrait of ${conductor.name}`}
                                 width={128}
                                 height={128}
