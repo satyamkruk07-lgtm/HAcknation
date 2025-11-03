@@ -82,7 +82,7 @@ const hackathonTips = [
 ]
 
 const conductors = [
-  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1' },
+  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1', imageUrl: 'https://images.unsplash.com/photo-1549421222-23c71a39678e?ixid=M3w3NDE5ODJ8MHwxfGFsbHx8fHx8fHx8fDE3NjIxMjI3Mjd8&ixlib=rb-4.0.3' },
   { name: 'Kalyani Kumari', role: 'Student', seed: 'conductor2' },
   { name: 'Paramjeet Singh', role: 'Faculty', seed: 'conductor3' },
   { name: 'Akshat Sharma', role: 'Faculty', seed: 'conductor4' },
@@ -442,7 +442,7 @@ export default function DashboardPage() {
                     {conductors.slice(0, 2).map((conductor) => (
                         <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
                             <Image
-                                src={`https://picsum.photos/seed/${conductor.seed}/200/200`}
+                                src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.seed}/200/200`}
                                 alt={`Portrait of ${conductor.name}`}
                                 width={128}
                                 height={128}
@@ -482,3 +482,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
