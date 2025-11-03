@@ -78,6 +78,13 @@ export default function LoginPage() {
     }
   }, [searchParams]);
 
+  useEffect(() => {
+    // If a verified user somehow lands on the login page, redirect them.
+    if (currentUser?.emailVerified) {
+      router.push('/dashboard');
+    }
+  }, [currentUser, router]);
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -102,6 +109,8 @@ export default function LoginPage() {
         setError('Please verify your email address before logging in. A new verification link has been sent to your email.');
         await sendEmailVerification(user);
         await signOut(auth);
+        // Force a page refresh to ensure UI reflects the signed-out state.
+        router.refresh();
       }
 
     } catch (error: any) {
