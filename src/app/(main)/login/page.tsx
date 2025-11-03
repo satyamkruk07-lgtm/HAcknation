@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useAuth } from '@/firebase';
 
@@ -28,7 +28,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2 } from 'lucide-react';
+import { Loader2, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 
 const formSchema = z.object({
@@ -41,8 +41,18 @@ type FormData = z.infer<typeof formSchema>;
 export default function LoginPage() {
   const auth = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('registered') === 'true') {
+      setSuccess('Account created! Please check your email to verify your account before logging in.');
+      // Optionally, you can remove the query param from the URL
+      // router.replace('/login', undefined);
+    }
+  }, [searchParams, router]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -55,13 +65,23 @@ export default function LoginPage() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setError(null);
+    setSuccess(null);
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
+      const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      if (!userCredential.user.emailVerified) {
+        setError('Please verify your email address before logging in. A new verification link has been sent.');
+        // Optionally resend verification email
+        // await sendEmailVerification(userCredential.user);
+        setIsSubmitting(false);
+        return;
+      }
       router.push('/dashboard');
     } catch (error: any) {
       setError(error.message);
     } finally {
-      setIsSubmitting(false);
+      if (error === null) { // only set to false if it's not already false from email verification check
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -83,6 +103,13 @@ export default function LoginPage() {
                 <Alert variant="destructive">
                   <AlertTitle>Login Failed</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+               {success && (
+                <Alert variant='default'>
+                  <CheckCircle className="h-4 w-4" />
+                  <AlertTitle>Success!</AlertTitle>
+                  <AlertDescription>{success}</AlertDescription>
                 </Alert>
               )}
               <FormField

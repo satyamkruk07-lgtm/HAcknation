@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -6,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useAuth, useFirestore } from '@/firebase';
 
@@ -78,7 +77,10 @@ export default function RegisterPage() {
         data.password
       );
       const user = userCredential.user;
+      
+      // Update profile and send verification email
       await updateProfile(user, { displayName: data.name });
+      await sendEmailVerification(user);
 
       // Save user data to Firestore
       const userDocRef = doc(firestore, 'users', user.uid);
@@ -86,10 +88,13 @@ export default function RegisterPage() {
         id: user.uid,
         email: data.email,
         name: data.name,
+        photoURL: user.photoURL,
         registrationDate: new Date().toISOString(),
       });
 
-      router.push('/dashboard');
+      // Redirect to login with a success message
+      router.push('/login?registered=true');
+
     } catch (error: any) {
       setError(error.message);
     } finally {
