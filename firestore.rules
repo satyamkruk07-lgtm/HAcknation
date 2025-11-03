@@ -17,7 +17,6 @@
  *   Publicly readable, but judging creation/modification is restricted (TODO).
  * - /roles_admin/{userId}: Indicates if a user has admin roles. Admin-only access for write, Owner-only for read.
  * - /users/{userId}/teams/{teamId}: Stores teams created by a user. Owner-only access.
- * - /site_settings/{settingId}: Global site settings like logos. Writable by admin, readable by all signed-in users.
  *
  * Key Security Decisions:
  * - User listing is allowed for any signed-in user to facilitate team formation.
@@ -160,19 +159,6 @@ service cloud.firestore {
     }
     
     /**
-     * @description Rules for global site settings.
-     * @path /site_settings/{settingId}
-     * @allow (get, list): Any signed-in user can read site settings.
-     * @allow (create, update, delete): Only admins can change site settings.
-     * @principle Securely manage global site configuration.
-     */
-    match /site_settings/{settingId} {
-        allow get, list: if isSignedIn();
-        allow create, update, delete: if isAdmin();
-    }
-
-
-    /**
      * @description Allows a user to read and write their own teams.
      * @path /users/{userId}/teams/{teamId}
      * @allow (get, list): A user can read and list their own teams.
@@ -209,21 +195,6 @@ service cloud.firestore {
         allow write: if isOwner(userId)
                     && request.resource.size < 2 * 1024 * 1024
                     && request.resource.contentType.matches('image/.*');
-      }
-
-      /**
-      * @description Rules for admin-uploaded site assets like logos and banners.
-      * @path /site_assets/{fileName}
-      * @allow (read): Anyone can read site assets.
-      * @allow (write): Only admins can upload or delete site assets.
-      *                 The uploaded file must be an image and under 2MB.
-      * @principle Securely manage global site assets.
-      */
-      match /site_assets/{allPaths=**} {
-          allow read: if true;
-          allow write: if isAdmin()
-                        && request.resource.size < 2 * 1024 * 1024
-                        && request.resource.contentType.matches('image/.*');
       }
     }
   }

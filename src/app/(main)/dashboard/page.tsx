@@ -1,6 +1,6 @@
 'use client';
 
-import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
+import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -22,8 +22,8 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { sponsors } from '@/lib/data.tsx';
 import { Badge } from '@/components/ui/badge';
-import type { Announcement, SiteSettings } from '@/lib/types';
-import { collection, query, orderBy, limit, doc } from 'firebase/firestore';
+import type { Announcement } from '@/lib/types';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 
@@ -171,13 +171,6 @@ export default function DashboardPage() {
   }, [firestore, user]);
 
   const { data: announcements, isLoading: areAnnouncementsLoading } = useCollection<Announcement>(announcementsQuery);
-  
-  const siteSettingsDocRef = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return doc(firestore, 'site_settings', 'main');
-  }, [firestore]);
-
-  const { data: siteSettings, isLoading: areSettingsLoading } = useDoc<SiteSettings>(siteSettingsDocRef);
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -211,19 +204,6 @@ export default function DashboardPage() {
       <div className="container py-12">
         {/* Header */}
         <div className="mb-12">
-           {areSettingsLoading ? (
-                <Skeleton className="w-full aspect-[4/1] rounded-lg mb-8" />
-           ) : siteSettings?.collegeBannerUrl && (
-             <div className="relative w-full aspect-[4/1] rounded-lg overflow-hidden mb-8">
-                <Image
-                    src={siteSettings.collegeBannerUrl}
-                    alt="The official banner for Shivalik College of Engineering."
-                    layout="fill"
-                    objectFit="cover"
-                    data-ai-hint="college banner"
-                />
-              </div>
-           )}
           <div className="flex flex-col items-center text-center">
             <h1 className="font-headline text-2xl font-bold">
               Welcome, {user.displayName || 'Hacker'}!
