@@ -343,6 +343,16 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/rakhi-/",
         qualification: "MBA in Marketing",
         skills: ["Digital Marketing", "SEO", "Content Writing", "Social Media"]
+    },
+    {
+        id: "6",
+        name: "Mr. Anshul Namdev",
+        role: "Faculty",
+        imageUrl: `https://picsum.photos/seed/6/128/128`,
+        email: "anshul.namdev@shivalikcollege.edu.in",
+        linkedin: "https://www.linkedin.com/in/anshul-namdev",
+        qualification: "M.Tech in CSE",
+        skills: ["Cloud Computing", "AWS", "DevOps", "Docker"]
     }
 ];
 
@@ -363,3 +373,6 @@ export const conductors: Conductor[] = [
     
 
 
+
+
+    
