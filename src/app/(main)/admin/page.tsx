@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebase';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
@@ -193,7 +193,7 @@ function CreateAnnouncementForm() {
 
 function UserManagementTab() {
   const firestore = useFirestore();
-  const { isUserLoading } = useUser();
+  const { user, isUserLoading } = useUser();
   const { isAdmin, isAdminLoading } = useAdminStatus();
   const [selectedUser, setSelectedUser] = useState<UserAccount | null>(null);
 
@@ -203,7 +203,7 @@ function UserManagementTab() {
   }, [firestore, isAdmin]);
 
   const { data: users, isLoading: isUsersLoading } = useCollection<UserAccount>(usersQuery);
-  const isLoading = isUserLoading || isAdminLoading || (isAdmin && isUsersLoading);
+  const isLoading = isUserLoading || isAdminLoading || isUsersLoading;
 
   const downloadCSV = (data: UserAccount[], filename: string) => {
     if (!data || data.length === 0) {
@@ -677,22 +677,19 @@ export default function AdminPage() {
 
   const isLoading = isUserLoading || isAdminLoading;
 
-
   useEffect(() => {
-    // Only perform actions once everything has loaded.
-    if (!isLoading) {
-      if (!user) {
-        // If there's no user, redirect to login.
-        router.push('/login');
-      } else if (!isAdmin) {
-        // If there is a user, but they are not an admin, redirect to dashboard.
-        router.push('/dashboard');
-      }
+    if (isLoading) {
+      return; // Do nothing while loading
+    }
+    if (!user) {
+      router.push('/login');
+    } else if (!isAdmin) {
+      router.push('/dashboard');
     }
   }, [user, isAdmin, isLoading, router]);
 
-
-  if (isLoading || !user || !isAdmin) {
+  // Show a loader while we are determining the user's auth and admin status.
+  if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -700,6 +697,13 @@ export default function AdminPage() {
     );
   }
 
+  // If after loading, the user is not an admin, we render nothing,
+  // as the useEffect will handle the redirection.
+  if (!isAdmin) {
+    return null;
+  }
+  
+  // Only render the admin content if the user is an admin and everything has loaded.
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
