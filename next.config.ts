@@ -32,8 +32,10 @@ const nextConfig: NextConfig = {
     ],
   },
   experimental: {
-    allowedDevOrigins: ["https://*.cloudworkstations.dev"],
+    // serverActions is kept here if it was present,
+    // allowedDevOrigins is moved out.
   },
+  allowedDevOrigins: ["https://*.cloudworkstations.dev"],
 };
 
 export default nextConfig;
