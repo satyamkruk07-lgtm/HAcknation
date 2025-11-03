@@ -451,7 +451,7 @@ export default function DashboardPage() {
                                 data-ai-hint="person portrait"
                             />
                             <div className="mt-2">
-                                <h3 className="font-semibold text-base">Name: {conductor.name}</h3>
+                                <h3 className="font-semibold text-base">{conductor.name}</h3>
                                 <p className="text-sm text-muted-foreground">Faculty</p>
                             </div>
                         </div>
@@ -470,7 +470,7 @@ export default function DashboardPage() {
                                 data-ai-hint="person portrait"
                             />
                             <div className="mt-2">
-                                <h3 className="font-semibold text-base">Name: {conductor.name}</h3>
+                                <h3 className="font-semibold text-base">{conductor.name}</h3>
                                 <p className="text-sm text-muted-foreground">Faculty</p>
                             </div>
                         </div>
@@ -483,5 +483,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
