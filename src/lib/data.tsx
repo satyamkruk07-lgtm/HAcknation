@@ -314,13 +314,13 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/satyam-kumar-87913b168/",
         qualification: "BCA",
         skills: ["Event Management", "Public Speaking", "Canva", "Photoshop"],
-        phone: "+919661175197"
+        phone: "9661175197"
     },
     {
         id: "3",
         name: "Mr. Sartaj Khan",
         role: "Head Of Department",
-        imageUrl: `https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwcm9mZXNzaW9uYWwlMjBib3l8ZW58MHx8fHwxNzYyMTk2NzE3fDA&ixlib=rb-4.1.0&q=80&w=1080`,
+        imageUrl: `https://images.unsplash.com/photo-1568602471122-7832951cc4c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBtYW58ZW58MHx8fHwxNzYyMzk5NjU3fDA&ixlib=rb-4.1.0&q=80&w=1080`,
         email: "kalyani.kumari@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/kalyani-kumari-b97280249/",
         qualification: "Head of BCA Department",
