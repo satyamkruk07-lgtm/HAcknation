@@ -302,7 +302,8 @@ export const conductors: Conductor[] = [
         email: "devesh.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/dr-devesh-kumar-0a849725/",
         qualification: "BCA",
-        skills: ["Machine Learning", "Data Science", "AI", "Python"]
+        skills: ["Machine Learning", "Data Science", "AI", "Python"],
+        phone: "7060550243"
     },
     {
         id: "2",

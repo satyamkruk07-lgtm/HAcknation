@@ -521,6 +521,13 @@ export default function DashboardPage() {
                                 <Linkedin className="h-5 w-5" />
                             </a>
                         </Button>
+                        {selectedConductor.phone && (
+                            <Button variant="outline" size="icon" asChild>
+                                <a href={`tel:${selectedConductor.phone}`} aria-label="Call">
+                                    <Phone className="h-5 w-5" />
+                                </a>
+                            </Button>
+                        )}
                     </div>
                 </div>
 
