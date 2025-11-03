@@ -9,6 +9,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter } from 'next/navigation';
 import { useDoc } from '@/firebase/firestore/use-doc';
+import { useUserAndMutate } from '@/firebase/provider';
 
 import {
   Card,
@@ -51,7 +52,7 @@ const profileFormSchema = z.object({
 type ProfileFormData = z.infer<typeof profileFormSchema>;
 
 export default function ProfilePage() {
-  const { user, auth, isUserLoading, mutate: mutateUser } = useUser();
+  const { user, isUserLoading, mutate: mutateUser } = useUserAndMutate();
   const firestore = useFirestore();
   const storage = useStorage();
   const router = useRouter();
@@ -106,7 +107,7 @@ export default function ProfilePage() {
   
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !user) return;
+    if (!file || !user || !userDocRef) return;
 
     if (file.size > 2 * 1024 * 1024) { // 2MB limit
       toast({
@@ -124,8 +125,8 @@ export default function ProfilePage() {
       const downloadURL = await getDownloadURL(uploadResult.ref);
 
       await setDoc(userDocRef, { photoURL: downloadURL }, { merge: true });
-      if(auth.currentUser) {
-        await updateProfile(auth.currentUser, { photoURL: downloadURL });
+      if(user) {
+        await updateProfile(user, { photoURL: downloadURL });
       }
       
       await mutateUser(); // Refresh auth state
@@ -147,7 +148,7 @@ export default function ProfilePage() {
   };
 
   const onSubmit = async (data: ProfileFormData) => {
-    if (!user || !userDocRef || !auth.currentUser) {
+    if (!user || !userDocRef) {
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -168,11 +169,12 @@ export default function ProfilePage() {
 
       await setDoc(userDocRef, updatedData, { merge: true });
 
-      if (auth.currentUser.displayName !== data.name || auth.currentUser.phoneNumber !== data.phoneNumber) {
-        await updateProfile(auth.currentUser, { displayName: data.name, phoneNumber: data.phoneNumber });
+      if (user.displayName !== data.name || user.phoneNumber !== data.phoneNumber) {
+        await updateProfile(user, { displayName: data.name, phoneNumber: data.phoneNumber });
       }
       
       await mutateUser();
+      await mutateProfile();
 
       toast({
         title: 'Profile updated successfully!',
