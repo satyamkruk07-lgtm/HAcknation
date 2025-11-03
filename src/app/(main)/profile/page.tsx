@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -42,9 +43,9 @@ const profileFormSchema = z.object({
   skills: z.string().optional(),
   bio: z.string().optional(),
   phoneNumber: z.string().optional().refine(
-    (val) => !val || /^\+91[1-9][0-9]{9}$/.test(val),
+    (val) => !val || /^\d{10}$/.test(val),
     {
-      message: 'Phone number must be a valid Indian number (e.g., +919876543210)',
+      message: 'Phone number must be 10 digits.',
     }
   ),
 });
@@ -285,7 +286,7 @@ export default function ProfilePage() {
                             <FormItem>
                               <FormLabel>Phone Number</FormLabel>
                               <FormControl>
-                                <Input type="tel" placeholder="+919876543210" {...field} />
+                                <Input type="tel" placeholder="9876543210" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -351,3 +352,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    
