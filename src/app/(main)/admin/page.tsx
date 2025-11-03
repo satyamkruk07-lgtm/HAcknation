@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -611,24 +612,21 @@ export default function AdminPage() {
   const isLoading = isUserLoading || isAdminLoading;
 
   useEffect(() => {
-    // Only perform actions once everything has loaded
-    if (isLoading) {
-      return; // Wait until loading is complete
-    }
-
-    // If there's no user, redirect to login
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-
-    // If there is a user but they are not an admin, redirect to dashboard
-    if (!isAdmin) {
-      router.push('/dashboard');
+    // This effect runs whenever the loading or admin status changes.
+    // We wait until all loading is complete before making a decision.
+    if (!isLoading) {
+      if (!user) {
+        // If there's no user, they can't be an admin. Redirect to login.
+        router.push('/login');
+      } else if (!isAdmin) {
+        // If there is a user but they are not an admin, redirect to dashboard.
+        router.push('/dashboard');
+      }
+      // If user exists and is admin, do nothing and let the page render.
     }
   }, [user, isAdmin, isLoading, router]);
-
-  // Show a unified loader while we are determining the user's auth and admin status.
+  
+  // While loading user or admin status, show a loader.
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -637,44 +635,45 @@ export default function AdminPage() {
     );
   }
 
-  // If after loading, the user is not an admin, render nothing.
-  // The useEffect above will handle the redirection.
-  if (!isAdmin) {
-    return null;
-  }
-  
-  // Only render the admin content if the user is confirmed to be an admin.
-  return (
-    <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
-      <div className="container py-12">
-        <div className="mb-8">
-          <h1 className="font-headline text-4xl font-bold tracking-tight">Admin Dashboard</h1>
-          <p className="mt-2 text-lg text-muted-foreground">
-            Manage your HackNation event from here.
-          </p>
-        </div>
+  // After loading, if the user is confirmed to be an admin, render the page.
+  // The useEffect above handles redirection for non-admins, but this is an extra safeguard.
+  if (user && isAdmin) {
+    return (
+      <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
+        <div className="container py-12">
+          <div className="mb-8">
+            <h1 className="font-headline text-4xl font-bold tracking-tight">Admin Dashboard</h1>
+            <p className="mt-2 text-lg text-muted-foreground">
+              Manage your HackNation event from here.
+            </p>
+          </div>
 
-        <Tabs defaultValue="announcements" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-background/50 border shadow-inner">
-            <TabsTrigger value="admins" className="data-[state=active]:shadow-inner">Admins</TabsTrigger>
-            <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
-            <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
-          </TabsList>
-          <TabsContent value="admins" className="mt-6">
-            <MakeAdminForm />
-          </TabsContent>
-          <TabsContent value="announcements" className="mt-6">
-            <CreateAnnouncementForm />
-          </TabsContent>
-          <TabsContent value="users" className="mt-6">
-            <UserManagementTab />
-          </TabsContent>
-          <TabsContent value="projects" className="mt-6">
-            <ProjectManagementTab />
-          </TabsContent>
-        </Tabs>
+          <Tabs defaultValue="announcements" className="w-full">
+            <TabsList className="grid w-full grid-cols-4 bg-background/50 border shadow-inner">
+              <TabsTrigger value="admins" className="data-[state=active]:shadow-inner">Admins</TabsTrigger>
+              <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
+              <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
+              <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
+            </TabsList>
+            <TabsContent value="admins" className="mt-6">
+              <MakeAdminForm />
+            </TabsContent>
+            <TabsContent value="announcements" className="mt-6">
+              <CreateAnnouncementForm />
+            </TabsContent>
+            <TabsContent value="users" className="mt-6">
+              <UserManagementTab />
+            </TabsContent>
+            <TabsContent value="projects" className="mt-6">
+              <ProjectManagementTab />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  // If the user is not an admin, or there is no user, render nothing.
+  // The redirection is handled by the useEffect.
+  return null;
 }
