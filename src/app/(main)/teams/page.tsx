@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Mail } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
 import type { UserAccount } from '@/lib/types';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
@@ -125,12 +125,19 @@ export default function TeamsPage() {
                     ))}
                   </div>
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex gap-2">
                   <Button asChild className="w-full">
                     <a href={`mailto:${profile.email}`}>
                       <Mail className="mr-2 h-4 w-4" /> Connect
                     </a>
                   </Button>
+                  {profile.phoneNumber && (
+                    <Button asChild variant="outline" className="w-full">
+                        <a href={`tel:${profile.phoneNumber}`}>
+                            <Phone className="mr-2 h-4 w-4" /> Call
+                        </a>
+                    </Button>
+                  )}
                 </CardFooter>
               </Card>
             );
