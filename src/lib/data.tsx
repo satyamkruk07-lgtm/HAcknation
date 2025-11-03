@@ -338,8 +338,8 @@ export const conductors: Conductor[] = [
         id: "5",
         name: "Mr. Akshat Sharma",
         role: "Faculty",
-        imageUrl: `https://picsum.photos/seed/5/128/128`,
-        email: "rakhi@shivalikcollege.edu.in",
+        imageUrl: `https://images.unsplash.com/photo-1480827625140-981096152bdc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMXx8bmljZSUyMGxvb2t8ZW58MHx8fHwxNzYyMTk2Mjg0fDA&ixlib=rb-4.1.0&q=80&w=1080`,
+        email: "rakhi@shivalikcollege.eduin",
         linkedin: "https://www.linkedin.com/in/rakhi-/",
         qualification: "MBA in Marketing",
         skills: ["Digital Marketing", "SEO", "Content Writing", "Social Media"]
@@ -361,4 +361,5 @@ export const conductors: Conductor[] = [
     
 
     
+
 
