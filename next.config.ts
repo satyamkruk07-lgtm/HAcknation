@@ -24,11 +24,8 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'https'
-      },
-      {
         protocol: 'https',
-        hostname: 'storage.googleapis.com',
+        hostname: 'firebasestorage.googleapis.com',
         port: '',
         pathname: '/**',
       }
@@ -37,8 +34,8 @@ const nextConfig: NextConfig = {
   experimental: {
     // serverActions is kept here if it was present,
     // allowedDevOrigins is moved out.
-    allowedDevOrigins: ["https://*.cloudworkstations.dev"]
   },
+  allowedDevOrigins: ["https://*.cloudworkstations.dev"]
 };
 
 export default nextConfig;

@@ -206,7 +206,7 @@ export default function DashboardPage() {
         <div className="mb-12">
           <div className="flex flex-col items-center text-center">
              <Image 
-                src="https://storage.googleapis.com/aifire-422811.appspot.com/uploads/shivalik-logo.png"
+                src="https://firebasestorage.googleapis.com/v0/b/aifire-422811.appspot.com/o/uploads%2Fshivalik-logo.png?alt=media&token=86259695-1ad4-4d37-b352-aa85906f33f7"
                 alt="Shivalik Logo"
                 width={250}
                 height={54}
