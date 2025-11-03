@@ -19,6 +19,8 @@ import {
   FileText,
   MessageSquare,
   Zap,
+  Mail,
+  Phone,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { sponsors } from '@/lib/data.tsx';
@@ -203,9 +205,27 @@ export default function DashboardPage() {
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold font-headline tracking-tighter text-destructive">Shivalik</h1>
-          <p className="text-xl font-bold text-foreground">College of Engineering</p>
+        <div className="relative mb-12">
+            <div className="absolute top-0 right-0 flex items-center gap-2">
+                <Button variant="outline" size="icon" asChild>
+                    <a href="mailto:info@shivalikcollege.edu.in" aria-label="Email Us">
+                        <Mail className="h-5 w-5" />
+                    </a>
+                </Button>
+                <Button variant="outline" size="icon" asChild>
+                    <a href="tel:+911352693400" aria-label="Call Us">
+                        <Phone className="h-5 w-5" />
+                    </a>
+                </Button>
+            </div>
+            <div className="text-center">
+              <h1 className="text-5xl font-bold font-headline tracking-tighter text-destructive">
+                Shivalik
+              </h1>
+              <p className="text-xl text-foreground font-bold">
+                College of Engineering
+              </p>
+            </div>
         </div>
 
         {/* Header */}
@@ -392,3 +412,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
