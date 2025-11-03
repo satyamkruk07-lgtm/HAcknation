@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Logo } from './logo';
 import { Button } from './ui/button';
-import { useUser } from '@/firebase';
+import { useUser, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import {
   DropdownMenu,
@@ -18,16 +18,25 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogOut, User as UserIcon, LayoutGrid, Shield } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const adminEmails = ['kalyanikri1111@gmail.com', 'frgtpeople@gmail.com'];
 
 export function MainNav() {
   const pathname = usePathname();
-  const { user, auth, isUserLoading } = useUser();
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
+  const { toast } = useToast();
 
   const handleLogout = async () => {
-    if (auth) {
+    try {
       await signOut(auth);
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Logout Failed',
+        description: error.message || 'Could not log you out. Please try again.',
+      });
     }
   };
 
