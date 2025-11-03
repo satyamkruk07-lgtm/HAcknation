@@ -347,13 +347,13 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/rakhi-/",
         qualification: "M.Tech in CSE",
         skills: ["Digital Marketing", "SEO", "Content Writing", "Social Media"],
-        phone: "7355128710"
+        phone: "+91 7355128710"
     },
     {
         id: "6",
         name: "Mr. Anshul Namdev",
         role: "Faculty",
-        imageUrl: `https://images.unsplash.com/photo-1555436169-6abd9c5532c3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0ZWFjaGVyJTIwbWVufGVufDB8fHx8MTc2MjE5NTk4Mnww&ixlib=rb-4.1.0&q=80&w=1080`,
+        imageUrl: `https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwcm9mZXNzaW9uYWwlMjBib3l8ZW58MHx8fHwxNzYyMTk2NzE3fDA&ixlib=rb-4.1.0&q=80&w=1080`,
         email: "anshul.namdev@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/anshul-namdev",
         qualification: "M.Tech in CSE",
