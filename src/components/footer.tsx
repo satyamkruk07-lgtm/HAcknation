@@ -11,14 +11,14 @@ export function Footer() {
         </p>
         <div className="flex items-center gap-4">
           <a
-            href="mailto:satyamkruk07@gmail.com"
+            href="mailto:satyam@example.com"
             className="text-muted-foreground hover:text-foreground"
             aria-label="Mail"
           >
             <Mail className="h-5 w-5" />
           </a>
           <a
-            href="https://www.linkedin.com/in/kumar-satyam-055841394"
+            href="https://www.linkedin.com/in/kumarsatyam"
             className="text-muted-foreground hover:text-foreground"
             aria-label="LinkedIn"
             target="_blank"
@@ -27,7 +27,7 @@ export function Footer() {
             <Linkedin className="h-5 w-5" />
           </a>
           <a
-            href="https://www.instagram.com/official_satya_.0001_?igsh=dGk3ZWw3MDZ1eWI5"
+            href="https://www.instagram.com/kumarsatyam"
             className="text-muted-foreground hover:text-foreground"
             aria-label="Instagram"
             target="_blank"
@@ -40,3 +40,5 @@ export function Footer() {
     </footer>
   );
 }
+
+    

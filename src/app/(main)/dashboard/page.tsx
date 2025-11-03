@@ -83,7 +83,7 @@ const hackathonTips = [
 ]
 
 const conductors = [
-  { name: 'Dr. Satyam', seed: 'conductor1' },
+  { name: 'Kumar Satyam', seed: 'conductor1' },
   { name: 'Dr. Neha', seed: 'conductor2' },
   { name: 'Prof. Ankit', seed: 'conductor3' },
   { name: 'Prof. Sneha', seed: 'conductor4' },
@@ -483,3 +483,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
