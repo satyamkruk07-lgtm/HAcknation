@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ExternalLink, Github, Loader2, Trash2, User as UserIcon, Download, CheckCircle, XCircle } from 'lucide-react';
+import { ExternalLink, Github, Loader2, Trash2, User as UserIcon, Download, CheckCircle, XCircle, PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -58,6 +58,72 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+import { makeAdminAction, removeAdminAction } from '@/lib/actions';
+import { useForm, type SubmitHandler } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const MakeAdminSchema = z.object({
+    email: z.string().email({ message: 'Please enter a valid email address.' }),
+});
+type MakeAdminForm = z.infer<typeof MakeAdminSchema>;
+
+
+function MakeAdminForm() {
+    const { toast } = useToast();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<MakeAdminForm>({
+        resolver: zodResolver(MakeAdminSchema),
+    });
+
+    const onSubmit: SubmitHandler<MakeAdminForm> = async (data) => {
+        setIsSubmitting(true);
+        const result = await makeAdminAction(data.email);
+        if (result.success) {
+            toast({
+                title: 'Success!',
+                description: result.message,
+            });
+            reset();
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Error',
+                description: result.message,
+            });
+        }
+        setIsSubmitting(false);
+    };
+
+    return (
+        <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl">Make a User Admin</CardTitle>
+                    <CardDescription>Enter the email of the user you want to grant admin privileges to.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div>
+                        <Label htmlFor="admin-email">User Email</Label>
+                        <Input
+                            id="admin-email"
+                            type="email"
+                            placeholder="user@example.com"
+                            {...register('email')}
+                        />
+                        {errors.email && <p className="text-sm text-destructive mt-2">{errors.email.message}</p>}
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Make Admin
+                    </Button>
+                </CardFooter>
+            </form>
+        </Card>
+    )
+}
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -589,11 +655,15 @@ export default function AdminPage() {
         </div>
 
         <Tabs defaultValue="announcements" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-background/50 border shadow-inner">
+          <TabsList className="grid w-full grid-cols-4 bg-background/50 border shadow-inner">
+            <TabsTrigger value="admins" className="data-[state=active]:shadow-inner">Admins</TabsTrigger>
             <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
             <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
           </TabsList>
+          <TabsContent value="admins" className="mt-6">
+            <MakeAdminForm />
+          </TabsContent>
           <TabsContent value="announcements" className="mt-6">
             <CreateAnnouncementForm />
           </TabsContent>
@@ -608,3 +678,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
