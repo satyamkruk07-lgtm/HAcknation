@@ -262,19 +262,6 @@
         "description",
         "location"
       ]
-    },
-    "SiteSettings": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "SiteSettings",
-      "type": "object",
-      "description": "Global site settings, like logos.",
-      "properties": {
-        "collegeLogoUrl": {
-          "type": "string",
-          "description": "URL for the college logo displayed on the dashboard.",
-          "format": "uri"
-        }
-      }
     }
   },
   "auth": {
@@ -446,26 +433,6 @@
             {
               "name": "teamId",
               "description": "The unique identifier for the team."
-            }
-          ]
-        }
-      },
-      {
-        "path": "events/{eventId}/site_settings/{settingId}",
-        "definition": {
-          "entityName": "SiteSettings",
-          "schema": {
-            "$ref": "#/backend/entities/SiteSettings"
-          },
-          "description": "Stores global site settings like logos, nested under a specific event.",
-          "params": [
-            {
-              "name": "eventId",
-              "description": "The unique identifier for the event."
-            },
-            {
-              "name": "settingId",
-              "description": "The unique identifier for the setting."
             }
           ]
         }
