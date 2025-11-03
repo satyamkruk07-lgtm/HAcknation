@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -86,7 +85,7 @@ const conductors = [
   { name: 'Kumar Satyam', seed: 'conductor1' },
   { name: 'Kalyani Kumari', seed: 'conductor2' },
   { name: 'Paramjeet Singh', seed: 'conductor3' },
-  { name: 'Prof. Sneha', seed: 'conductor4' },
+  { name: 'Akshat Sharma', seed: 'conductor4' },
   { name: 'Dr. Raj', seed: 'conductor5' },
 ];
 
