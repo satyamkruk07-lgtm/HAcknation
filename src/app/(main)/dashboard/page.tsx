@@ -202,12 +202,18 @@ export default function DashboardPage() {
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
+        <div className="text-center mb-12">
+          <h1 className="font-headline text-4xl font-bold tracking-tight text-primary">
+            Shivalik College of Engineering
+          </h1>
+        </div>
+
         {/* Header */}
         <div className="mb-12">
           <div className="flex flex-col items-center text-center">
-            <h1 className="font-headline text-2xl font-bold">
+            <h2 className="font-headline text-2xl font-bold">
               Welcome, {user.displayName || 'Hacker'}!
-            </h1>
+            </h2>
             <p className="mt-2 text-lg text-muted-foreground">
               Your HackNation journey starts here. Let's get building!
             </p>
