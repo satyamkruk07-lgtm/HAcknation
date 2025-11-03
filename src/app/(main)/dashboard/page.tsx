@@ -76,11 +76,6 @@ const hackathonTips = [
     },
     {
         icon: GitBranch,
-        title: "Version Control is Your Friend",
-        description: "Use Git from the start. Commit often. It will save you from headaches and help your team collaborate smoothly."
-    },
-    {
-        icon: GitBranch,
         title: "Manage Your Time",
         description: "Create a rough schedule. Allocate time for brainstorming, building, debugging, and preparing your presentation."
     }
