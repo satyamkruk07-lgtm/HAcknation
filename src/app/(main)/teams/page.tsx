@@ -16,7 +16,7 @@ import type { UserAccount } from '@/lib/types';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 
 function ProfileCardSkeleton() {
@@ -61,13 +61,13 @@ export default function TeamsPage() {
 
   const { data: teamProfiles, isLoading } = useCollection<UserAccount>(usersCollectionQuery);
 
-  const sortedProfiles = useMemoFirebase(() => {
+  const sortedProfiles = useMemo(() => {
     if (!teamProfiles) return null;
 
     let profiles = [...teamProfiles];
     
     // Define the special profiles
-    const kalyaniProfile = profiles.find(p => p.name?.toLowerCase() === 'kalyani kumari');
+    const kalyaniProfile = profiles.find(p => p.email === 'kalyanikri1111@gmail.com');
     const satyamProfile = profiles.find(p => p.email === 'frgtpeople@gmail.com');
 
     // Filter out the special profiles from the main list

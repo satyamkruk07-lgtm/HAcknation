@@ -52,20 +52,20 @@ service cloud.firestore {
     }
 
     /**
-     * @description Allows a user to read and write their own profile data. Admins can list all users.
+     * @description Allows a user to read and write their own profile data. Any signed-in user can list users for team formation.
      * @path /users/{userId}
      * @allow (get): A user can read their own profile.
      * @allow (create): A user can create their own profile.  The `id` field must match the `auth.uid`.
      * @allow (update, delete): A user can update or delete their own profile.
-     * @allow (list): Only an admin can list all users.
-     * @principle Enforces document ownership for user profiles, with an exception for admin listing.
+     * @allow (list): Any signed-in user can list users to find team members.
+     * @principle Enforces document ownership for user profiles, with an exception for signed-in users to find teams.
      */
     match /users/{userId} {
       allow get: if isOwner(userId);
       allow create: if isOwner(userId) && request.resource.data.id == request.auth.uid;
       allow update: if isOwner(userId) && resource.data.id == request.resource.data.id;
       allow delete: if isExistingOwner(userId);
-      allow list: if isAdmin();
+      allow list: if isSignedIn();
     }
     
     /**
