@@ -26,6 +26,7 @@ import type { Announcement } from '@/lib/types';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
+import { ShivalikTextLogo } from '@/components/shivalik-text-logo';
 
 const features = [
   {
@@ -203,9 +204,9 @@ export default function DashboardPage() {
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
         <div className="text-center mb-12">
-          <h1 className="font-headline text-4xl font-bold tracking-tight text-primary">
-            Shivalik College of Engineering
-          </h1>
+          <div className="flex justify-center mb-4">
+            <ShivalikTextLogo className="h-16 text-[#5C0C2D]" />
+          </div>
         </div>
 
         {/* Header */}
