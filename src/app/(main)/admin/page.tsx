@@ -234,6 +234,8 @@ function UserManagementTab() {
     link.click();
     document.body.removeChild(link);
   };
+  
+  const adminEmails = ['kalyanikri1111@gmail.com', 'frgtpeople@gmail.com'];
 
   return (
     <>
@@ -272,7 +274,7 @@ function UserManagementTab() {
                 ))
               ) : users && users.length > 0 ? (
                 users.map((user) => {
-                  const isVerified = user.emailVerified;
+                  const isVerified = user.emailVerified || (user.email && adminEmails.includes(user.email));
                   return (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">{user.name}</TableCell>
@@ -745,5 +747,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
