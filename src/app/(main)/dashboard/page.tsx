@@ -213,7 +213,7 @@ export default function DashboardPage() {
                     </a>
                 </Button>
                 <Button variant="outline" size="icon" asChild>
-                    <a href="tel:+911352693400" aria-label="Call Us">
+                    <a href="tel:+919997155111" aria-label="Call Us">
                         <Phone className="h-5 w-5" />
                     </a>
                 </Button>
@@ -412,5 +412,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
