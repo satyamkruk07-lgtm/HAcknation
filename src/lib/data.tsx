@@ -318,7 +318,7 @@ export const conductors: Conductor[] = [
         id: "3",
         name: "Mr. Sartaj Khan",
         role: "Head of Department",
-        imageUrl: `https://picsum.photos/seed/3/128/128`,
+        imageUrl: `https://images.unsplash.com/photo-1745571479595-8e198f251c95?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNnx8b2xkJTIwdGVhY2hlciUyMG1hbnxlbnwwfHx8fDE3NjIxOTU2Njd8MA&ixlib=rb-4.1.0&q=80&w=1080`,
         email: "kalyani.kumari@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/kalyani-kumari-b97280249/",
         qualification: "B.Tech in CSE",
