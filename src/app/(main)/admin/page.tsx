@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -645,7 +646,12 @@ function AdminManagementTab() {
               ) : admins && admins.length > 0 ? (
                 admins.map((admin) => (
                   <TableRow key={admin.id}>
-                    <TableCell>{admin.email || 'N/A'}</TableCell>
+                    <TableCell>
+                      {admin.email ||
+                        (admin.id === 'L373EWlzBSZThbkQUorLE7Fr1CF2'
+                          ? 'kalyanikri1111@gmail.com'
+                          : 'N/A')}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button
                         variant="destructive"
