@@ -195,10 +195,6 @@
           "type": "string",
           "description": "Unique identifier for the announcement."
         },
-        "eventId": {
-          "type": "string",
-          "description": "Reference to Event. (Relationship: Event 1:N Announcement)"
-        },
         "timestamp": {
           "type": "string",
           "description": "Timestamp of the announcement.",
@@ -207,13 +203,22 @@
         "content": {
           "type": "string",
           "description": "Content of the announcement."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the announcement."
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of announcement (e.g., 'Info', 'Update')."
         }
       },
       "required": [
         "id",
-        "eventId",
         "timestamp",
-        "content"
+        "content",
+        "title",
+        "type"
       ]
     },
     "ScheduleItem": {
@@ -301,6 +306,22 @@
         }
       },
       {
+        "path": "announcements/{announcementId}",
+        "definition": {
+          "entityName": "Announcement",
+          "schema": {
+            "$ref": "#/backend/entities/Announcement"
+          },
+          "description": "Stores announcements for the event.",
+          "params": [
+            {
+              "name": "announcementId",
+              "description": "The unique identifier for the announcement."
+            }
+          ]
+        }
+      },
+      {
         "path": "events/{eventId}/teams/{teamId}",
         "definition": {
           "entityName": "Team",
@@ -316,26 +337,6 @@
             {
               "name": "teamId",
               "description": "The unique identifier for the team."
-            }
-          ]
-        }
-      },
-      {
-        "path": "events/{eventId}/announcements/{announcementId}",
-        "definition": {
-          "entityName": "Announcement",
-          "schema": {
-            "$ref": "#/backend/entities/Announcement"
-          },
-          "description": "Stores announcements for a given event. Includes denormalized `eventId` for authorization independence.",
-          "params": [
-            {
-              "name": "eventId",
-              "description": "The unique identifier for the event."
-            },
-            {
-              "name": "announcementId",
-              "description": "The unique identifier for the announcement."
             }
           ]
         }
@@ -437,7 +438,7 @@
         }
       }
     ],
-    "reasoning": "The Firestore data structure is designed to support the HackTrack application's features, including event schedules, registration, live updates, submission platform, judging, and team formation. The structure emphasizes authorization independence and supports secure list operations. It leverages path-based ownership for user-specific data and membership maps for collaborative entities.\n\nAuthorization Independence (CRITICAL): Achieved primarily through denormalization. For example, teams store the `eventId` directly, avoiding the need to `get()` the event document to check authorization.  Projects include the `teamId`.\n\nQAPs (Rules are not Filters): Supported through structural segregation. The `users/{userId}/teams` collection ensures only the user can list their own teams. The `events/{eventId}/announcements` collection allows listing announcements scoped to an event without filtering.\n\nThe top-level collections are `events`, `users` and `roles_admin`. Events contain event-specific information, Users contain personal profiles and roles_admin contains the user ID when the user has admin rights.\n\nAccess Modeling: Path-based ownership is used for `users/{userId}/teams` to store teams created by each user. The `members` map is not explicitly used in this design but could be added to the `Team` entity for collaborative features if required in the future.\n\nClarity of Intent: Paths are named semantically to reflect the data they contain (e.g., `events/{eventId}/scheduleItems/{scheduleItemId}`)."
+    "reasoning": "The Firestore data structure is designed to support the HackTrack application's features, including event schedules, registration, live updates, submission platform, judging, and team formation. The structure emphasizes authorization independence and supports secure list operations. It leverages path-based ownership for user-specific data and membership maps for collaborative entities.\n\nAuthorization Independence (CRITICAL): Achieved primarily through denormalization. For example, teams store the `eventId` directly, avoiding the need to `get()` the event document to check authorization.  Projects include the `teamId`.\n\nQAPs (Rules are not Filters): Supported through structural segregation. The `users/{userId}/teams` collection ensures only the user can list their own teams. The `announcements` collection allows listing announcements scoped to the event without filtering, as it's a top-level collection.\n\nThe top-level collections are `events`, `users`, `roles_admin`, and `announcements`. Events contain event-specific information, Users contain personal profiles, roles_admin contains the user ID when the user has admin rights, and announcements are global for the event."
   }
 }
 

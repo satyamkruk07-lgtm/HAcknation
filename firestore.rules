@@ -7,9 +7,9 @@
  * Data Structure:
  * - /events/{eventId}: Stores event details. Publicly readable.
  * - /users/{userId}: Stores user profiles. Owner-only access.
+ * - /announcements/{announcementId}: Stores event announcements. Publicly readable by authenticated users.
  * - /events/{eventId}/teams/{teamId}: Stores teams participating in an event.
  *   Publicly readable, but team creation/modification is restricted (TODO).
- * - /events/{eventId}/announcements/{announcementId}: Stores event announcements. Publicly readable.
  * - /events/{eventId}/scheduleItems/{scheduleItemId}: Stores event schedule. Publicly readable.
  * - /teams/{teamId}/projects/{projectId}: Stores project information.
  *   Publicly readable, but project creation/modification is restricted (TODO).
@@ -20,8 +20,9 @@
  *
  * Key Security Decisions:
  * - User listing is implicitly denied.  Only individual user profiles can be read.
- * - Event data (announcements, schedule items) is publicly readable to facilitate
+ * - Event data (schedule items) is publicly readable to facilitate
  *   easy access to event information.
+ * - Announcements are readable by any signed-in user.
  * - Admin roles are managed via the `roles_admin` collection.
  * - Teams created by a user are in the `/users/{userId}/teams/{teamId}` subcollection
  *   for enhanced security and simplified listing.
@@ -70,6 +71,18 @@ service cloud.firestore {
       allow delete: if isExistingOwner(userId);
       allow list: if false; // Prevent listing of all users.
     }
+    
+    /**
+     * @description Allows read access to announcements for any authenticated user. Write is admin only.
+     * @path /announcements/{announcementId}
+     * @allow (get, list): Any signed-in user can read announcements.
+     * @allow (create, update, delete): Only admins can manage announcements.
+     * @principle Allows public read access to event announcements for logged-in users.
+     */
+    match /announcements/{announcementId} {
+      allow get, list: if isSignedIn();
+      allow create, update, delete: if isAdmin();
+    }
 
     /**
      * @description Allows read access to teams associated with an event. Write operations are not yet implemented.
@@ -81,18 +94,6 @@ service cloud.firestore {
     match /events/{eventId}/teams/{teamId} {
       allow get, list: if true;
       allow create, update, delete: if false; // TODO: Implement team creation/modification rules.
-    }
-
-    /**
-     * @description Allows read access to announcements associated with an event. Write operations are not permitted.
-     * @path /events/{eventId}/announcements/{announcementId}
-     * @allow (get, list): Any user can read announcements for an event.
-     * @deny (create, update, delete): No user can create, update, or delete announcements.
-     * @principle Allows public read access to event announcements.
-     */
-    match /events/{eventId}/announcements/{announcementId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
     }
 
     /**
@@ -118,6 +119,21 @@ service cloud.firestore {
       allow get, list: if true;
       allow create, update, delete: if false; // TODO: Implement project creation/modification rules.
     }
+    
+    /**
+    * @description Allows any authenticated user to create a project, but only the creator can update/delete.
+    * @path /projects/{projectId}
+    * @allow create: Any authenticated user can submit a project.
+    * @allow get, list: Any user can read project details.
+    * @allow update, delete: Only the user who submitted the project can modify or delete it.
+    * @principle Secure project submissions.
+    */
+    match /projects/{projectId} {
+        allow get, list: if true;
+        allow create: if isSignedIn() && request.resource.data.submittedBy == request.auth.uid;
+        allow update, delete: if isSignedIn() && resource.data.submittedBy == request.auth.uid;
+    }
+
 
     /**
      * @description Allows read access to judgings associated with a project. Write operations are not yet implemented.
@@ -207,3 +223,5 @@ service cloud.firestore {
     }
   }
 }
+
+    
