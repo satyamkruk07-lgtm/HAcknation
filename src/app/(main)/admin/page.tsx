@@ -66,17 +66,17 @@ import { z } from 'zod';
 const MakeAdminSchema = z.object({
     email: z.string().email({ message: 'Please enter a valid email address.' }),
 });
-type MakeAdminForm = z.infer<typeof MakeAdminSchema>;
+type MakeAdminFormType = z.infer<typeof MakeAdminSchema>;
 
 
 function MakeAdminForm() {
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<MakeAdminForm>({
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<MakeAdminFormType>({
         resolver: zodResolver(MakeAdminSchema),
     });
 
-    const onSubmit: SubmitHandler<MakeAdminForm> = async (data) => {
+    const onSubmit: SubmitHandler<MakeAdminFormType> = async (data) => {
         setIsSubmitting(true);
         const result = await makeAdminAction(data.email);
         if (result.success) {

@@ -1,8 +1,8 @@
 export const firebaseConfig = {
-  "projectId": "studio-4104961720-80208",
-  "appId": "1:44552287167:web:6814340ca3becb22e9a70a",
-  "apiKey": "AIzaSyA4UuvVfLAT7KGxy6AQp7UiWQ4B75QN5Qk",
-  "authDomain": "studio-4104961720-80208.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "44552287167"
+  "projectId": "hackathon-ca080",
+  "appId": "1:1082935594723:web:757e43594b63e0aa01b171",
+  "storageBucket": "hackathon-ca080.appspot.com",
+  "apiKey": "AIzaSyDo_1JbYwGqV2mYtJ1xM_o5w_c_Z_a_Z_y",
+  "authDomain": "hackathon-ca080.firebaseapp.com",
+  "messagingSenderId": "1082935594723"
 };
