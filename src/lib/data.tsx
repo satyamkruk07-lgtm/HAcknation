@@ -320,7 +320,7 @@ export const conductors: Conductor[] = [
         id: "3",
         name: "Mr. Sartaj Khan",
         role: "Head Of Department",
-        imageUrl: `https://images.unsplash.com/photo-1568602471122-7832951cc4c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBtYW58ZW58MHx8fHwxNzYyMzk5NjU3fDA&ixlib=rb-4.1.0&q=80&w=1080`,
+        imageUrl: `https://images.unsplash.com/photo-1745571479595-8e198f251c95?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNXx8dGVhY2hlciUyMG9sZCUyMG1lbnxlbnwwfHx8fDE3NjIxOTk3NTZ8MA&ixlib=rb-4.1.0&q=80&w=1080`,
         email: "kalyani.kumari@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/kalyani-kumari-b97280249/",
         qualification: "Head of BCA Department",
@@ -402,3 +402,4 @@ export const conductors: Conductor[] = [
     
 
     
+
