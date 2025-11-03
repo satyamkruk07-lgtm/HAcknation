@@ -549,14 +549,15 @@ function SiteManagementTab() {
 
     const settingsDocRef = useMemoFirebase(() => {
         if (!firestore) return null;
-        return doc(firestore, 'site_settings', 'main');
+        // Point to the new sub-collection path
+        return doc(firestore, 'events/main/site_settings', 'main');
     }, [firestore]);
 
     const { data: siteSettings, isLoading, mutate: mutateSiteSettings } = useDoc<SiteSettings>(settingsDocRef);
 
     const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (!file) return;
+        if (!file || !settingsDocRef) return;
 
         if (file.size > 2 * 1024 * 1024) { // 2MB limit
             toast({

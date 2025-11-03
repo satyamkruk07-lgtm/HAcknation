@@ -11,6 +11,7 @@
  * - /events/{eventId}/teams/{teamId}: Stores teams participating in an event.
  *   Publicly readable, but team creation/modification is restricted (TODO).
  * - /events/{eventId}/scheduleItems/{scheduleItemId}: Stores event schedule. Publicly readable.
+ * - /events/{eventId}/site_settings/{settingId}: Stores global site settings like logos. Admin write, public read.
  * - /teams/{teamId}/projects/{projectId}: Stores project information.
  *   Publicly readable, but project creation/modification is restricted (TODO).
  * - /projects/{projectId}/judgings/{judgingId}: Stores judging information.
@@ -18,11 +19,11 @@
  * - /roles_admin/{userId}: Indicates if a user has admin roles. Admin-only access for write, Owner-only for read.
  * - /users/{userId}/teams/{teamId}: Stores teams created by a user. Owner-only access.
  * - /user_avatars/{userId}/{fileName}: User uploaded profile images.
- * - /site_settings/{settingId}: Stores global site settings like logos. Admin write, public read.
+ * - /site_assets/{fileName}: Admin uploaded site assets like logos.
  *
  * Key Security Decisions:
  * - User listing is allowed for any signed-in user to facilitate team formation.
- * - Event data (schedule items) is publicly readable to facilitate
+ * - Event data (schedule, settings) is publicly readable to facilitate
  *   easy access to event information.
  * - Announcements are readable by any signed-in user.
  * - Admin roles are managed via the `roles_admin` collection. A user can read their own admin status.
@@ -106,6 +107,18 @@ service cloud.firestore {
       allow get, list: if true;
       allow create, update, delete: if false;
     }
+    
+    /**
+     * @description Allows admins to manage global site settings, nested under an event. Logged-in users can read them.
+     * @path /events/{eventId}/site_settings/{settingId}
+     * @allow (get, list): Anyone can read site settings.
+     * @allow (create, update, delete): Only admins can manage site settings.
+     * @principle Secure global site settings by nesting under public event data.
+     */
+    match /events/{eventId}/site_settings/{settingId} {
+        allow get, list: if true;
+        allow create, update, delete: if isAdmin();
+    }
 
     /**
      * @description Allows read access to projects associated with a team.  Write operations are not yet implemented.
@@ -158,18 +171,6 @@ service cloud.firestore {
       allow get: if isOwner(userId);
       allow list: if isAdmin();
       allow create, update, delete: if isAdmin();
-    }
-    
-    /**
-     * @description Allows admins to manage global site settings. Logged-in users can read them.
-     * @path /site_settings/{settingId}
-     * @allow (get, list): Any signed-in user can read site settings (like logos).
-     * @allow (create, update, delete): Only admins can manage site settings.
-     * @principle Secure global site settings.
-     */
-    match /site_settings/{settingId} {
-        allow get, list: if isAdmin() || isSignedIn();
-        allow create, update, delete: if isAdmin();
     }
 
     /**
