@@ -31,6 +31,14 @@ export function useAdminStatus() {
       return;
     }
 
+    // Temporary hardcoded check for immediate access
+    if (user.email === 'kalyanikri1111@gmail.com' || user.email === 'frgtpeople@gmail.com') {
+        setIsAdmin(true);
+        setIsAdminLoading(false);
+        return;
+    }
+
+
     // If we have a user, check their admin status from Firestore.
     const checkAdminStatus = async () => {
       if (!firestore) {
