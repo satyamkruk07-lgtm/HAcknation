@@ -6,8 +6,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { useAuth } from '@/firebase';
+import { signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { useAuth, useUser } from '@/firebase';
 
 import {
   Card,
@@ -40,6 +40,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function LoginPage() {
   const auth = useAuth();
+  const { user: currentUser, isUserLoading } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -49,10 +50,14 @@ export default function LoginPage() {
   useEffect(() => {
     if (searchParams.get('registered') === 'true') {
       setSuccess('Account created! Please check your email to verify your account before logging in.');
-      // Optionally, you can remove the query param from the URL
-      // router.replace('/login', undefined);
     }
-  }, [searchParams, router]);
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (!isUserLoading && currentUser) {
+      router.push('/dashboard');
+    }
+  }, [currentUser, isUserLoading, router]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -68,21 +73,35 @@ export default function LoginPage() {
     setSuccess(null);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      
       if (!userCredential.user.emailVerified) {
-        setError('Please verify your email address before logging in. A new verification link has been sent.');
-        // Optionally resend verification email
-        // await sendEmailVerification(userCredential.user);
-        setIsSubmitting(false);
+        setError('Please verify your email address before logging in. A new verification link has been sent to your email.');
+        await sendEmailVerification(userCredential.user);
+        setIsSubmitting(false); 
         return;
       }
-      router.push('/dashboard');
+      
+      // The useEffect hook above will handle the redirect on successful login.
+
     } catch (error: any) {
-      setError(error.message);
-    } finally {
-      if (error === null) { // only set to false if it's not already false from email verification check
-        setIsSubmitting(false);
+      let errorMessage = 'An unknown error occurred.';
+      switch (error.code) {
+        case 'auth/user-not-found':
+          errorMessage = 'No account found with this email address.';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Incorrect password. Please try again.';
+          break;
+        case 'auth/too-many-requests':
+            errorMessage = 'Too many login attempts. Please try again later.';
+            break;
+        default:
+          errorMessage = error.message;
       }
+      setError(errorMessage);
+      setIsSubmitting(false);
     }
+    // No need for a final 'setIsSubmitting(false)' here because it's handled in all branches.
   };
 
   return (
