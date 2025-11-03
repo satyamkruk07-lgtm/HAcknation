@@ -153,9 +153,9 @@ export default function DashboardPage() {
   const router = useRouter();
 
   const announcementsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !user) return null;
     return query(collection(firestore, 'announcements'), orderBy('timestamp', 'desc'), limit(5));
-  }, [firestore]);
+  }, [firestore, user]);
 
   const { data: announcements, isLoading: areAnnouncementsLoading } = useCollection<Announcement>(announcementsQuery);
   
@@ -237,7 +237,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Announcements */}
-            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover-translate-y-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 font-headline">
                   <Megaphone className="h-6 w-6 text-accent" />
