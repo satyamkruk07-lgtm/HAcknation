@@ -22,10 +22,11 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { sponsors } from '@/lib/data.tsx';
 import { Badge } from '@/components/ui/badge';
-import type { Announcement, ScheduleEvent } from '@/lib/types';
-import { collection, query, orderBy, limit } from 'firebase/firestore';
+import type { Announcement, ScheduleEvent, SiteSettings } from '@/lib/types';
+import { collection, query, orderBy, limit, doc } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
+import { useDoc } from '@/firebase/firestore/use-doc';
 
 const features = [
   {
@@ -170,7 +171,13 @@ export default function DashboardPage() {
     return query(collection(firestore, 'announcements'), orderBy('timestamp', 'desc'), limit(5));
   }, [firestore, user]);
 
+  const settingsDocRef = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return doc(firestore, 'site_settings', 'main');
+  }, [firestore]);
+
   const { data: announcements, isLoading: areAnnouncementsLoading } = useCollection<Announcement>(announcementsQuery);
+  const { data: siteSettings, isLoading: areSettingsLoading } = useDoc<SiteSettings>(settingsDocRef);
   
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -178,7 +185,7 @@ export default function DashboardPage() {
     }
   }, [user, isUserLoading, router]);
 
-  if (isUserLoading || !user) {
+  if (isUserLoading || !user || areSettingsLoading) {
     return (
       <div className="container py-12">
         <div className="space-y-4">
@@ -199,6 +206,8 @@ export default function DashboardPage() {
     );
   }
 
+  const logoUrl = siteSettings?.collegeLogoUrl || "https://www.shivalikcollege.edu.in/wp-content/uploads/2023/10/logo-sce.png";
+
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
@@ -206,11 +215,11 @@ export default function DashboardPage() {
         <div className="mb-12">
           <div className="flex flex-col items-center text-center">
              <Image 
-                src="https://www.shivalikcollege.edu.in/wp-content/uploads/2023/10/logo-sce.png"
-                alt="Shivalik Logo"
-                width={180}
+                src={logoUrl}
+                alt="College Logo"
+                width={150}
                 height={39}
-                className="mb-4"
+                className="mb-4 h-12 w-auto object-contain"
              />
             <h1 className="font-headline text-2xl font-bold">
               Welcome, {user.displayName || 'Hacker'}!

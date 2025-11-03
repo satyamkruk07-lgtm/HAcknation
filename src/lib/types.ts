@@ -67,5 +67,6 @@ export type ProjectIdea = {
   technologies: string[];
 };
 
-    
-    
+export type SiteSettings = {
+    collegeLogoUrl?: string;
+};

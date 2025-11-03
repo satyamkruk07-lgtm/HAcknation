@@ -1,10 +1,10 @@
-
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebase';
+import { useState, useEffect, useRef } from 'react';
+import { useFirestore, useUser, useCollection, useMemoFirebase, useStorage } from '@/firebase';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
-import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
   Card,
   CardContent,
@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ExternalLink, Github, Loader2, Trash2, User as UserIcon, Download, CheckCircle, XCircle } from 'lucide-react';
+import { ExternalLink, Github, Loader2, Trash2, User as UserIcon, Download, CheckCircle, XCircle, Upload } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -36,7 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { UserAccount, SubmittedProject } from '@/lib/types';
+import type { UserAccount, SubmittedProject, SiteSettings } from '@/lib/types';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -60,6 +60,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { makeAdminAction, removeAdminAction } from '@/lib/actions';
+import { useDoc } from '@/firebase/firestore/use-doc';
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -539,6 +540,112 @@ function ProjectManagementTab() {
   );
 }
 
+function SiteManagementTab() {
+    const firestore = useFirestore();
+    const storage = useStorage();
+    const { toast } = useToast();
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = useState(false);
+
+    const settingsDocRef = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return doc(firestore, 'site_settings', 'main');
+    }, [firestore]);
+
+    const { data: siteSettings, isLoading, mutate: mutateSiteSettings } = useDoc<SiteSettings>(settingsDocRef);
+
+    const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) { // 2MB limit
+            toast({
+                variant: 'destructive',
+                title: 'File too large',
+                description: 'Please upload an image smaller than 2MB.',
+            });
+            return;
+        }
+
+        setIsUploading(true);
+        try {
+            const storageRef = ref(storage, `site_assets/college_logo_${Date.now()}`);
+            const uploadResult = await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(uploadResult.ref);
+
+            await setDoc(settingsDocRef, { collegeLogoUrl: downloadURL }, { merge: true });
+            
+            await mutateSiteSettings(); // Refresh firestore state
+
+            toast({
+                title: 'Logo uploaded successfully!',
+                description: 'The new logo will now appear on the dashboard.',
+            });
+
+        } catch (error: any) {
+            toast({
+                variant: 'destructive',
+                title: 'Upload failed',
+                description: error.message || 'Could not upload your logo.',
+            });
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    return (
+        <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+            <CardHeader>
+                <CardTitle>Site Management</CardTitle>
+                <CardDescription>Manage global site settings like the college logo.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="space-y-2">
+                    <Label>College Logo</Label>
+                    <CardDescription>This logo appears on the main dashboard.</CardDescription>
+                </div>
+                 {isLoading ? (
+                    <Skeleton className="h-24 w-full" />
+                ) : (
+                    <div className="flex items-center gap-6 p-4 border rounded-lg">
+                        <Image
+                            src={siteSettings?.collegeLogoUrl || 'https://www.shivalikcollege.edu.in/wp-content/uploads/2023/10/logo-sce.png'}
+                            alt="Current College Logo"
+                            width={150}
+                            height={150}
+                            className="object-contain h-16"
+                        />
+                        <div className="flex-1">
+                            <p className="text-sm text-muted-foreground break-all">
+                                {siteSettings?.collegeLogoUrl ? new URL(siteSettings.collegeLogoUrl).pathname.split('/').pop() : 'Default Logo'}
+                            </p>
+                        </div>
+                        <Button
+                            variant="outline"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isUploading}
+                        >
+                            {isUploading ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                                <Upload className="mr-2 h-4 w-4" />
+                            )}
+                            Upload New Logo
+                        </Button>
+                        <Input 
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            accept="image/png, image/jpeg, image/gif, image/svg+xml"
+                            onChange={handleLogoUpload}
+                        />
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
   const { isAdmin, isAdminLoading } = useAdminStatus();
@@ -591,10 +698,11 @@ export default function AdminPage() {
         </div>
 
         <Tabs defaultValue="announcements" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-background/50 border shadow-inner">
+          <TabsList className="grid w-full grid-cols-4 bg-background/50 border shadow-inner">
             <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
             <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
+            <TabsTrigger value="site" className="data-[state=active]:shadow-inner">Site</TabsTrigger>
           </TabsList>
           <TabsContent value="announcements" className="mt-6">
             <CreateAnnouncementForm />
@@ -604,6 +712,9 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="projects" className="mt-6">
             <ProjectManagementTab />
+          </TabsContent>
+           <TabsContent value="site" className="mt-6">
+            <SiteManagementTab />
           </TabsContent>
         </Tabs>
       </div>
