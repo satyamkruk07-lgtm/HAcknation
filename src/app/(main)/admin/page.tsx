@@ -272,35 +272,38 @@ function UserManagementTab() {
                   </TableRow>
                 ))
               ) : users && users.length > 0 ? (
-                users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      {user.emailVerified ? (
-                        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
-                          <CheckCircle className="mr-1 h-3 w-3" />
-                          Verified
-                        </Badge>
-                      ) : (
-                        <Badge variant="destructive" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">
-                           <XCircle className="mr-1 h-3 w-3" />
-                          Unverified
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {user.registrationDate
-                        ? format(new Date(user.registrationDate), 'PP')
-                        : 'N/A'}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => setSelectedUser(user)}>
-                        View Details
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
+                users.map((user) => {
+                  const isVerified = user.emailVerified || (user.email && adminEmails.includes(user.email));
+                  return (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">{user.name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        {isVerified ? (
+                          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
+                            <CheckCircle className="mr-1 h-3 w-3" />
+                            Verified
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive" className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300">
+                            <XCircle className="mr-1 h-3 w-3" />
+                            Unverified
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {user.registrationDate
+                          ? format(new Date(user.registrationDate), 'PP')
+                          : 'N/A'}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="outline" size="sm" onClick={() => setSelectedUser(user)}>
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               ) : (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center">
@@ -335,7 +338,7 @@ function UserManagementTab() {
                <div className="grid grid-cols-4 items-center gap-4">
                 <Label className="text-right">Status</Label>
                 <div className="col-span-3">
-                    {selectedUser.emailVerified ? (
+                    {selectedUser.emailVerified || (selectedUser.email && adminEmails.includes(selectedUser.email)) ? (
                         <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300">
                           <CheckCircle className="mr-1 h-3 w-3" />
                           Verified
@@ -594,5 +597,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
