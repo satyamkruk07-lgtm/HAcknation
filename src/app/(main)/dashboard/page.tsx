@@ -86,7 +86,7 @@ const conductors = [
   { name: 'Kalyani Kumari', seed: 'conductor2' },
   { name: 'Paramjeet Singh', seed: 'conductor3' },
   { name: 'Akshat Sharma', seed: 'conductor4' },
-  { name: 'Dr. Raj', seed: 'conductor5' },
+  { name: 'Anshul Namdev', seed: 'conductor5' },
 ];
 
 
