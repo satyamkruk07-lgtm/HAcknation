@@ -106,7 +106,7 @@ function Countdown() {
     }, [deadline]);
 
     const renderTimeValue = (value: number | undefined) => {
-        if (value === undefined) {
+        if (value === undefined || timeLeft === null) {
             return <Skeleton className="h-8 w-12" />;
         }
         return <div className="text-3xl font-bold font-mono">{String(value).padStart(2, '0')}</div>;
@@ -203,7 +203,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="mb-12">
           <div>
-            <h1 className="font-headline text-3xl font-bold">
+            <h1 className="font-headline text-2xl font-bold">
               Welcome, {user.displayName || 'Hacker'}!
             </h1>
             <p className="mt-2 text-lg text-muted-foreground">
