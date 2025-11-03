@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { signInWithEmailAndPassword, sendEmailVerification, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendEmailVerification, GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo, signOut } from 'firebase/auth';
 import { useAuth, useUser, useFirestore } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 
@@ -79,7 +79,8 @@ export default function LoginPage() {
   }, [searchParams]);
 
   useEffect(() => {
-    if (!isUserLoading && currentUser) {
+    // Only redirect if the user is loaded and verified
+    if (!isUserLoading && currentUser && currentUser.emailVerified) {
       router.push('/dashboard');
     }
   }, [currentUser, isUserLoading, router]);
@@ -102,17 +103,20 @@ export default function LoginPage() {
       if (!userCredential.user.emailVerified) {
         setError('Please verify your email address before logging in. A new verification link has been sent to your email.');
         await sendEmailVerification(userCredential.user);
+        // Sign out the user immediately so they don't get redirected
+        await signOut(auth);
         setIsSubmitting(false); 
         return;
       }
       
-      // The useEffect hook above will handle the redirect on successful login.
+      // The useEffect hook will handle the redirect on successful and verified login.
 
     } catch (error: any) {
       let errorMessage = 'An unknown error occurred.';
       switch (error.code) {
         case 'auth/user-not-found':
-          errorMessage = 'No account found with this email address.';
+        case 'auth/invalid-credential':
+          errorMessage = 'Invalid email or password. Please try again.';
           break;
         case 'auth/wrong-password':
           errorMessage = 'Incorrect password. Please try again.';
@@ -124,9 +128,9 @@ export default function LoginPage() {
           errorMessage = error.message;
       }
       setError(errorMessage);
-      setIsSubmitting(false);
+    } finally {
+        setIsSubmitting(false);
     }
-    // No need for a final 'setIsSubmitting(false)' here because it's handled in all branches.
   };
 
   const handleGoogleSignIn = async () => {
