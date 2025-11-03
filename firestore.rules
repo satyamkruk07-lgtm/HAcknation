@@ -114,15 +114,6 @@ service cloud.firestore {
       allow get, list: if true;
       allow create, update, delete: if false;
     }
-    
-    /**
-     * @description Rule for the /conductors/{conductorId} collection.
-     * Publicly readable, but only admins can edit.
-     */
-    match /conductors/{conductorId} {
-      allow get, list: if true;
-      allow create, update, delete: if isAdmin();
-    }
   }
 }
 

@@ -28,7 +28,7 @@ import {
   Linkedin
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { sponsors } from '@/lib/data.tsx';
+import { sponsors, conductors } from '@/lib/data.tsx';
 import { Badge } from '@/components/ui/badge';
 import type { Announcement, Conductor } from '@/lib/types';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
@@ -193,21 +193,15 @@ export default function DashboardPage() {
     return query(collection(firestore, 'announcements'), orderBy('timestamp', 'desc'), limit(5));
   }, [firestore, user]);
 
-  const conductorsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'conductors'));
-  }, [firestore]);
-
   const { data: announcements, isLoading: areAnnouncementsLoading } = useCollection<Announcement>(announcementsQuery);
-  const { data: conductors, isLoading: areConductorsLoading } = useCollection<Conductor>(conductorsQuery);
-
+  
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/login');
     }
   }, [user, isUserLoading, router]);
 
-  if (isUserLoading || !user || areConductorsLoading) {
+  if (isUserLoading || !user) {
     return (
       <div className="container py-12">
         <div className="space-y-4">
@@ -228,8 +222,8 @@ export default function DashboardPage() {
     );
   }
 
-  const topConductors = conductors?.slice(0, 2) || [];
-  const bottomConductors = conductors?.slice(2, 5) || [];
+  const topConductors = conductors.slice(0, 2);
+  const bottomConductors = conductors.slice(2, 5);
 
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">

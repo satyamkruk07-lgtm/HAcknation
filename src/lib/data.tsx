@@ -1,5 +1,5 @@
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
-import type { Sponsor, Project, ProjectIdea, ScheduleEvent } from './types';
+import type { Sponsor, Project, ProjectIdea, ScheduleEvent, Conductor } from './types';
 
 export const sponsors: Sponsor[] = [
   { name: 'Innovate Inc.', icon: <Briefcase /> },
@@ -289,6 +289,59 @@ export const projectIdeas: ProjectIdea[] = [
         title: "Poll-Everywhere-Clone",
         description: "A real-time polling tool for presentations and classrooms, where the audience can respond via their phones and see live results.",
         technologies: ["WebSockets", "React", "Chart.js", "Firebase"]
+    }
+];
+
+export const conductors: Conductor[] = [
+    {
+        id: "1",
+        name: "Dr. Devesh Kumar",
+        role: "Head of Department",
+        imageUrl: "https://i.imgur.com/gK2D323.jpeg",
+        email: "devesh.kumar@shivalikcollege.edu.in",
+        linkedin: "https://www.linkedin.com/in/dr-devesh-kumar-0a849725/",
+        qualification: "Ph.D. in Computer Science",
+        skills: ["Machine Learning", "Data Science", "AI", "Python"]
+    },
+    {
+        id: "2",
+        name: "Mr. Satyam Kumar",
+        role: "Head of IIPC",
+        imageUrl: "https://images.unsplash.com/photo-1627328950087-ce4ed2b5896a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bW91bnRhaW4lMjBib3l8ZW58MHx8fHwxNzYyMTg5NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+        email: "satyam.kumar@shivalikcollege.edu.in",
+        linkedin: "https://www.linkedin.com/in/satyam-kumar-87913b168/",
+        qualification: "M.Tech in CSE",
+        skills: ["Web Development", "React", "Node.js", "Firebase"]
+    },
+    {
+        id: "3",
+        name: "Ms. Kalyani Kumari",
+        role: "Event Coordinator",
+        imageUrl: `https://picsum.photos/seed/3/128/128`,
+        email: "kalyani.kumari@shivalikcollege.edu.in",
+        linkedin: "https://www.linkedin.com/in/kalyani-kumari-b97280249/",
+        qualification: "B.Tech in CSE",
+        skills: ["Event Management", "Public Speaking", "Canva", "Photoshop"]
+    },
+    {
+        id: "4",
+        name: "Mr. Manas Kumar",
+        role: "Technical Lead",
+        imageUrl: `https://picsum.photos/seed/4/128/128`,
+        email: "manas.kumar@shivalikcollege.edu.in",
+        linkedin: "https://www.linkedin.com/in/manas-kumar-87913b168/",
+        qualification: "B.Tech in CSE",
+        skills: ["Competitive Programming", "Java", "C++", "DSA"]
+    },
+    {
+        id: "5",
+        name: "Ms. Rakhi",
+        role: "Marketing Head",
+        imageUrl: `https://picsum.photos/seed/5/128/128`,
+        email: "rakhi@shivalikcollege.edu.in",
+        linkedin: "https://www.linkedin.com/in/rakhi-/",
+        qualification: "MBA in Marketing",
+        skills: ["Digital Marketing", "SEO", "Content Writing", "Social Media"]
     }
 ];
 

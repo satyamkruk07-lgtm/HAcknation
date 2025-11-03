@@ -249,26 +249,6 @@
         "timestamp",
         "content"
       ]
-    },
-    "Conductor": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Conductor",
-      "type": "object",
-      "description": "Represents a person conducting the hackathon event.",
-      "properties": {
-        "id": { "type": "string" },
-        "name": { "type": "string" },
-        "role": { "type": "string" },
-        "imageUrl": { "type": "string", "format": "uri" },
-        "email": { "type": "string", "format": "email" },
-        "linkedin": { "type": "string", "format": "uri" },
-        "qualification": { "type": "string" },
-        "skills": {
-          "type": "array",
-          "items": { "type": "string" }
-        }
-      },
-      "required": ["id", "name", "role", "email"]
     }
   },
   "auth": {
@@ -387,22 +367,6 @@
             {
               "name": "announcementId",
               "description": "Unique identifier for the announcement."
-            }
-          ]
-        }
-      },
-       {
-        "path": "/conductors/{conductorId}",
-        "definition": {
-          "entityName": "Conductor",
-          "schema": {
-            "$ref": "#/backend/entities/Conductor"
-          },
-          "description": "Stores details of the people conducting the event.",
-          "params": [
-            {
-              "name": "conductorId",
-              "description": "Unique identifier for the conductor."
             }
           ]
         }

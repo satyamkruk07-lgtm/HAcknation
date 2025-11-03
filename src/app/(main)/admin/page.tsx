@@ -546,154 +546,6 @@ function ProjectManagementTab() {
   );
 }
 
-const ConductorFormSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  role: z.string().min(1, 'Role is required'),
-  email: z.string().email(),
-  linkedin: z.string().url().optional().or(z.literal('')),
-  qualification: z.string().optional(),
-  imageUrl: z.string().url().optional().or(z.literal('')),
-  skills: z.string().optional(),
-});
-
-type ConductorFormData = z.infer<typeof ConductorFormSchema>;
-
-function ConductorManagementTab() {
-    const firestore = useFirestore();
-    const { toast } = useToast();
-    const [selectedConductor, setSelectedConductor] = useState<Conductor | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const conductorsQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
-        return query(collection(firestore, 'conductors'));
-    }, [firestore]);
-
-    const { data: conductors, isLoading, mutate: mutateConductors } = useCollection<Conductor>(conductorsQuery);
-
-    const form = useForm<ConductorFormData>({
-        resolver: zodResolver(ConductorFormSchema),
-        defaultValues: {
-            name: '',
-            role: '',
-            email: '',
-            linkedin: '',
-            qualification: '',
-            imageUrl: '',
-            skills: '',
-        }
-    });
-
-    useEffect(() => {
-        if (selectedConductor) {
-            form.reset({
-                name: selectedConductor.name,
-                role: selectedConductor.role,
-                email: selectedConductor.email,
-                linkedin: selectedConductor.linkedin,
-                qualification: selectedConductor.qualification,
-                imageUrl: selectedConductor.imageUrl,
-                skills: (selectedConductor.skills || []).join(', '),
-            });
-        }
-    }, [selectedConductor, form]);
-
-    const handleEditSubmit: SubmitHandler<ConductorFormData> = async (data) => {
-        if (!firestore || !selectedConductor) return;
-        setIsSubmitting(true);
-        try {
-            const conductorRef = doc(firestore, 'conductors', selectedConductor.id);
-            const updatedData = {
-                ...data,
-                skills: data.skills ? data.skills.split(',').map(s => s.trim()) : [],
-            };
-            await setDoc(conductorRef, updatedData, { merge: true });
-            toast({ title: 'Conductor Updated', description: `${data.name}'s details have been saved.` });
-            await mutateConductors();
-            setSelectedConductor(null);
-        } catch (error: any) {
-            toast({ variant: 'destructive', title: 'Update Failed', description: error.message });
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-    
-    return (
-        <>
-            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
-                <CardHeader>
-                    <CardTitle>Conductor Management</CardTitle>
-                    <CardDescription>Edit details for the people conducting the event.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Role</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {isLoading ? (
-                                Array.from({ length: 5 }).map((_, i) => (
-                                    <TableRow key={i}>
-                                        <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-                                        <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                                        <TableCell><Skeleton className="h-5 w-48" /></TableCell>
-                                        <TableCell className="text-right"><Skeleton className="h-8 w-16 ml-auto" /></TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
-                                conductors?.map(conductor => (
-                                    <TableRow key={conductor.id}>
-                                        <TableCell className="font-medium flex items-center gap-3">
-                                            <Image src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/40/40`} alt={conductor.name} width={40} height={40} className="rounded-full" />
-                                            {conductor.name}
-                                        </TableCell>
-                                        <TableCell>{conductor.role}</TableCell>
-                                        <TableCell>{conductor.email}</TableCell>
-                                        <TableCell className="text-right">
-                                            <Button variant="outline" size="sm" onClick={() => setSelectedConductor(conductor)}>
-                                                <Edit className="mr-2 h-4 w-4" /> Edit
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-
-            <Dialog open={!!selectedConductor} onOpenChange={(open) => !open && setSelectedConductor(null)}>
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>Edit Conductor</DialogTitle>
-                        <DialogDescription>Update the details for {selectedConductor?.name}.</DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={form.handleSubmit(handleEditSubmit)} className="space-y-4 py-4">
-                        <Input {...form.register('name')} placeholder="Name" />
-                        <Input {...form.register('role')} placeholder="Role" />
-                        <Input type="email" {...form.register('email')} placeholder="Email" />
-                        <Input {...form.register('qualification')} placeholder="Qualification" />
-                        <Input {...form.register('linkedin')} placeholder="LinkedIn URL" />
-                        <Input {...form.register('imageUrl')} placeholder="Image URL" />
-                        <Textarea {...form.register('skills')} placeholder="Skills (comma-separated)" />
-                        <DialogFooter>
-                            <Button type="button" variant="ghost" onClick={() => setSelectedConductor(null)}>Cancel</Button>
-                            <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Save Changes
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
-            </Dialog>
-        </>
-    );
-}
 
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
@@ -740,11 +592,10 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="announcements" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-background/50 border shadow-inner">
+            <TabsList className="grid w-full grid-cols-3 bg-background/50 border shadow-inner">
               <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
               <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
               <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
-              <TabsTrigger value="conductors" className="data-[state=active]:shadow-inner">Conductors</TabsTrigger>
             </TabsList>
             <TabsContent value="announcements" className="mt-6">
               <CreateAnnouncementForm />
@@ -754,9 +605,6 @@ export default function AdminPage() {
             </TabsContent>
             <TabsContent value="projects" className="mt-6">
               <ProjectManagementTab />
-            </TabsContent>
-            <TabsContent value="conductors" className="mt-6">
-                <ConductorManagementTab />
             </TabsContent>
           </Tabs>
         </div>
@@ -768,5 +616,3 @@ export default function AdminPage() {
   // The redirection is handled by the useEffect.
   return null;
 }
-
-    
