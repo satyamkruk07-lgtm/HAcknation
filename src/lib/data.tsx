@@ -313,7 +313,8 @@ export const conductors: Conductor[] = [
         email: "satyam.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/satyam-kumar-87913b168/",
         qualification: "M.Tech in CSE",
-        skills: ["Web Development", "React", "Node.js", "Firebase"]
+        skills: ["Web Development", "React", "Node.js", "Firebase"],
+        phone: "9661175197"
     },
     {
         id: "3",
@@ -323,7 +324,8 @@ export const conductors: Conductor[] = [
         email: "kalyani.kumari@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/kalyani-kumari-b97280249/",
         qualification: "B.Tech in CSE",
-        skills: ["Event Management", "Public Speaking", "Canva", "Photoshop"]
+        skills: ["Event Management", "Public Speaking", "Canva", "Photoshop"],
+        phone: "9760017416"
     },
     {
         id: "4",
@@ -333,7 +335,8 @@ export const conductors: Conductor[] = [
         email: "manas.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/manas-kumar-87913b168/",
         qualification: "B.Tech in CSE",
-        skills: ["Competitive Programming", "Java", "C++", "DSA"]
+        skills: ["Competitive Programming", "Java", "C++", "DSA"],
+        phone: "8923859863"
     },
     {
         id: "5",
@@ -343,7 +346,8 @@ export const conductors: Conductor[] = [
         email: "rakhi@shivalikcollege.eduin",
         linkedin: "https://www.linkedin.com/in/rakhi-/",
         qualification: "MBA in Marketing",
-        skills: ["Digital Marketing", "SEO", "Content Writing", "Social Media"]
+        skills: ["Digital Marketing", "SEO", "Content Writing", "Social Media"],
+        phone: "7355128710"
     },
     {
         id: "6",
@@ -353,7 +357,8 @@ export const conductors: Conductor[] = [
         email: "anshul.namdev@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/anshul-namdev",
         qualification: "M.Tech in CSE",
-        skills: ["Cloud Computing", "AWS", "DevOps", "Docker"]
+        skills: ["Cloud Computing", "AWS", "DevOps", "Docker"],
+        phone: "9076994339"
     }
 ];
 
@@ -379,6 +384,8 @@ export const conductors: Conductor[] = [
     
 
 
+
+    
 
     
 
