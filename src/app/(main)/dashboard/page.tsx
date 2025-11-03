@@ -203,7 +203,7 @@ export default function DashboardPage() {
         {/* Header */}
         <div className="mb-12">
           <div>
-            <h1 className="font-headline text-4xl font-bold">
+            <h1 className="font-headline text-3xl font-bold">
               Welcome, {user.displayName || 'Hacker'}!
             </h1>
             <p className="mt-2 text-lg text-muted-foreground">
