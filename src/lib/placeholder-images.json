@@ -7,40 +7,40 @@
       "imageHint": "code abstract"
     },
     {
-      "id": "avatar1",
-      "description": "Avatar of a person",
-      "imageUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjE5ODk0NTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "id": "conductor-satyam",
+      "description": "Portrait of Kumar Satyam",
+      "imageUrl": "https://images.unsplash.com/photo-1627328950087-ce4ed2b5896a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bW91bnRhaW4lMjBib3l8ZW58MHx8fHwxNzYyMTg5NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "person portrait"
     },
     {
-      "id": "avatar2",
-      "description": "Avatar of a person",
-      "imageUrl": "https://images.unsplash.com/photo-1600180758890-6b94519a8ba6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjE5ODk0NTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "id": "conductor-kalyani",
+      "description": "Portrait of Kalyani Kumari",
+      "imageUrl": "https://images.unsplash.com/photo-1610916113640-d6332ff87ddf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNnx8bW91bnRhaW4lMjBnaXJsfGVufDB8fHx8MTc2MjE4OTM3Mnww&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "person portrait"
     },
     {
-      "id": "avatar3",
-      "description": "Avatar of a person",
-      "imageUrl": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjE5ODk0NTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "id": "conductor-sartaj",
+      "description": "Portrait of Sartaj Khan",
+      "imageUrl": "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBtYW58ZW58MHx8fHwxNzYyMzk5NjU3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional man"
+    },
+    {
+      "id": "conductor-paramjeet",
+      "description": "Portrait of Paramjeet Singh",
+      "imageUrl": "https://images.unsplash.com/photo-1599992454196-937d155e063d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNXx8Ym95JTIwaGlkZGVufGVufDB8fHx8MTc2MjE5NjAyMXww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "conductor-akshat",
+      "description": "Portrait of Akshat Sharma",
+      "imageUrl": "https://images.unsplash.com/photo-1480827625140-981096152bdc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMXx8bmljZSUyMGxvb2t8ZW58MHx8fHwxNzYyMTk2Mjg0fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "person portrait"
     },
     {
-      "id": "avatar4",
-      "description": "Avatar of a person",
-      "imageUrl": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjE5ODk0NTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "person portrait"
-    },
-    {
-      "id": "avatar5",
-      "description": "Avatar of a person",
-      "imageUrl": "https://images.unsplash.com/photo-1535643302794-19c3804b874b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8cGVyc29uJTIwcG9ydHJhaXR8ZW58MHx8fHwxNzYxOTg5NDU4fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "person portrait"
-    },
-    {
-      "id": "avatar6",
-      "description": "Avatar of a person",
-      "imageUrl": "https://images.unsplash.com/photo-1521119989659-a83eee488004?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjE5ODk0NTh8MA&ixlibrb-4.1.0&q=80&w=1080",
-      "imageHint": "person portrait"
+      "id": "conductor-anshul",
+      "description": "Portrait of Anshul Namdev",
+      "imageUrl": "https://images.unsplash.com/photo-1555436169-6abd9c5532c3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0ZWFjaGVyJTIwbWVufGVufDB8fHx8MTc2MjE5NTk4Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "teacher man"
     },
     {
       "id": "profile-background",

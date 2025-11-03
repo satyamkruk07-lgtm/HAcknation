@@ -1,6 +1,6 @@
-
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
 import type { Sponsor, Project, ProjectIdea, ScheduleEvent, Conductor } from './types';
+import { PlaceHolderImages } from './placeholder-images';
 
 export const sponsors: Sponsor[] = [
   { name: 'Innovate Inc.', icon: <Briefcase /> },
@@ -298,7 +298,7 @@ export const conductors: Conductor[] = [
         id: "1",
         name: "Mr. Kumar Satyam",
         role: "Student",
-        imageUrl: "https://images.unsplash.com/photo-1627328950087-ce4ed2b5896a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bW91bnRhaW4lMjBib3l8ZW58MHx8fHwxNzYyMTg5NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
+        imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-satyam')?.imageUrl || `https://picsum.photos/seed/1/128/128`,
         email: "devesh.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/dr-devesh-kumar-0a849725/",
         qualification: "BCA",
@@ -309,7 +309,7 @@ export const conductors: Conductor[] = [
         id: "2",
         name: "Ms. Kalyani Kumari",
         role: "Student",
-        imageUrl: "https://images.unsplash.com/photo-1610916113640-d6332ff87ddf?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNnx8bW91bnRhaW4lMjBnaXJsfGVufDB8fHx8MTc2MjE4OTM3Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+        imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-kalyani')?.imageUrl || `https://picsum.photos/seed/2/128/128`,
         email: "satyam.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/satyam-kumar-87913b168/",
         qualification: "BCA",
@@ -320,7 +320,7 @@ export const conductors: Conductor[] = [
         id: "3",
         name: "Mr. Sartaj Khan",
         role: "Head Of Department",
-        imageUrl: `https://images.unsplash.com/photo-1745571479595-8e198f251c95?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNXx8dGVhY2hlciUyMG9sZCUyMG1lbnxlbnwwfHx8fDE3NjIxOTk3NTZ8MA&ixlib=rb-4.1.0&q=80&w=1080`,
+        imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-sartaj')?.imageUrl || `https://picsum.photos/seed/3/128/128`,
         email: "kalyani.kumari@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/kalyani-kumari-b97280249/",
         qualification: "Head of BCA Department",
@@ -331,7 +331,7 @@ export const conductors: Conductor[] = [
         id: "4",
         name: "Mr. Paramjeet Singh",
         role: "Faculty",
-        imageUrl: `https://images.unsplash.com/photo-1599992454196-937d155e063d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNXx8Ym95JTIwaGlkZGVufGVufDB8fHx8MTc2MjE5NjAyMXww&ixlib=rb-4.1.0&q=80&w=1080`,
+        imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-paramjeet')?.imageUrl || `https://picsum.photos/seed/4/128/128`,
         email: "manas.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/manas-kumar-87913b168/",
         qualification: "M.Tech in CSE",
@@ -342,7 +342,7 @@ export const conductors: Conductor[] = [
         id: "5",
         name: "Mr. Akshat Sharma",
         role: "Faculty",
-        imageUrl: `https://images.unsplash.com/photo-1480827625140-981096152bdc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMXx8bmljZSUyMGxvb2t8ZW58MHx8fHwxNzYyMTk2Mjg0fDA&ixlib=rb-4.1.0&q=80&w=1080`,
+        imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-akshat')?.imageUrl || `https://picsum.photos/seed/5/128/128`,
         email: "rakhi@shivalikcollege.eduin",
         linkedin: "https://www.linkedin.com/in/rakhi-/",
         qualification: "M.Tech in CSE",
@@ -353,7 +353,7 @@ export const conductors: Conductor[] = [
         id: "6",
         name: "Mr. Anshul Namdev",
         role: "Faculty",
-        imageUrl: `https://images.unsplash.com/photo-1555436169-6abd9c5532c3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHx0ZWFjaGVyJTIwbWVufGVufDB8fHx8MTc2MjE5NTk4Mnww&ixlib=rb-4.1.0&q=80&w=1080`,
+        imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-anshul')?.imageUrl || `https://picsum.photos/seed/6/128/128`,
         email: "anshul.namdev@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/anshul-namdev",
         qualification: "M.Tech in CSE",
@@ -402,4 +402,5 @@ export const conductors: Conductor[] = [
     
 
     
+
 
