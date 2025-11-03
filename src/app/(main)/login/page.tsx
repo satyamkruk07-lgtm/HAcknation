@@ -60,6 +60,8 @@ const GoogleIcon = () => (
     </svg>
   );
 
+const adminEmails = ['kalyanikri1111@gmail.com', 'frgtpeople@gmail.com'];
+
 export default function LoginPage() {
   const auth = useAuth();
   const firestore = useFirestore();
@@ -78,13 +80,6 @@ export default function LoginPage() {
     }
   }, [searchParams]);
 
-  // This useEffect will redirect already logged-in and verified users.
-  useEffect(() => {
-    if (currentUser && currentUser.emailVerified) {
-      router.push('/dashboard');
-    }
-  }, [currentUser, router]);
-
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -99,15 +94,17 @@ export default function LoginPage() {
     setSuccess(null);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
       
-      if (userCredential.user.emailVerified) {
-        // SUCCESS: Email is verified, proceed to dashboard.
+      const isAdmin = user.email && adminEmails.includes(user.email);
+
+      if (user.emailVerified || isAdmin) {
+        // SUCCESS: Email is verified OR user is an admin, proceed to dashboard.
         router.push('/dashboard');
       } else {
         // FAIL: Email is not verified.
         setError('Please verify your email address before logging in. A new verification link has been sent to your email.');
-        await sendEmailVerification(userCredential.user);
-        // Immediately sign the user out.
+        await sendEmailVerification(user);
         await signOut(auth);
       }
 
@@ -162,8 +159,6 @@ export default function LoginPage() {
             emailVerified: user.emailVerified,
           });
         }
-        // Redirection for Google sign-in is handled by the useEffect that listens for currentUser
-        // because Google sign-in automatically verifies the user.
         router.push('/dashboard');
     } catch(error: any) {
         let errorMessage = 'An unknown error occurred.';
@@ -294,5 +289,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    
