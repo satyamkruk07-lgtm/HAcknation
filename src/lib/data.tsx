@@ -296,7 +296,7 @@ export const conductors: Conductor[] = [
     {
         id: "1",
         name: "Mr. Kumar Satyam",
-        role: "Head of Department",
+        role: "Student",
         imageUrl: "https://images.unsplash.com/photo-1627328950087-ce4ed2b5896a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bW91bnRhaW4lMjBib3l8ZW58MHx8fHwxNzYyMTg5NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
         email: "devesh.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/dr-devesh-kumar-0a849725/",
@@ -306,7 +306,7 @@ export const conductors: Conductor[] = [
     {
         id: "2",
         name: "Ms. Kalyani Kumari",
-        role: "Head of IIPC",
+        role: "Student",
         imageUrl: "https://images.unsplash.com/photo-1627328950087-ce4ed2b5896a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bW91bnRhaW4lMjBib3l8ZW58MHx8fHwxNzYyMTg5NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
         email: "satyam.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/satyam-kumar-87913b168/",
@@ -316,7 +316,7 @@ export const conductors: Conductor[] = [
     {
         id: "3",
         name: "Mr. Sartaj Khan",
-        role: "Event Coordinator",
+        role: "Head of Department",
         imageUrl: `https://picsum.photos/seed/3/128/128`,
         email: "kalyani.kumari@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/kalyani-kumari-b97280249/",
@@ -326,7 +326,7 @@ export const conductors: Conductor[] = [
     {
         id: "4",
         name: "Mr. Paramjeet Singh",
-        role: "Technical Lead",
+        role: "Faculty",
         imageUrl: `https://picsum.photos/seed/4/128/128`,
         email: "manas.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/manas-kumar-87913b168/",
@@ -336,7 +336,7 @@ export const conductors: Conductor[] = [
     {
         id: "5",
         name: "Mr. Akshat Sharma",
-        role: "Marketing Head",
+        role: "Faculty",
         imageUrl: `https://picsum.photos/seed/5/128/128`,
         email: "rakhi@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/rakhi-/",
@@ -354,5 +354,7 @@ export const conductors: Conductor[] = [
     
 
 
+
+    
 
     
