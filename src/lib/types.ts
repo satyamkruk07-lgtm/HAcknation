@@ -58,6 +58,7 @@ export type UserAccount = {
   bio?: string;
   photoURL?: string;
   profileBannerUrl?: string;
+  phoneNumber?: string;
 };
 
 export type ProjectIdea = {

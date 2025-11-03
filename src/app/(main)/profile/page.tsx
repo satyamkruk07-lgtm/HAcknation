@@ -38,6 +38,7 @@ const profileFormSchema = z.object({
   college: z.string().optional(),
   skills: z.string().optional(),
   bio: z.string().optional(),
+  phoneNumber: z.string().optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileFormSchema>;
@@ -63,6 +64,7 @@ export default function ProfilePage() {
       college: '',
       skills: '',
       bio: '',
+      phoneNumber: '',
     },
   });
 
@@ -79,6 +81,7 @@ export default function ProfilePage() {
         college: userProfile.college || '',
         skills: userProfile.skills?.join(', ') || '',
         bio: userProfile.bio || '',
+        phoneNumber: userProfile.phoneNumber || '',
       });
     } else if (user) {
       form.reset({
@@ -86,6 +89,7 @@ export default function ProfilePage() {
         college: '',
         skills: '',
         bio: '',
+        phoneNumber: user.phoneNumber || '',
       });
     }
   }, [userProfile, user, form, isProfileLoading]);
@@ -107,13 +111,14 @@ export default function ProfilePage() {
         college: data.college,
         skills: data.skills ? data.skills.split(',').map((s) => s.trim()) : [],
         bio: data.bio,
+        phoneNumber: data.phoneNumber,
       };
 
       // The useDoc hook will automatically update on its own after this setDoc call.
       await setDoc(userDocRef, updatedData, { merge: true });
 
-      if (auth.currentUser.displayName !== data.name) {
-        await updateProfile(auth.currentUser, { displayName: data.name });
+      if (auth.currentUser.displayName !== data.name || auth.currentUser.phoneNumber !== data.phoneNumber) {
+        await updateProfile(auth.currentUser, { displayName: data.name, phoneNumber: data.phoneNumber });
       }
       
       // We manually call mutateUser to refresh the auth state from useUser hook
@@ -194,6 +199,19 @@ export default function ProfilePage() {
                             <FormMessage />
                             </FormItem>
                         )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="phoneNumber"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Phone Number</FormLabel>
+                              <FormControl>
+                                <Input type="tel" placeholder="+1 234 567 890" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
                         <FormField
                         control={form.control}
