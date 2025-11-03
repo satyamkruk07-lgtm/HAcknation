@@ -295,9 +295,9 @@ export const projectIdeas: ProjectIdea[] = [
 export const conductors: Conductor[] = [
     {
         id: "1",
-        name: "Kumar Satyam",
+        name: "Mr. Kumar Satyam",
         role: "Head of Department",
-        imageUrl: "https://i.imgur.com/gK2D323.jpeg",
+        imageUrl: "https://images.unsplash.com/photo-1627328950087-ce4ed2b5896a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bW91bnRhaW4lMjBib3l8ZW58MHx8fHwxNzYyMTg5NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
         email: "devesh.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/dr-devesh-kumar-0a849725/",
         qualification: "Ph.D. in Computer Science",
@@ -353,3 +353,6 @@ export const conductors: Conductor[] = [
 
     
 
+
+
+    
