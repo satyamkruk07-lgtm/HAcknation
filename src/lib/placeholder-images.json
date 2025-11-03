@@ -7,6 +7,12 @@
       "imageHint": "code abstract"
     },
     {
+      "id": "dashboard-banner",
+      "description": "The official banner for Shivalik College of Engineering.",
+      "imageUrl": "https://images.unsplash.com/photo-1718135899988-29476b3f9d2a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzaGl2YWxpayUyMGNvbGxlZ2UlMjBiYW5uZXJ8ZW58MHx8fHwxNzIyMjExNDYwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "college banner"
+    },
+    {
       "id": "avatar1",
       "description": "Avatar of a person",
       "imageUrl": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxwZXJzb24lMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjE5ODk0NTh8MA&ixlib=rb-4.1.0&q=80&w=1080",
