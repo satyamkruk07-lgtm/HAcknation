@@ -205,7 +205,7 @@ export default function DashboardPage() {
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
-        <div className="relative mb-12">
+        <div className="relative mb-12 border-b pb-8">
             <div className="absolute top-0 right-0 flex items-center gap-2">
                 <Button variant="outline" size="icon" asChild>
                     <a href="mailto:info@shivalikcollege.edu.in" aria-label="Email Us">
@@ -421,3 +421,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
