@@ -295,7 +295,7 @@ export const projectIdeas: ProjectIdea[] = [
 export const conductors: Conductor[] = [
     {
         id: "1",
-        name: "Dr. Devesh Kumar",
+        name: "Kumar Satyam",
         role: "Head of Department",
         imageUrl: "https://i.imgur.com/gK2D323.jpeg",
         email: "devesh.kumar@shivalikcollege.edu.in",
@@ -305,7 +305,7 @@ export const conductors: Conductor[] = [
     },
     {
         id: "2",
-        name: "Mr. Satyam Kumar",
+        name: "Ms. Kalyani Kumari",
         role: "Head of IIPC",
         imageUrl: "https://images.unsplash.com/photo-1627328950087-ce4ed2b5896a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bW91bnRhaW4lMjBib3l8ZW58MHx8fHwxNzYyMTg5NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080",
         email: "satyam.kumar@shivalikcollege.edu.in",
@@ -315,7 +315,7 @@ export const conductors: Conductor[] = [
     },
     {
         id: "3",
-        name: "Ms. Kalyani Kumari",
+        name: "Mr. Sartaj Khan",
         role: "Event Coordinator",
         imageUrl: `https://picsum.photos/seed/3/128/128`,
         email: "kalyani.kumari@shivalikcollege.edu.in",
@@ -325,7 +325,7 @@ export const conductors: Conductor[] = [
     },
     {
         id: "4",
-        name: "Mr. Manas Kumar",
+        name: "Mr. Paramjeet Singh",
         role: "Technical Lead",
         imageUrl: `https://picsum.photos/seed/4/128/128`,
         email: "manas.kumar@shivalikcollege.edu.in",
@@ -335,7 +335,7 @@ export const conductors: Conductor[] = [
     },
     {
         id: "5",
-        name: "Ms. Rakhi",
+        name: "Mr. Akshat Sharma",
         role: "Marketing Head",
         imageUrl: `https://picsum.photos/seed/5/128/128`,
         email: "rakhi@shivalikcollege.edu.in",
@@ -352,3 +352,4 @@ export const conductors: Conductor[] = [
 
 
     
+
