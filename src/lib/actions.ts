@@ -50,8 +50,10 @@ export async function makeAdminAction(email: string): Promise<{ success: boolean
             return { success: false, message: 'User not found.' };
         }
 
+        // Set the document in roles_admin collection with the user's UID as the document ID
+        // and store the email inside the document.
         const adminRoleRef = firestore.collection('roles_admin').doc(uid);
-        await adminRoleRef.set({ email: email });
+        await adminRoleRef.set({ email: userRecord.email });
 
         return { success: true, message: `Successfully made ${email} an admin.` };
     } catch (error: any) {
