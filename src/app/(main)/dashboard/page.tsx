@@ -204,6 +204,15 @@ export default function DashboardPage() {
       <div className="container py-12">
         {/* Header */}
         <div className="mb-12">
+           <div className="relative w-full h-48 rounded-lg overflow-hidden mb-8">
+              <Image
+                src="https://images.unsplash.com/photo-1593349480503-6857d4a7a85d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxzaGl2YWxpayUyMGNvbGxlZ2UlMjBiYW5uZXJ8ZW58MHx8fHwxNzE2NDAxODgyfDA&ixlib=rb-4.0.3&q=80&w=1080"
+                alt="The official banner for Shivalik College of Engineering."
+                layout="fill"
+                objectFit="cover"
+                data-ai-hint="college banner"
+              />
+            </div>
           <div className="flex flex-col items-center text-center">
             <h1 className="font-headline text-2xl font-bold">
               Welcome, {user.displayName || 'Hacker'}!
