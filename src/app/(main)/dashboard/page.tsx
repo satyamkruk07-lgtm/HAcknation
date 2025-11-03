@@ -218,7 +218,7 @@ export default function DashboardPage() {
                     </a>
                 </Button>
             </div>
-            <div className="flex justify-center items-center gap-4">
+            <div className="flex justify-center items-center gap-8">
               <div className="text-center">
                 <h1 className="text-5xl font-bold font-headline tracking-tighter text-destructive">
                   Shivalik
@@ -227,9 +227,12 @@ export default function DashboardPage() {
                   College of Engineering
                 </p>
               </div>
-              <div className="text-center">
-                <p className="text-2xl font-black text-destructive uppercase">NAAC</p>
-                <p className="text-xl font-bold">Grade</p>
+              <div className="flex items-center gap-2">
+                <div className="text-center">
+                  <p className="text-2xl font-black text-destructive uppercase">NAAC</p>
+                  <p className="text-xl font-bold">Grade</p>
+                </div>
+                <div className="text-5xl font-black text-destructive">A+</div>
               </div>
             </div>
         </div>
