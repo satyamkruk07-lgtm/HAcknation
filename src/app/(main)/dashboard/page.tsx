@@ -23,6 +23,9 @@ import {
   Mail,
   Phone,
   GitBranch,
+  BookOpen,
+  Briefcase,
+  Linkedin
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { sponsors } from '@/lib/data.tsx';
@@ -31,6 +34,14 @@ import type { Announcement } from '@/lib/types';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 const features = [
   {
@@ -83,11 +94,11 @@ const hackathonTips = [
 ]
 
 const conductors = [
-  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1', imageUrl: 'https://images.unsplash.com/photo-1627328950087-ce4ed2b5896a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bW91bnRhaW4lMjBib3l8ZW58MHx8fHwxNzYyMTg5NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080' },
-  { name: 'Kalyani Kumari', role: 'Student', seed: 'conductor2', imageUrl: 'https://images.unsplash.com/photo-1654414883391-24e17446e4d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtb3VudGFpbiUyMGdpcmx8ZW58MHx8fHwxNzYyMTg5MzcyfDA&ixlib=rb-4.1.0&q=80&w=1080' },
-  { name: 'Paramjeet Singh', role: 'Faculty', seed: 'conductor3' },
-  { name: 'Akshat Sharma', role: 'Faculty', seed: 'conductor4' },
-  { name: 'Anshul Namdev', role: 'Faculty', seed: 'conductor5' },
+  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1', imageUrl: 'https://images.unsplash.com/photo-1627328950087-ce4ed2b5896a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxNHx8bW91bnRhaW4lMjBib3l8ZW58MHx8fHwxNzYyMTg5NTMzfDA&ixlib=rb-4.1.0&q=80&w=1080', email: 'kumar.satyam@example.com', linkedin: 'https://linkedin.com/in/kumarsatyam', qualification: 'B.Tech in Computer Science', skills: ['Next.js', 'Firebase', 'Genkit', 'AI/ML'] },
+  { name: 'Kalyani Kumari', role: 'Student', seed: 'conductor2', imageUrl: 'https://images.unsplash.com/photo-1654414883391-24e17446e4d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxtb3VudGFpbiUyMGdpcmx8ZW58MHx8fHwxNzYyMTg5MzcyfDA&ixlib=rb-4.1.0&q=80&w=1080', email: 'kalyani.kumari@example.com', linkedin: 'https://linkedin.com/in/kalyanikumari', qualification: 'B.Tech in Information Technology', skills: ['UI/UX Design', 'React', 'Figma', 'Frontend Dev'] },
+  { name: 'Paramjeet Singh', role: 'Faculty', seed: 'conductor3', imageUrl: `https://picsum.photos/seed/conductor3/200/200`, email: 'paramjeet.singh@example.com', linkedin: 'https://linkedin.com/in/paramjeetsingh', qualification: 'M.Tech, PhD in AI', skills: ['Machine Learning', 'Python', 'Research', 'Academic Writing'] },
+  { name: 'Akshat Sharma', role: 'Faculty', seed: 'conductor4', imageUrl: `https://picsum.photos/seed/conductor4/200/200`, email: 'akshat.sharma@example.com', linkedin: 'https://linkedin.com/in/akshatsharma', qualification: 'M.Sc in Software Engineering', skills: ['Cloud Computing', 'AWS', 'DevOps', 'System Design'] },
+  { name: 'Anshul Namdev', role: 'Faculty', seed: 'conductor5', imageUrl: `https://picsum.photos/seed/conductor5/200/200`, email: 'anshul.namdev@example.com', linkedin: 'https://linkedin.com/in/anshulnamdev', qualification: 'MCA', skills: ['Cyber Security', 'Networking', 'Ethical Hacking', 'C++'] },
 ];
 
 
@@ -183,6 +194,7 @@ export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const router = useRouter();
+  const [selectedConductor, setSelectedConductor] = useState<(typeof conductors)[0] | null>(null);
 
   const announcementsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -442,14 +454,16 @@ export default function DashboardPage() {
                 <div className="flex justify-center gap-16">
                     {conductors.slice(0, 2).map((conductor) => (
                         <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
-                            <Image
-                                src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.seed}/200/200`}
-                                alt={`Portrait of ${conductor.name}`}
-                                width={128}
-                                height={128}
-                                className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover"
-                                data-ai-hint="person portrait"
-                            />
+                            <button onClick={() => setSelectedConductor(conductor)} className="rounded-full">
+                                <Image
+                                    src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.seed}/200/200`}
+                                    alt={`Portrait of ${conductor.name}`}
+                                    width={128}
+                                    height={128}
+                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover"
+                                    data-ai-hint="person portrait"
+                                />
+                            </button>
                             <div className="mt-2">
                                 <h3 className="font-semibold text-base">{conductor.name}</h3>
                                 <p className="text-sm text-muted-foreground">{conductor.role}</p>
@@ -461,15 +475,16 @@ export default function DashboardPage() {
                 <div className="flex justify-center gap-16">
                     {conductors.slice(2, 5).map((conductor) => (
                         <div key={conductor.seed} className="flex flex-col items-center text-center gap-2">
-                            <Image
-                                src={`https://picsum.photos/seed/${conductor.seed}/200
-/200`}
-                                alt={`Portrait of ${conductor.name}`}
-                                width={128}
-                                height={128}
-                                className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover"
-                                data-ai-hint="person portrait"
-                            />
+                             <button onClick={() => setSelectedConductor(conductor)} className="rounded-full">
+                                <Image
+                                    src={conductor.imageUrl}
+                                    alt={`Portrait of ${conductor.name}`}
+                                    width={128}
+                                    height={128}
+                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover"
+                                    data-ai-hint="person portrait"
+                                />
+                            </button>
                             <div className="mt-2">
                                 <h3 className="font-semibold text-base">{conductor.name}</h3>
                                 <p className="text-sm text-muted-foreground">{conductor.role}</p>
@@ -479,10 +494,58 @@ export default function DashboardPage() {
                 </div>
             </div>
         </div>
-
       </div>
+      {selectedConductor && (
+        <Dialog open={!!selectedConductor} onOpenChange={(open) => !open && setSelectedConductor(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader className="items-center text-center">
+                <Image
+                    src={selectedConductor.imageUrl}
+                    alt={selectedConductor.name}
+                    width={96}
+                    height={96}
+                    className="rounded-full border-4 border-background shadow-lg"
+                    data-ai-hint="person portrait"
+                  />
+              <div className='pt-2'>
+                <DialogTitle className="text-2xl font-headline">{selectedConductor.name}</DialogTitle>
+                <DialogDescription>{selectedConductor.role}</DialogDescription>
+              </div>
+            </DialogHeader>
+            <div className="py-4 grid gap-6">
+                <div className='space-y-4'>
+                    <h4 className="font-semibold text-center text-muted-foreground text-sm uppercase tracking-wider">Contact</h4>
+                    <div className='flex items-center justify-center gap-4'>
+                        <Button variant="outline" size="icon" asChild>
+                            <a href={`mailto:${selectedConductor.email}`} aria-label="Email">
+                                <Mail className="h-5 w-5" />
+                            </a>
+                        </Button>
+                         <Button variant="outline" size="icon" asChild>
+                            <a href={selectedConductor.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                                <Linkedin className="h-5 w-5" />
+                            </a>
+                        </Button>
+                    </div>
+                </div>
+
+                <div className='space-y-2 text-center'>
+                    <h4 className="font-semibold text-muted-foreground text-sm uppercase tracking-wider">Qualification</h4>
+                    <p className="text-sm flex items-center justify-center gap-2"><BookOpen className="h-4 w-4 text-accent" /> {selectedConductor.qualification}</p>
+                </div>
+
+                <div className='space-y-3 text-center'>
+                    <h4 className="font-semibold text-muted-foreground text-sm uppercase tracking-wider">Skills</h4>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                        {selectedConductor.skills.map(skill => (
+                            <Badge key={skill} variant="secondary">{skill}</Badge>
+                        ))}
+                    </div>
+                </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
-
-    
