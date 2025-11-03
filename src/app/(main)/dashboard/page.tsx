@@ -78,15 +78,20 @@ const hackathonTips = [
         icon: GitBranch,
         title: "Version Control is Your Friend",
         description: "Use Git from the start. Commit often. It will save you from headaches and help your team collaborate smoothly."
+    },
+    {
+        icon: GitBranch,
+        title: "Manage Your Time",
+        description: "Create a rough schedule. Allocate time for brainstorming, building, debugging, and preparing your presentation."
     }
 ]
 
 const conductors = [
-  { name: 'Kumar Satyam', seed: 'conductor1' },
-  { name: 'Kalyani Kumari', seed: 'conductor2' },
-  { name: 'Paramjeet Singh', seed: 'conductor3' },
-  { name: 'Akshat Sharma', seed: 'conductor4' },
-  { name: 'Anshul Namdev', seed: 'conductor5' },
+  { name: 'Kumar Satyam', role: 'Student', seed: 'conductor1' },
+  { name: 'Kalyani Kumari', role: 'Student', seed: 'conductor2' },
+  { name: 'Paramjeet Singh', role: 'Faculty', seed: 'conductor3' },
+  { name: 'Akshat Sharma', role: 'Faculty', seed: 'conductor4' },
+  { name: 'Anshul Namdev', role: 'Faculty', seed: 'conductor5' },
 ];
 
 
@@ -392,6 +397,26 @@ export default function DashboardPage() {
                 ))}
               </div>
             </div>
+            
+             {/* Our Sponsors */}
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1 mt-8">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-3 font-headline">
+                    <HeartHandshake className="h-6 w-6 text-accent" />
+                    <span>Our Sponsors</span>
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-y-8 gap-x-4 items-center justify-items-center">
+                    {sponsors.map((sponsor) => (
+                        <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-2">
+                            {React.cloneElement(sponsor.icon, { className: "h-10 w-10 text-muted-foreground" })}
+                            <span className="font-semibold text-sm text-muted-foreground">{sponsor.name}</span>
+                        </div>
+                    ))}
+                    </div>
+                </CardContent>
+            </Card>
           </div>
 
           {/* Right Column */}
@@ -410,25 +435,6 @@ export default function DashboardPage() {
                   <Link href="/submit">Submit Your Project</Link>
                 </Button>
               </CardContent>
-            </Card>
-            {/* Our Sponsors */}
-            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-3 font-headline">
-                    <HeartHandshake className="h-6 w-6 text-accent" />
-                    <span>Our Sponsors</span>
-                    </CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-8 gap-x-4 items-center justify-items-center">
-                    {sponsors.map((sponsor) => (
-                        <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-2">
-                            {React.cloneElement(sponsor.icon, { className: "h-10 w-10 text-muted-foreground" })}
-                            <span className="font-semibold text-sm text-muted-foreground">{sponsor.name}</span>
-                        </div>
-                    ))}
-                    </div>
-                </CardContent>
             </Card>
           </div>
         </div>
@@ -451,7 +457,7 @@ export default function DashboardPage() {
                             />
                             <div className="mt-2">
                                 <h3 className="font-semibold text-base">{conductor.name}</h3>
-                                <p className="text-sm text-muted-foreground">Faculty</p>
+                                <p className="text-sm text-muted-foreground">{conductor.role}</p>
                             </div>
                         </div>
                     ))}
@@ -470,7 +476,7 @@ export default function DashboardPage() {
                             />
                             <div className="mt-2">
                                 <h3 className="font-semibold text-base">{conductor.name}</h3>
-                                <p className="text-sm text-muted-foreground">Faculty</p>
+                                <p className="text-sm text-muted-foreground">{conductor.role}</p>
                             </div>
                         </div>
                     ))}
