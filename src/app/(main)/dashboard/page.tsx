@@ -21,6 +21,7 @@ import {
   Zap,
   Mail,
   Phone,
+  GitBranch,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { sponsors } from '@/lib/data.tsx';
@@ -72,6 +73,11 @@ const hackathonTips = [
         icon: Lightbulb,
         title: "Don't Be Afraid to Pivot",
         description: "If your initial idea isn't working or you think of something better, it's okay to change direction. Adaptability is key."
+    },
+    {
+        icon: GitBranch,
+        title: "Version Control is Your Friend",
+        description: "Use Git from the start. Commit often. It will save you from headaches and help your team collaborate smoothly."
     }
 ]
 
@@ -364,7 +370,7 @@ export default function DashboardPage() {
             {/* Hackathon Tips */}
             <div>
               <h2 className="mb-4 font-headline text-2xl font-bold">Hackathon Tips</h2>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {hackathonTips.map((tip, index) => (
                   <Card key={index} className="group transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
                       <CardContent className="p-6">
@@ -477,5 +483,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
