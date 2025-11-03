@@ -12,7 +12,9 @@ function initializeAdminApp(): App {
   if (adminApp) {
     return adminApp;
   }
-  return initializeApp({}, 'admin');
+  // By passing 'undefined' as the first argument, the SDK will automatically
+  // use Application Default Credentials in the Google Cloud environment.
+  return initializeApp(undefined, 'admin');
 }
 
 export async function generateSummaryAction(feedback: string) {
