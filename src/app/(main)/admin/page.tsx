@@ -36,7 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { UserAccount, SubmittedProject } from '@/lib/types';
+import type { UserAccount, SubmittedProject, SiteSettings } from '@/lib/types';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -540,6 +540,107 @@ function ProjectManagementTab() {
   );
 }
 
+function SiteAssetsTab() {
+  const storage = useStorage();
+  const firestore = useFirestore();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const siteSettingsDocRef = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return doc(firestore, 'site_settings', 'main');
+  }, [firestore]);
+
+  const { data: siteSettings, isLoading: isSettingsLoading, mutate: mutateSiteSettings } = useDoc<SiteSettings>(siteSettingsDocRef);
+
+  const handleFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !firestore) return;
+
+    if (file.size > 2 * 1024 * 1024) { // 2MB limit
+      toast({
+        variant: 'destructive',
+        title: 'File too large',
+        description: 'Please upload an image smaller than 2MB.',
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const storageRef = ref(storage, `site_assets/college-banner`);
+      const uploadResult = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(uploadResult.ref);
+
+      await setDoc(siteSettingsDocRef, { collegeBannerUrl: downloadURL }, { merge: true });
+      await mutateSiteSettings();
+
+      toast({
+        title: 'Banner uploaded successfully!',
+        description: 'The new banner is now live on the dashboard.',
+      });
+
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Upload failed',
+        description: error.message || 'Could not upload your image.',
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+      <CardHeader>
+        <CardTitle>Site Assets</CardTitle>
+        <CardDescription>Manage global site assets like logos and banners.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div>
+          <Label className="text-lg font-semibold">College Banner</Label>
+          <p className="text-sm text-muted-foreground mb-4">
+            This banner appears on the top of the participant dashboard. Recommended size: 1200x300px.
+          </p>
+          <div className="relative w-full aspect-[4/1] rounded-lg border-2 border-dashed flex items-center justify-center bg-muted/50 overflow-hidden">
+            {isSettingsLoading ? (
+              <Skeleton className="w-full h-full" />
+            ) : siteSettings?.collegeBannerUrl ? (
+              <Image
+                src={siteSettings.collegeBannerUrl}
+                alt="College Banner Preview"
+                layout="fill"
+                objectFit="cover"
+              />
+            ) : (
+              <p className="text-muted-foreground">No banner uploaded yet.</p>
+            )}
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button onClick={handleFileSelect} disabled={isUploading}>
+          {isUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+          {isUploading ? 'Uploading...' : 'Upload New Banner'}
+        </Button>
+        <Input
+          type="file"
+          ref={fileInputRef}
+          className="hidden"
+          accept="image/png, image/jpeg, image/webp"
+          onChange={handleImageUpload}
+        />
+      </CardFooter>
+    </Card>
+  );
+}
+
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
   const { isAdmin, isAdminLoading } = useAdminStatus();
@@ -592,10 +693,11 @@ export default function AdminPage() {
         </div>
 
         <Tabs defaultValue="announcements" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-background/50 border shadow-inner">
+          <TabsList className="grid w-full grid-cols-4 bg-background/50 border shadow-inner">
             <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
             <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
+            <TabsTrigger value="site_assets" className="data-[state=active]:shadow-inner">Site Assets</TabsTrigger>
           </TabsList>
           <TabsContent value="announcements" className="mt-6">
             <CreateAnnouncementForm />
@@ -605,6 +707,9 @@ export default function AdminPage() {
           </TabsContent>
           <TabsContent value="projects" className="mt-6">
             <ProjectManagementTab />
+          </TabsContent>
+          <TabsContent value="site_assets" className="mt-6">
+            <SiteAssetsTab />
           </TabsContent>
         </Tabs>
       </div>

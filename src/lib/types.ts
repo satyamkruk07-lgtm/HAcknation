@@ -66,3 +66,7 @@ export type ProjectIdea = {
   description: string;
   technologies: string[];
 };
+
+export type SiteSettings = {
+  collegeBannerUrl?: string;
+};

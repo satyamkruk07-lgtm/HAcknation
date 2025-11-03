@@ -17,8 +17,7 @@
  *   Publicly readable, but judging creation/modification is restricted (TODO).
  * - /roles_admin/{userId}: Indicates if a user has admin roles. Admin-only access for write, Owner-only for read.
  * - /users/{userId}/teams/{teamId}: Stores teams created by a user. Owner-only access.
- * - /user_avatars/{userId}/{fileName}: User uploaded profile images.
- * - /site_assets/{fileName}: Admin uploaded site assets like logos.
+ * - /site_settings/{settingId}: Global site settings like logos. Writable by admin, readable by all signed-in users.
  *
  * Key Security Decisions:
  * - User listing is allowed for any signed-in user to facilitate team formation.
@@ -159,6 +158,19 @@ service cloud.firestore {
       allow list: if isAdmin();
       allow create, update, delete: if isAdmin();
     }
+    
+    /**
+     * @description Rules for global site settings.
+     * @path /site_settings/{settingId}
+     * @allow (get, list): Any signed-in user can read site settings.
+     * @allow (create, update, delete): Only admins can change site settings.
+     * @principle Securely manage global site configuration.
+     */
+    match /site_settings/{settingId} {
+        allow get, list: if isSignedIn();
+        allow create, update, delete: if isAdmin();
+    }
+
 
     /**
      * @description Allows a user to read and write their own teams.
@@ -179,78 +191,78 @@ service cloud.firestore {
       allow update: if isOwner(userId);
       allow delete: if isExistingOwner(userId);
     }
+  }
+  
+  // --- Firebase Storage Rules ---
+  service firebase.storage {
+    match /b/{bucket}/o {
+      /**
+      * @description Rules for user-uploaded profile pictures.
+      * @path /user_avatars/{userId}/{fileName}
+      * @allow (read): Anyone can read profile pictures.
+      * @allow (write): Only the authenticated owner of the profile can upload or delete their own avatar.
+      *                 The uploaded file must be an image and under 2MB.
+      * @principle Securely manage user profile images.
+      */
+      match /user_avatars/{userId}/{allPaths=**} {
+        allow read: if true;
+        allow write: if isOwner(userId)
+                    && request.resource.size < 2 * 1024 * 1024
+                    && request.resource.contentType.matches('image/.*');
+      }
 
-    // --- Firebase Storage Rules ---
-    service firebase.storage {
-      match /b/{bucket}/o {
-        /**
-        * @description Rules for user-uploaded profile pictures.
-        * @path /user_avatars/{userId}/{fileName}
-        * @allow (read): Anyone can read profile pictures.
-        * @allow (write): Only the authenticated owner of the profile can upload or delete their own avatar.
-        *                 The uploaded file must be an image and under 2MB.
-        * @principle Securely manage user profile images.
-        */
-        match /user_avatars/{userId}/{fileName} {
+      /**
+      * @description Rules for admin-uploaded site assets like logos and banners.
+      * @path /site_assets/{fileName}
+      * @allow (read): Anyone can read site assets.
+      * @allow (write): Only admins can upload or delete site assets.
+      *                 The uploaded file must be an image and under 2MB.
+      * @principle Securely manage global site assets.
+      */
+      match /site_assets/{allPaths=**} {
           allow read: if true;
-          allow write: if isOwner(userId)
-                      && request.resource.size < 2 * 1024 * 1024
-                      && request.resource.contentType.matches('image/.*');
-        }
-
-        /**
-        * @description Rules for admin-uploaded site assets like logos.
-        * @path /site_assets/{fileName}
-        * @allow (read): Anyone can read site assets.
-        * @allow (write): Only admins can upload or delete site assets.
-        *                 The uploaded file must be an image and under 2MB.
-        * @principle Securely manage global site assets.
-        */
-        match /site_assets/{fileName} {
-            allow read: if true;
-            allow write: if isAdmin()
-                         && request.resource.size < 2 * 1024 * 1024
-                         && request.resource.contentType.matches('image/.*');
-        }
+          allow write: if isAdmin()
+                        && request.resource.size < 2 * 1024 * 1024
+                        && request.resource.contentType.matches('image/.*');
       }
     }
+  }
 
 
-    // --- Helper Functions ---
+  // --- Helper Functions ---
+
+  /**
+    * @description Checks if the current user is signed in.
+    * @return True if the user is authenticated, false otherwise.
+    */
+  function isSignedIn() {
+    return request.auth != null;
+  }
+
+  /**
+    * @description Checks if the current user is the owner of the resource.
+    * @param {string} userId The user ID to compare against the authenticated user's ID.
+    * @return True if the user is the owner, false otherwise.
+    * @example `isOwner('user123')` returns true if `request.auth.uid == 'user123'`.
+    */
+  function isOwner(userId) {
+    return isSignedIn() && request.auth.uid == userId;
+  }
+
+  /**
+    * @description Checks if the current user is the owner of the resource AND the resource exists.
+    * @param {string} userId The user ID to compare against the authenticated user's ID.
+    * @return True if the user is the owner AND the resource exists, false otherwise.
+    */
+  function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+  }
 
     /**
-     * @description Checks if the current user is signed in.
-     * @return True if the user is authenticated, false otherwise.
-     */
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    /**
-     * @description Checks if the current user is the owner of the resource.
-     * @param {string} userId The user ID to compare against the authenticated user's ID.
-     * @return True if the user is the owner, false otherwise.
-     * @example `isOwner('user123')` returns true if `request.auth.uid == 'user123'`.
-     */
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    /**
-     * @description Checks if the current user is the owner of the resource AND the resource exists.
-     * @param {string} userId The user ID to compare against the authenticated user's ID.
-     * @return True if the user is the owner AND the resource exists, false otherwise.
-     */
-    function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-    }
-
-     /**
-      * @description Checks if the current user is an admin based on their existence in the roles_admin collection.
-      * @return True if the user is an admin, false otherwise.
-      */
-    function isAdmin() {
-      return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
-    }
+    * @description Checks if the current user is an admin based on their existence in the roles_admin collection.
+    * @return True if the user is an admin, false otherwise.
+    */
+  function isAdmin() {
+    return exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
   }
 }

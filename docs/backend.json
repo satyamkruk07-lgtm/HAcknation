@@ -262,6 +262,19 @@
         "description",
         "location"
       ]
+    },
+    "SiteSettings": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "SiteSettings",
+      "type": "object",
+      "description": "Global settings for the website, such as logos and banners.",
+      "properties": {
+        "collegeBannerUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for the main college banner image displayed on the dashboard."
+        }
+      }
     }
   },
   "auth": {
@@ -436,8 +449,24 @@
             }
           ]
         }
+      },
+      {
+        "path": "site_settings/{settingId}",
+        "definition": {
+          "entityName": "SiteSettings",
+          "schema": {
+            "$ref": "#/backend/entities/SiteSettings"
+          },
+          "description": "Stores global site settings. `settingId` is typically a singleton like 'main'.",
+          "params": [
+            {
+              "name": "settingId",
+              "description": "The unique identifier for the settings document (e.g., 'main')."
+            }
+          ]
+        }
       }
     ],
-    "reasoning": "The Firestore data structure is designed to support the HackTrack application's features, including event schedules, registration, live updates, submission platform, judging, and team formation. The structure emphasizes authorization independence and supports secure list operations. It leverages path-based ownership for user-specific data and membership maps for collaborative entities.\n\nAuthorization Independence (CRITICAL): Achieved primarily through denormalization. For example, teams store the `eventId` directly, avoiding the need to `get()` the event document to check authorization.  Projects include the `teamId`.\n\nQAPs (Rules are not Filters): Supported through structural segregation. The `users/{userId}/teams` collection ensures only the user can list their own teams. The `announcements` collection allows listing announcements scoped to the event without filtering, as it's a top-level collection.\n\nThe top-level collections are `events`, `users`, `roles_admin`, and `announcements`. Events contain event-specific information, Users contain personal profiles, roles_admin contains the user ID when the user has admin rights, and announcements are global for the event."
+    "reasoning": "The Firestore data structure is designed to support the HackTrack application's features, including event schedules, registration, live updates, submission platform, judging, and team formation. The structure emphasizes authorization independence and supports secure list operations. It leverages path-based ownership for user-specific data and membership maps for collaborative entities.\n\nAuthorization Independence (CRITICAL): Achieved primarily through denormalization. For example, teams store the `eventId` directly, avoiding the need to `get()` the event document to check authorization.  Projects include the `teamId`.\n\nQAPs (Rules are not Filters): Supported through structural segregation. The `users/{userId}/teams` collection ensures only the user can list their own teams. The `announcements` collection allows listing announcements scoped to the event without filtering, as it's a top-level collection.\n\nThe top-level collections are `events`, `users`, `roles_admin`, `announcements`, and `site_settings`. Events contain event-specific information, Users contain personal profiles, roles_admin contains the user ID when the user has admin rights, announcements are global for the event, and site_settings stores global configuration like logos."
   }
 }
