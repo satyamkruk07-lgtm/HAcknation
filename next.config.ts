@@ -31,9 +31,6 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-  experimental: {
-    // serverActions is kept here if it was present,
-  },
   allowedDevOrigins: ["https://*.cloudworkstations.dev"]
 };
 
