@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { LogOut, User as UserIcon, LayoutGrid, Shield } from 'lucide-react';
+import { LogOut, User as UserIcon, LayoutGrid, Shield, FileText, Code } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export function MainNav() {
@@ -94,11 +94,26 @@ export function MainNav() {
                   <span>Profile</span>
                 </Link>
               </DropdownMenuItem>
-               {isAdmin && (
+              {isAdmin ? (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href="/judging">
+                      <Code className="mr-2 h-4 w-4" />
+                      <span>Judging</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin">
+                      <Shield className="mr-2 h-4 w-4" />
+                      <span>Admin</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              ) : (
                 <DropdownMenuItem asChild>
-                  <Link href="/admin">
-                    <Shield className="mr-2 h-4 w-4" />
-                    <span>Admin</span>
+                  <Link href="/submit">
+                    <FileText className="mr-2 h-4 w-4" />
+                    <span>Submit Project</span>
                   </Link>
                 </DropdownMenuItem>
               )}
