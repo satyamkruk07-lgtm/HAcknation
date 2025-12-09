@@ -82,6 +82,14 @@ const judgingRounds = [
   },
 ];
 
+const initialScores = judgingRounds.reduce((acc, round) => {
+    round.questions.forEach((_, qIndex) => {
+        acc[`${round.id}-q${qIndex}`] = 5;
+    });
+    return acc;
+}, {} as Record<string, number>);
+
+
 export default function JudgingForm() {
   const [feedback, setFeedback] = useState('');
   const [summary, setSummary] = useState('');
@@ -89,6 +97,11 @@ export default function JudgingForm() {
   const [error, setError] = useState<string | null>(null);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [currentTab, setCurrentTab] = useState(judgingRounds[0].id);
+  const [scores, setScores] = useState<Record<string, number>>(initialScores);
+
+  const handleScoreChange = (key: string, value: number[]) => {
+    setScores(prev => ({...prev, [key]: value[0]}));
+  };
 
   const handleFeedbackSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,7 +152,7 @@ export default function JudgingForm() {
           </CardHeader>
           <CardContent>
             <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
                  {judgingRounds.map((round) => (
                     <TabsTrigger key={round.id} value={round.id} className="flex flex-col h-auto p-2 gap-1 sm:flex-row">
                         <round.icon className="h-4 w-4" />
@@ -150,15 +163,25 @@ export default function JudgingForm() {
               {judgingRounds.map((round) => (
                 <TabsContent key={round.id} value={round.id} className="py-6 px-2 space-y-8">
                     <h3 className="text-xl font-semibold font-headline text-center">{round.name}</h3>
-                    {round.questions.map((question, index) => (
-                        <div key={index} className="space-y-3">
-                            <div className="flex justify-between items-center">
-                                <Label className="text-base">{question}</Label>
-                                <span className="text-sm font-bold w-12 text-center bg-primary/10 text-primary rounded-md py-1">5</span>
+                    {round.questions.map((question, index) => {
+                        const scoreKey = `${round.id}-q${index}`;
+                        return (
+                            <div key={index} className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <Label className="text-base">{question}</Label>
+                                    <span className="text-sm font-bold w-12 text-center bg-primary/10 text-primary rounded-md py-1">
+                                        {scores[scoreKey]}
+                                    </span>
+                                </div>
+                                <Slider 
+                                    value={[scores[scoreKey]]}
+                                    onValueChange={(value) => handleScoreChange(scoreKey, value)}
+                                    max={10} 
+                                    step={1} 
+                                />
                             </div>
-                            <Slider defaultValue={[5]} max={10} step={1} />
-                        </div>
-                    ))}
+                        );
+                    })}
                 </TabsContent>
               ))}
             </Tabs>
