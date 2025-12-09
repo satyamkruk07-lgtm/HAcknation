@@ -1,3 +1,6 @@
+
+'use client';
+
 import Link from 'next/link';
 import {
   Card,
@@ -8,9 +11,12 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { projects } from '@/lib/data.tsx';
-import { ArrowRight, Github } from 'lucide-react';
+import { ArrowRight, Github, PlusCircle } from 'lucide-react';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 export default function JudgingPage() {
+  const { isAdmin } = useAdminStatus();
+
   return (
     <div className="container py-12">
       <div className="text-center">
@@ -19,6 +25,17 @@ export default function JudgingPage() {
           Review submissions and provide your feedback.
         </p>
       </div>
+
+      {isAdmin && (
+        <div className="mt-8 flex justify-center">
+          <Button asChild>
+            <Link href="/submit">
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Submit a Project
+            </Link>
+          </Button>
+        </div>
+      )}
 
       <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {projects.map((project) => (

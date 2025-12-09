@@ -57,9 +57,9 @@ const features = [
     icon: Users,
   },
   {
-    name: 'Submit Project',
-    description: 'Submit your project for judging.',
-    href: '/submit',
+    name: 'Judging',
+    description: 'View project submissions for judging.',
+    href: '/judging',
     icon: Code,
   },
   {
