@@ -18,7 +18,7 @@ export function Footer() {
             <Mail className="h-5 w-5" />
           </a>
           <a
-            href="https://www.linkedin.com/in/kumarsatyam"
+            href="https://www.linkedin.com/in/kumar-satyam-055841394"
             className="text-muted-foreground hover:text-foreground"
             aria-label="LinkedIn"
             target="_blank"
