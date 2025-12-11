@@ -70,18 +70,6 @@ const judgingRounds = [
       'Overall Presentation Quality',
     ],
   },
-  {
-    id: 'round5',
-    name: 'Feasibility & Impact',
-    icon: Trophy,
-    questions: [
-      'Business Model/Monetization Strategy',
-      'Market Fit and Potential',
-      'Real-world Applicability',
-      'Future Scope for Development',
-      'Overall Impression',
-    ],
-  },
 ];
 
 const initialScores = judgingRounds.reduce((acc, round) => {
@@ -203,12 +191,12 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
               Judge's Scorecard
             </CardTitle>
             <CardDescription>
-              Evaluate the project across 5 rounds. Use the tabs to navigate between rounds.
+              Evaluate the project across 4 rounds. Use the tabs to navigate between rounds.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-5">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
                  {judgingRounds.map((round) => (
                     <TabsTrigger key={round.id} value={round.id} className="flex flex-col h-auto p-2 gap-1 sm:flex-row">
                         <round.icon className="h-4 w-4" />
