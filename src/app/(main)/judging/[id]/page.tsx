@@ -96,7 +96,18 @@ export default function ProjectJudgingPage({
     );
   }
 
-  // If loading is finished and we still don't have a user or project, show not found.
-  notFound();
-  return null; // This is technically unreachable due to notFound()
+  // If loading is finished and we still don't have a user or project, 
+  // it might be a genuine 'not found' case (e.g., bad project ID).
+  if (!isContentLoading && (!user || !project)) {
+    notFound();
+  }
+
+  // Fallback to a loading spinner while waiting for the logic to resolve.
+  // This helps prevent premature rendering of "not found".
+  return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
 }
+
