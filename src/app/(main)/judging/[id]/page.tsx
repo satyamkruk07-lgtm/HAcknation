@@ -1,16 +1,17 @@
+
 'use client';
 
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Github, Loader2 } from 'lucide-react';
 import JudgingForm from './_components/judging-form';
-import { useDoc, useFirestore, useMemoFirebase, useAuth, useUser } from '@/firebase';
+import { useDoc, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { SubmittedProject } from '@/lib/types';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
-import { signInAnonymously } from 'firebase/auth';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
 export default function ProjectJudgingPage({
   params,
@@ -18,27 +19,26 @@ export default function ProjectJudgingPage({
   params: { id: string };
 }) {
   const firestore = useFirestore();
-  const auth = useAuth();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    // If not loading and no user is signed in, sign them in anonymously.
-    if (!isUserLoading && !user && auth) {
+    const auth = getAuth();
+    if (!isUserLoading && !user) {
       signInAnonymously(auth).catch((error) => {
         console.error("Anonymous sign-in failed:", error);
       });
     }
-  }, [user, isUserLoading, auth]);
+  }, [user, isUserLoading]);
   
   const projectRef = useMemoFirebase(() => {
     if (!firestore || !params.id) return null;
     return doc(firestore, 'projects', params.id);
   }, [firestore, params.id]);
 
-  const { data: project, isLoading, error } = useDoc<SubmittedProject>(projectRef);
+  const { data: project, isLoading: isProjectLoading, error } = useDoc<SubmittedProject>(projectRef);
   
-  const isContentLoading = isLoading || isUserLoading;
+  const isContentLoading = isProjectLoading || isUserLoading;
 
   if (isContentLoading) {
     return (
@@ -59,13 +59,11 @@ export default function ProjectJudgingPage({
         </div>
     );
   }
-
-  if (!project && !isContentLoading) {
+  
+  // Wait until loading is complete before checking for the project.
+  // If after loading there's no user, or no project, then it's a 404.
+  if (!user || !project) {
     notFound();
-  }
-
-  if (!project) {
-      return null;
   }
 
   return (
