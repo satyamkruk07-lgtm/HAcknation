@@ -509,7 +509,7 @@ function ProjectManagementTab() {
 
 interface ProjectJudgments {
   judgments: Judgment[];
-  average: number;
+  totalScore: number;
   count: number;
 }
 
@@ -551,16 +551,16 @@ function JudgingTab() {
 
         for (const judgment of allJudgments) {
             if (!judgmentMap.has(judgment.projectId)) {
-                judgmentMap.set(judgment.projectId, { judgments: [], average: 0, count: 0 });
+                judgmentMap.set(judgment.projectId, { judgments: [], totalScore: 0, count: 0 });
             }
             const projectData = judgmentMap.get(judgment.projectId)!;
             projectData.judgments.push(judgment);
         }
         
         for (const [, data] of judgmentMap.entries()) {
-            const totalScore = data.judgments.reduce((acc, j) => acc + (j.totalScore || 0), 0);
+            const grandTotalScore = data.judgments.reduce((acc, j) => acc + (j.totalScore || 0), 0);
             data.count = data.judgments.length;
-            data.average = data.count > 0 ? totalScore / data.count : 0;
+            data.totalScore = grandTotalScore;
         }
         
         return judgmentMap;
@@ -582,7 +582,7 @@ function JudgingTab() {
                             <TableRow>
                                 <TableHead>Project Name</TableHead>
                                 <TableHead className="text-center">Judges</TableHead>
-                                <TableHead className="text-center">Avg. Score (200)</TableHead>
+                                <TableHead className="text-center">Total Score</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -604,7 +604,7 @@ function JudgingTab() {
                                             <TableCell className="font-medium">{project.name}</TableCell>
                                             <TableCell className="text-center">{judgments?.count || 0}</TableCell>
                                             <TableCell className="text-center font-semibold text-primary">
-                                                {judgments ? judgments.average.toFixed(2) : 'N/A'}
+                                                {judgments ? judgments.totalScore : 'N/A'}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <Button variant="outline" size="sm" onClick={() => setSelectedProject(project)} disabled={!judgments}>
