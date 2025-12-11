@@ -1,10 +1,9 @@
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebase';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
-import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc, setDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc, where } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -25,7 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { ExternalLink, Github, Loader2, Trash2, User as UserIcon, Download, CheckCircle, XCircle, PlusCircle, Edit } from 'lucide-react';
+import { ExternalLink, Github, Loader2, Trash2, Download, Trophy, Eye, Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -36,7 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { UserAccount, SubmittedProject, Conductor } from '@/lib/types';
+import type { UserAccount, SubmittedProject, Judgment } from '@/lib/types';
 import { format } from 'date-fns';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
@@ -55,20 +54,9 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { makeAdminAction, removeAdminAction } from '@/lib/actions';
-import { useForm, type SubmitHandler, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-
-const MakeAdminSchema = z.object({
-    email: z.string().email({ message: 'Please enter a valid email address.' }),
-});
-type MakeAdminFormType = z.infer<typeof MakeAdminSchema>;
-
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -519,6 +507,178 @@ function ProjectManagementTab() {
   );
 }
 
+interface ProjectJudgments {
+  judgments: Judgment[];
+  average: number;
+  count: number;
+}
+
+function useProjectJudgments(projectId: string): { judgments: Judgment[] | null; isLoading: boolean } {
+  const firestore = useFirestore();
+  const judgmentsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'judgments'), where('projectId', '==', projectId));
+  }, [firestore, projectId]);
+
+  const { data: judgments, isLoading } = useCollection<Judgment>(judgmentsQuery);
+
+  return { judgments, isLoading };
+}
+
+
+function JudgingTab() {
+    const firestore = useFirestore();
+    const projectsQuery = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return query(collection(firestore, 'projects'), orderBy('submissionDate', 'desc'));
+    }, [firestore]);
+
+    const { data: projects, isLoading: isLoadingProjects } = useCollection<SubmittedProject>(projectsQuery);
+
+    const judgmentsQuery = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return collection(firestore, 'judgments');
+    }, [firestore]);
+
+    const { data: allJudgments, isLoading: isLoadingJudgments } = useCollection<Judgment>(judgmentsQuery);
+    
+    const [selectedProject, setSelectedProject] = useState<SubmittedProject | null>(null);
+
+    const projectJudgments = useMemo(() => {
+        if (!projects || !allJudgments) return new Map<string, ProjectJudgments>();
+
+        const judgmentMap = new Map<string, ProjectJudgments>();
+
+        for (const judgment of allJudgments) {
+            if (!judgmentMap.has(judgment.projectId)) {
+                judgmentMap.set(judgment.projectId, { judgments: [], average: 0, count: 0 });
+            }
+            const projectData = judgmentMap.get(judgment.projectId)!;
+            projectData.judgments.push(judgment);
+        }
+        
+        for (const [projectId, data] of judgmentMap.entries()) {
+            const totalScore = data.judgments.reduce((acc, j) => acc + j.totalScore, 0);
+            data.count = data.judgments.length;
+            data.average = data.count > 0 ? totalScore / data.count : 0;
+        }
+        
+        return judgmentMap;
+
+    }, [projects, allJudgments]);
+    
+    const isLoading = isLoadingProjects || isLoadingJudgments;
+
+    return (
+        <>
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl">Judging Results</CardTitle>
+                    <CardDescription>View scores and feedback for all submitted projects.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Project Name</TableHead>
+                                <TableHead className="text-center">Judges</TableHead>
+                                <TableHead className="text-center">Avg. Score (250)</TableHead>
+                                <TableHead className="text-right">Actions</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {isLoading ? (
+                                Array.from({ length: 3 }).map((_, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell><Skeleton className="h-5 w-40" /></TableCell>
+                                        <TableCell><Skeleton className="h-5 w-16 mx-auto" /></TableCell>
+                                        <TableCell><Skeleton className="h-5 w-24 mx-auto" /></TableCell>
+                                        <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                                    </TableRow>
+                                ))
+                            ) : projects && projects.length > 0 ? (
+                                projects.map((project) => {
+                                    const judgments = projectJudgments.get(project.id);
+                                    return (
+                                        <TableRow key={project.id}>
+                                            <TableCell className="font-medium">{project.name}</TableCell>
+                                            <TableCell className="text-center">{judgments?.count || 0}</TableCell>
+                                            <TableCell className="text-center font-semibold text-primary">
+                                                {judgments ? judgments.average.toFixed(2) : 'N/A'}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <Button variant="outline" size="sm" onClick={() => setSelectedProject(project)} disabled={!judgments}>
+                                                    <Eye className="mr-2 h-4 w-4" /> View Scores
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="text-center">No projects submitted yet.</TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+
+            {selectedProject && (
+                <JudgmentDetailsDialog
+                    project={selectedProject}
+                    onOpenChange={() => setSelectedProject(null)}
+                />
+            )}
+        </>
+    );
+}
+
+function JudgmentDetailsDialog({ project, onOpenChange }: { project: SubmittedProject, onOpenChange: (open: boolean) => void }) {
+    const { judgments, isLoading } = useProjectJudgments(project.id);
+
+    return (
+        <Dialog open={!!project} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-headline">{project.name}</DialogTitle>
+                    <DialogDescription>
+                        Detailed scores and feedback from all judges.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="py-4 max-h-[60vh] overflow-y-auto">
+                    {isLoading ? (
+                        <div className="flex justify-center items-center h-40">
+                            <Loader2 className="h-8 w-8 animate-spin" />
+                        </div>
+                    ) : judgments && judgments.length > 0 ? (
+                        <div className="space-y-6">
+                            {judgments.map((judgment) => (
+                                <Card key={judgment.id}>
+                                    <CardHeader>
+                                        <CardTitle className="text-lg flex justify-between items-center">
+                                            <span>Judge: {judgment.judgeName || 'Anonymous'}</span>
+                                            <Badge variant="secondary" className="flex items-center gap-1.5">
+                                                <Star className="h-4 w-4 text-amber-400" />
+                                                {judgment.totalScore} / 250
+                                            </Badge>
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm italic text-muted-foreground p-4 bg-muted/50 rounded-md">"{judgment.feedback}"</p>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-center text-muted-foreground">No judgments submitted for this project yet.</p>
+                    )}
+                </div>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
@@ -565,10 +725,11 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="announcements" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-background/50 border shadow-inner">
+            <TabsList className="grid w-full grid-cols-4 bg-background/50 border shadow-inner">
               <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
               <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
               <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
+              <TabsTrigger value="judging" className="data-[state=active]:shadow-inner">Judging</TabsTrigger>
             </TabsList>
             <TabsContent value="announcements" className="mt-6">
               <CreateAnnouncementForm />
@@ -578,6 +739,9 @@ export default function AdminPage() {
             </TabsContent>
             <TabsContent value="projects" className="mt-6">
               <ProjectManagementTab />
+            </TabsContent>
+            <TabsContent value="judging" className="mt-6">
+                <JudgingTab />
             </TabsContent>
           </Tabs>
         </div>
@@ -589,5 +753,3 @@ export default function AdminPage() {
   // The redirection is handled by the useEffect.
   return null;
 }
-
-    

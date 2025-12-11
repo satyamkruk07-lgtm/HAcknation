@@ -78,3 +78,14 @@ export type Conductor = {
   skills: string[];
   phone?: string;
 }
+
+export type Judgment = {
+    id: string;
+    projectId: string;
+    judgeId: string;
+    judgeName: string;
+    scores: Record<string, number>;
+    totalScore: number;
+    feedback: string;
+    submittedAt: Timestamp;
+};

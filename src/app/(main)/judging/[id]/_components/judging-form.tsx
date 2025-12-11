@@ -1,7 +1,8 @@
-
 'use client';
 
 import { useState } from 'react';
+import { useFirestore, useUser } from '@/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -16,6 +17,7 @@ import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { generateSummaryAction } from '@/lib/actions';
+import { useToast } from '@/hooks/use-toast';
 import { Lightbulb, Loader2, Sparkles, Trophy, Mic, Brush, Code, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -90,12 +92,17 @@ const initialScores = judgingRounds.reduce((acc, round) => {
 }, {} as Record<string, number>);
 
 
-export default function JudgingForm() {
+export default function JudgingForm({ projectId }: { projectId: string }) {
+  const { user } = useUser();
+  const firestore = useFirestore();
+  const { toast } = useToast();
+
   const [feedback, setFeedback] = useState('');
   const [summary, setSummary] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentTab, setCurrentTab] = useState(judgingRounds[0].id);
   const [scores, setScores] = useState<Record<string, number>>(initialScores);
 
@@ -103,10 +110,37 @@ export default function JudgingForm() {
     setScores(prev => ({...prev, [key]: value[0]}));
   };
 
-  const handleFeedbackSubmit = (e: React.FormEvent) => {
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (feedback.trim()) {
+    if (!user || !firestore) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Could not submit judgment. Please try again.' });
+      return;
+    }
+    setIsSubmitting(true);
+    
+    // Calculate total score
+    const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
+
+    try {
+      const judgmentsCollection = collection(firestore, 'judgments');
+      await addDoc(judgmentsCollection, {
+        projectId,
+        judgeId: user.uid,
+        judgeName: user.displayName || 'Anonymous Judge', // Store anonymous judge's temporary name
+        scores,
+        totalScore,
+        feedback,
+        submittedAt: serverTimestamp(),
+      });
+      
       setFeedbackSubmitted(true);
+      toast({ title: 'Feedback Submitted!', description: 'Your judgment has been recorded.' });
+
+    } catch (error: any) {
+      console.error(error);
+      toast({ variant: 'destructive', title: 'Submission Failed', description: error.message || 'An unknown error occurred.' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -138,13 +172,35 @@ export default function JudgingForm() {
   const isFirstTab = currentTab === judgingRounds[0].id;
   const isLastTab = currentTab === judgingRounds[judgingRounds.length - 1].id;
 
+  if (feedbackSubmitted) {
+    return (
+        <Card className="text-center p-8">
+          <CardHeader>
+            <Trophy className="mx-auto h-12 w-12 text-accent" />
+            <CardTitle className="font-headline text-2xl">
+              Thank You for Judging!
+            </CardTitle>
+            <CardDescription>
+              Your feedback has been successfully submitted.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+                <a href="/judging">Judge Another Project</a>
+            </Button>
+          </CardContent>
+        </Card>
+    );
+  }
+
+
   return (
     <div className="space-y-8">
       <Card>
         <form onSubmit={handleFeedbackSubmit}>
           <CardHeader>
             <CardTitle className="font-headline text-2xl">
-              Judge&apos;s Scorecard
+              Judge's Scorecard
             </CardTitle>
             <CardDescription>
               Evaluate the project across 5 rounds. Use the tabs to navigate between rounds.
@@ -208,54 +264,18 @@ export default function JudgingForm() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" disabled={feedbackSubmitted}>
-              {feedbackSubmitted ? 'Feedback Submitted' : 'Submit Final Feedback'}
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSubmitting ? 'Submitting...' : 'Submit Final Judgment'}
             </Button>
           </CardFooter>
         </form>
       </Card>
 
-      {feedbackSubmitted && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 font-headline text-2xl">
-              <Sparkles className="h-6 w-6 text-accent" />
-              AI-Powered Feedback Summary
-            </CardTitle>
-            <CardDescription>
-              Generate a concise summary of your feedback for the participants.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {error && (
-              <Alert variant="destructive">
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-            {summary && (
-              <Alert>
-                 <Lightbulb className="h-4 w-4" />
-                <AlertTitle>Feedback Summary</AlertTitle>
-                <AlertDescription>
-                  <p className="whitespace-pre-wrap">{summary}</p>
-                </AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-          <CardFooter>
-            <Button
-              onClick={handleGenerateSummary}
-              disabled={isLoading || !feedback}
-            >
-              {isLoading && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              {isLoading ? 'Generating...' : 'Generate Summary'}
-            </Button>
-          </CardFooter>
-        </Card>
-      )}
+      {/* AI Summary feature is currently disabled after form submission */}
+      {/* {feedbackSubmitted && (
+        ...
+      )} */}
     </div>
   );
 }
