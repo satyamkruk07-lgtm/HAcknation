@@ -558,7 +558,7 @@ function JudgingTab() {
         }
         
         for (const [projectId, data] of judgmentMap.entries()) {
-            const totalScore = data.judgments.reduce((acc, j) => acc + j.totalScore, 0);
+            const totalScore = data.judgments.reduce((acc, j) => acc + (j.totalScore || 0), 0);
             data.count = data.judgments.length;
             data.average = data.count > 0 ? totalScore / data.count : 0;
         }
