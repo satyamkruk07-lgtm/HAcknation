@@ -10,13 +10,25 @@ import {
   CardContent
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Github } from 'lucide-react';
+import { ArrowRight, Github, QrCode } from 'lucide-react';
 import { useCollection, useFirestore, useMemoFirebase, useAuth, useUser } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import type { SubmittedProject } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { signInAnonymously } from 'firebase/auth';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import QRCode from 'qrcode.react';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
+
 
 function ProjectCardSkeleton() {
     return (
@@ -36,6 +48,56 @@ function ProjectCardSkeleton() {
         </Card>
     )
 }
+
+function QRCodeGenerator() {
+  const [url, setUrl] = useState('');
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Ensure this runs only on the client
+    setUrl(window.location.href);
+  }, []);
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(url).then(() => {
+      toast({ title: 'URL Copied!', description: 'The judging page URL has been copied to your clipboard.' });
+    }, (err) => {
+      toast({ variant: 'destructive', title: 'Copy Failed', description: 'Could not copy URL to clipboard.' });
+    });
+  };
+
+  if (!url) return null;
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">
+          <QrCode className="mr-2 h-4 w-4" />
+          Generate QR Code
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Scan to Judge</DialogTitle>
+          <DialogDescription>
+            Judges can scan this QR code with their mobile devices to open the judging dashboard directly.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col items-center justify-center p-4 gap-4">
+          <div className="p-4 bg-white rounded-lg border">
+            <QRCode value={url} size={256} />
+          </div>
+          <p className="text-sm text-muted-foreground">Or share the URL below:</p>
+          <div className="flex w-full items-center space-x-2">
+            <Input value={url} readOnly />
+            <Button onClick={copyToClipboard}>Copy</Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 export default function JudgingPage() {
   const firestore = useFirestore();
@@ -62,11 +124,15 @@ export default function JudgingPage() {
 
   return (
     <div className="container py-12">
-      <div className="text-center">
+      <div className="text-center mb-8">
         <h1 className="font-headline text-4xl font-bold">Judging Dashboard</h1>
         <p className="mt-2 text-lg text-muted-foreground">
           Review submissions and provide your feedback.
         </p>
+      </div>
+
+       <div className="mb-8 flex justify-center">
+        <QRCodeGenerator />
       </div>
 
       <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
