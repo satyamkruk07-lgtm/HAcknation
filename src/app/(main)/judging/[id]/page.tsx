@@ -1,16 +1,16 @@
-
 'use client';
 
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Github, Loader2 } from 'lucide-react';
 import JudgingForm from './_components/judging-form';
-import { useDoc, useFirestore, useMemoFirebase, useFirebase } from '@/firebase';
+import { useDoc, useFirestore, useMemoFirebase, useAuth, useUser } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { SubmittedProject } from '@/lib/types';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { signInAnonymously } from 'firebase/auth';
 
 export default function ProjectJudgingPage({
   params,
@@ -18,14 +18,18 @@ export default function ProjectJudgingPage({
   params: { id: string };
 }) {
   const firestore = useFirestore();
-  const { user, isUserLoading } = useFirebase();
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isUserLoading && !user) {
-      router.push('/login');
+    // If not loading and no user is signed in, sign them in anonymously.
+    if (!isUserLoading && !user && auth) {
+      signInAnonymously(auth).catch((error) => {
+        console.error("Anonymous sign-in failed:", error);
+      });
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, auth]);
   
   const projectRef = useMemoFirebase(() => {
     if (!firestore || !params.id) return null;
@@ -34,7 +38,9 @@ export default function ProjectJudgingPage({
 
   const { data: project, isLoading, error } = useDoc<SubmittedProject>(projectRef);
   
-  if (isLoading || isUserLoading) {
+  const isContentLoading = isLoading || isUserLoading;
+
+  if (isContentLoading) {
     return (
         <div className="container py-12">
             <div className="mx-auto max-w-4xl">
@@ -54,7 +60,7 @@ export default function ProjectJudgingPage({
     );
   }
 
-  if (!project && !isLoading) {
+  if (!project && !isContentLoading) {
     notFound();
   }
 

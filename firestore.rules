@@ -103,6 +103,7 @@ service cloud.firestore {
 
     /**
      * @description Rule for the /judgments/{judgmentId} collection.
+     * Any signed-in user (including anonymous judges) can submit judgments.
      */
     match /judgments/{judgmentId} {
       allow get, list: if isSignedIn();

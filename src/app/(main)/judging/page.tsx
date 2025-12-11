@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -11,12 +10,13 @@ import {
   CardContent
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Github, PlusCircle } from 'lucide-react';
-import { useAdminStatus } from '@/hooks/useAdminStatus';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { ArrowRight, Github } from 'lucide-react';
+import { useCollection, useFirestore, useMemoFirebase, useAuth, useUser } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import type { SubmittedProject } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useEffect } from 'react';
+import { signInAnonymously } from 'firebase/auth';
 
 function ProjectCardSkeleton() {
     return (
@@ -38,8 +38,18 @@ function ProjectCardSkeleton() {
 }
 
 export default function JudgingPage() {
-  const { isAdmin } = useAdminStatus();
   const firestore = useFirestore();
+  const auth = useAuth();
+  const { user, isUserLoading } = useUser();
+
+  useEffect(() => {
+    // If not loading and no user is signed in, sign them in anonymously.
+    if (!isUserLoading && !user && auth) {
+      signInAnonymously(auth).catch((error) => {
+        console.error("Anonymous sign-in failed:", error);
+      });
+    }
+  }, [user, isUserLoading, auth]);
 
   const projectsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
@@ -47,6 +57,8 @@ export default function JudgingPage() {
   }, [firestore]);
 
   const { data: projects, isLoading } = useCollection<SubmittedProject>(projectsQuery);
+
+  const isContentLoading = isLoading || isUserLoading;
 
   return (
     <div className="container py-12">
@@ -58,7 +70,7 @@ export default function JudgingPage() {
       </div>
 
       <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {isLoading ? (
+        {isContentLoading ? (
             Array.from({ length: 3 }).map((_, i) => <ProjectCardSkeleton key={i} />)
         ) : projects && projects.length > 0 ? (
             projects.map((project) => (
