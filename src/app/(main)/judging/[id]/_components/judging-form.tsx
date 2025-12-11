@@ -13,12 +13,10 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { generateSummaryAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
-import { Lightbulb, Loader2, Sparkles, Trophy, Mic, Brush, Code, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Lightbulb, Loader2, Trophy, Mic, Brush, Code, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const judgingRounds = [
@@ -86,16 +84,20 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
   const { toast } = useToast();
 
   const [feedback, setFeedback] = useState('');
-  const [summary, setSummary] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [currentTab, setCurrentTab] = useState(judgingRounds[0].id);
   const [scores, setScores] = useState<Record<string, number>>(initialScores);
 
-  const handleScoreChange = (key: string, value: number[]) => {
-    setScores(prev => ({...prev, [key]: value[0]}));
+  const handleScoreChange = (key: string, value: string) => {
+    const numValue = parseInt(value, 10);
+    // Ensure value is between 0 and 10, and not NaN
+    if (!isNaN(numValue) && numValue >= 0 && numValue <= 10) {
+      setScores(prev => ({...prev, [key]: numValue}));
+    } else if (value === '') {
+      // Allow clearing the input
+      setScores(prev => ({...prev, [key]: 0}));
+    }
   };
 
   const handleFeedbackSubmit = async (e: React.FormEvent) => {
@@ -114,7 +116,7 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
       await addDoc(judgmentsCollection, {
         projectId,
         judgeId: user.uid,
-        judgeName: user.displayName || 'Anonymous Judge', // Store anonymous judge's temporary name
+        judgeName: user.displayName || 'Anonymous Judge',
         scores,
         totalScore,
         feedback,
@@ -124,7 +126,8 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
       setFeedbackSubmitted(true);
       toast({ title: 'Feedback Submitted!', description: 'Your judgment has been recorded.' });
 
-    } catch (error: any) {
+    } catch (error: any)
+{
       console.error(error);
       toast({ variant: 'destructive', title: 'Submission Failed', description: error.message || 'An unknown error occurred.' });
     } finally {
@@ -132,22 +135,6 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
     }
   };
 
-  const handleGenerateSummary = async () => {
-    if (!feedback) return;
-    setIsLoading(true);
-    setError(null);
-    setSummary('');
-
-    const result = await generateSummaryAction(feedback);
-
-    if (result.error) {
-      setError(result.error);
-    } else if (result.summary) {
-      setSummary(result.summary);
-    }
-    setIsLoading(false);
-  };
-  
   const navigateTabs = (direction: 'next' | 'prev') => {
     const currentIndex = judgingRounds.findIndex(r => r.id === currentTab);
     if (direction === 'next' && currentIndex < judgingRounds.length - 1) {
@@ -205,23 +192,21 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
                 ))}
               </TabsList>
               {judgingRounds.map((round) => (
-                <TabsContent key={round.id} value={round.id} className="py-6 px-2 space-y-8">
+                <TabsContent key={round.id} value={round.id} className="py-6 px-2 space-y-6">
                     <h3 className="text-xl font-semibold font-headline text-center">{round.name}</h3>
                     {round.questions.map((question, index) => {
                         const scoreKey = `${round.id}-q${index}`;
                         return (
-                            <div key={index} className="space-y-3">
-                                <div className="flex justify-between items-center">
-                                    <Label className="text-base">{question}</Label>
-                                    <span className="text-sm font-bold w-12 text-center bg-primary/10 text-primary rounded-md py-1">
-                                        {scores[scoreKey]}
-                                    </span>
-                                </div>
-                                <Slider 
-                                    value={[scores[scoreKey]]}
-                                    onValueChange={(value) => handleScoreChange(scoreKey, value)}
-                                    max={10} 
-                                    step={1} 
+                            <div key={index} className="flex justify-between items-center gap-4">
+                                <Label htmlFor={scoreKey} className="text-base flex-1">{question}</Label>
+                                <Input
+                                  id={scoreKey}
+                                  type="number"
+                                  min="0"
+                                  max="10"
+                                  value={scores[scoreKey]}
+                                  onChange={(e) => handleScoreChange(scoreKey, e.target.value)}
+                                  className="w-20 text-center font-bold"
                                 />
                             </div>
                         );
@@ -259,11 +244,6 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
           </CardFooter>
         </form>
       </Card>
-
-      {/* AI Summary feature is currently disabled after form submission */}
-      {/* {feedbackSubmitted && (
-        ...
-      )} */}
     </div>
   );
 }
