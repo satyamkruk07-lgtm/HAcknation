@@ -582,7 +582,7 @@ function JudgingTab() {
                             <TableRow>
                                 <TableHead>Project Name</TableHead>
                                 <TableHead className="text-center">Judges</TableHead>
-                                <TableHead className="text-center">Avg. Score (250)</TableHead>
+                                <TableHead className="text-center">Avg. Score (200)</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -660,7 +660,7 @@ function JudgmentDetailsDialog({ project, onOpenChange }: { project: SubmittedPr
                                             <span>Judge: {judgment.judgeName || 'Anonymous'}</span>
                                             <Badge variant="secondary" className="flex items-center gap-1.5">
                                                 <Star className="h-4 w-4 text-amber-400" />
-                                                {judgment.totalScore} / 250
+                                                {judgment.totalScore} / 200
                                             </Badge>
                                         </CardTitle>
                                     </CardHeader>
