@@ -62,6 +62,7 @@ export type UserAccount = {
 };
 
 export type ProjectIdea = {
+  id: string;
   title: string;
   description: string;
   technologies: string[];
