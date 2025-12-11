@@ -545,7 +545,7 @@ function JudgingTab() {
     const [selectedProject, setSelectedProject] = useState<SubmittedProject | null>(null);
 
     const projectJudgments = useMemo(() => {
-        if (!projects || !allJudgments) return new Map<string, ProjectJudgments>();
+        if (!allJudgments) return new Map<string, ProjectJudgments>();
 
         const judgmentMap = new Map<string, ProjectJudgments>();
 
@@ -557,7 +557,7 @@ function JudgingTab() {
             projectData.judgments.push(judgment);
         }
         
-        for (const [projectId, data] of judgmentMap.entries()) {
+        for (const [, data] of judgmentMap.entries()) {
             const totalScore = data.judgments.reduce((acc, j) => acc + (j.totalScore || 0), 0);
             data.count = data.judgments.length;
             data.average = data.count > 0 ? totalScore / data.count : 0;
@@ -565,7 +565,7 @@ function JudgingTab() {
         
         return judgmentMap;
 
-    }, [projects, allJudgments]);
+    }, [allJudgments]);
     
     const isLoading = isLoadingProjects || isLoadingJudgments;
 
