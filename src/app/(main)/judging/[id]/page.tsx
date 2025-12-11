@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Github, Loader2 } from 'lucide-react';
 import JudgingForm from './_components/judging-form';
-import { useDoc, useFirestore, useMemoFirebase, useUser } from '@/firebase';
+import { useDoc, useFirestore, useMemoFirebase, useFirebase } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { SubmittedProject } from '@/lib/types';
 import { useEffect } from 'react';
@@ -18,7 +18,7 @@ export default function ProjectJudgingPage({
   params: { id: string };
 }) {
   const firestore = useFirestore();
-  const { user, isUserLoading } = useUser();
+  const { user, isUserLoading } = useFirebase();
   const router = useRouter();
 
   useEffect(() => {
