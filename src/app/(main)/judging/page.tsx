@@ -57,17 +57,6 @@ export default function JudgingPage() {
         </p>
       </div>
 
-      {isAdmin && (
-        <div className="mt-8 flex justify-center">
-          <Button asChild>
-            <Link href="/submit">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Submit a Project
-            </Link>
-          </Button>
-        </div>
-      )}
-
       <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
             Array.from({ length: 3 }).map((_, i) => <ProjectCardSkeleton key={i} />)
