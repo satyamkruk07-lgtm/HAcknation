@@ -27,7 +27,7 @@ export function Footer() {
             <Linkedin className="h-5 w-5" />
           </a>
           <a
-            href="https://www.instagram.com/kumarsatyam"
+            href="https://www.instagram.com/official_satya_.0001_/"
             className="text-muted-foreground hover:text-foreground"
             aria-label="Instagram"
             target="_blank"
@@ -40,5 +40,3 @@ export function Footer() {
     </footer>
   );
 }
-
-    
