@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Card,
@@ -30,15 +30,45 @@ import { Button } from '@/components/ui/button';
 import { Lightbulb, Sparkles, Send, Lock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { projectIdeas } from '@/lib/data';
-import type { ProjectIdea } from '@/lib/types';
+import type { ProjectIdea, SubmittedProject } from '@/lib/types';
 import { cn } from '@/lib/utils';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, query } from 'firebase/firestore';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AiDiscussionPage() {
   const ideas: ProjectIdea[] = projectIdeas;
   const router = useRouter();
+  const firestore = useFirestore();
+
   const [selectedIdea, setSelectedIdea] = useState<ProjectIdea | null>(null);
   const [takenIdeas, setTakenIdeas] = useState<Set<string>>(new Set());
   const [showTakenAlert, setShowTakenAlert] = useState(false);
+
+  // Fetch all submitted projects to check for taken ideas
+  const projectsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'projects'));
+  }, [firestore]);
+
+  const { data: submittedProjects, isLoading } = useCollection<SubmittedProject>(projectsQuery);
+
+  useEffect(() => {
+    if (submittedProjects) {
+      const submittedProjectTitles = new Set(submittedProjects.map(p => p.name.toLowerCase()));
+      const newlyTakenIdeas = new Set<string>();
+
+      ideas.forEach(idea => {
+        if (submittedProjectTitles.has(idea.title.toLowerCase())) {
+          newlyTakenIdeas.add(idea.id);
+        }
+      });
+      
+      // Merge with existing taken ideas to handle both states
+      setTakenIdeas(prev => new Set([...Array.from(prev), ...Array.from(newlyTakenIdeas)]));
+    }
+  }, [submittedProjects, ideas]);
+
 
   const handleCardClick = (idea: ProjectIdea) => {
     if (takenIdeas.has(idea.id)) {
@@ -51,11 +81,11 @@ export default function AiDiscussionPage() {
   const handleTakeIdea = () => {
     if (selectedIdea) {
       setTakenIdeas((prev) => new Set(prev).add(selectedIdea.id));
-      const query = new URLSearchParams({
+      const queryParams = new URLSearchParams({
         name: selectedIdea.title,
         description: selectedIdea.description,
       }).toString();
-      router.push(`/submit?${query}`);
+      router.push(`/submit?${queryParams}`);
       setSelectedIdea(null);
     }
   };
@@ -77,47 +107,65 @@ export default function AiDiscussionPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {ideas.map((idea) => {
-              const isTaken = takenIdeas.has(idea.id);
-              return (
-                <Card
-                  key={idea.id}
-                  className={cn(
-                    'flex flex-col transition-all duration-300 ease-in-out cursor-pointer',
-                    isTaken
-                      ? 'blur-sm filter grayscale pointer-events-auto'
-                      : 'hover:shadow-2xl hover:-translate-y-2'
-                  )}
-                  onClick={() => handleCardClick(idea)}
-                >
-                  <CardHeader>
-                    <CardTitle className="flex items-start gap-3">
-                      {isTaken ? (
-                         <Lock className="h-6 w-6 mt-1 text-destructive flex-shrink-0" />
-                      ) : (
-                        <Lightbulb className="h-6 w-6 mt-1 text-accent flex-shrink-0" />
-                      )}
-                      <span>{idea.title}</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex-1">
-                    <p className="text-muted-foreground">{idea.description}</p>
-                  </CardContent>
-                  <CardContent>
-                    <h4 className="font-semibold text-sm mb-3">
-                      Suggested Tech:
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {idea.technologies.map((tech) => (
-                        <Badge key={tech} variant="secondary">
-                          {tech}
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
+            {isLoading ? (
+              Array.from({ length: 9 }).map((_, i) => (
+                <Card key={i}>
+                    <CardHeader>
+                        <Skeleton className="h-6 w-3/4" />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-5/6" />
+                        <div className="flex flex-wrap gap-2 pt-4">
+                            <Skeleton className="h-5 w-16" />
+                            <Skeleton className="h-5 w-20" />
+                        </div>
+                    </CardContent>
                 </Card>
-              );
-            })}
+              ))
+            ) : (
+              ideas.map((idea) => {
+                const isTaken = takenIdeas.has(idea.id);
+                return (
+                  <Card
+                    key={idea.id}
+                    className={cn(
+                      'flex flex-col transition-all duration-300 ease-in-out cursor-pointer',
+                      isTaken
+                        ? 'bg-muted/50 filter grayscale pointer-events-auto'
+                        : 'hover:shadow-2xl hover:-translate-y-2'
+                    )}
+                    onClick={() => handleCardClick(idea)}
+                  >
+                    <CardHeader>
+                      <CardTitle className="flex items-start gap-3">
+                        {isTaken ? (
+                          <Lock className="h-6 w-6 mt-1 text-destructive flex-shrink-0" />
+                        ) : (
+                          <Lightbulb className="h-6 w-6 mt-1 text-accent flex-shrink-0" />
+                        )}
+                        <span>{idea.title}</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex-1">
+                      <p className="text-muted-foreground">{idea.description}</p>
+                    </CardContent>
+                    <CardContent>
+                      <h4 className="font-semibold text-sm mb-3">
+                        Suggested Tech:
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {idea.technologies.map((tech) => (
+                          <Badge key={tech} variant="secondary">
+                            {tech}
+                          </Badge>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
           </div>
         </div>
       </div>
