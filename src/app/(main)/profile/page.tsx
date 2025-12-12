@@ -36,6 +36,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { UserAccount } from '@/lib/types';
 import { updateProfile } from 'firebase/auth';
 import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -260,6 +261,11 @@ export default function ProfilePage() {
                     <CardDescription className="text-foreground/80">
                         {user.email}
                     </CardDescription>
+                    {userProfile?.registrationType && (
+                      <Badge variant="secondary" className="mt-2 capitalize">
+                        {userProfile.registrationType} Registration
+                      </Badge>
+                    )}
                 </div>
             </div>
              <div className="pt-8">
@@ -352,5 +358,7 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    
 
     
