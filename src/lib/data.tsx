@@ -393,7 +393,7 @@ export const conductors: Conductor[] = [
         name: "Mr. Kshitij Jain",
         role: "Assistant Professor",
         imageUrl: "https://images.unsplash.com/photo-1765519817953-8f4206a73b70?q=80&w=738&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        email: "anshul.namdev@shivalikcollege.edu.in",
+        email: "kshitij.jain@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/anshul-namdev",
         qualification: "UG B.TECH ,PG M.TECH , PHD Pursuing",
         skills: ["Cloud Computing", "AWS", "DevOps", "Docker"],
@@ -446,6 +446,7 @@ export const conductors: Conductor[] = [
 
 
     
+
 
 
 
