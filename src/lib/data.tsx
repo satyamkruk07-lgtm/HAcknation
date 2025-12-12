@@ -380,7 +380,7 @@ export const conductors: Conductor[] = [
     {
         id: "5",
         name: "Mr. Ajay Kumar Verma",
-        role: "Faculty",
+        role: "Associate Dean-CBII & CEO, iHub Shivalik",
         imageUrl: "https://images.unsplash.com/photo-1765528447514-b85fbdd0e43d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         email: "rakhi@shivalikcollege.eduin",
         linkedin: "https://www.linkedin.com/in/rakhi-/",
@@ -446,6 +446,7 @@ export const conductors: Conductor[] = [
 
 
     
+
 
 
 
