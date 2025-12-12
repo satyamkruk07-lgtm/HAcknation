@@ -58,6 +58,12 @@ const nextConfig: NextConfig = {
         hostname: 'image3.mouthshut.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'shivalikcollege.edu.in',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
