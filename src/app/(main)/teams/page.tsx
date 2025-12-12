@@ -58,7 +58,6 @@ export default function TeamsPage() {
     if (!firestore || !user) return null;
     return query(
       collection(firestore, 'users'),
-      where('registrationType', '==', 'individual'),
       orderBy('registrationDate', 'desc')
     );
   }, [firestore, user]);
