@@ -232,7 +232,31 @@ export default function DashboardPage() {
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
-        {/* Header */}
+        {/* Header with Background */}
+        <div className="relative mb-12 border-b pb-8 rounded-lg overflow-hidden">
+          <Image
+            src="https://tse3.mm.bing.net/th/id/OIP.JnCUQBVNssl3sTwTOt84bgHaE8?cb=ucfimg2&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"
+            alt="Shivalik College Background"
+            fill
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="relative flex justify-end items-center p-8 gap-6">
+            <div className="text-right">
+              <h1 className="font-headline text-3xl font-bold text-white">Shivalik College of Engineering</h1>
+              <Badge variant="destructive" className="mt-2 text-lg">NAAC Grade A+</Badge>
+            </div>
+            <Image
+              src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
+              alt="Shivalik College Logo"
+              width={100}
+              height={100}
+              className="rounded-full"
+            />
+          </div>
+        </div>
+
+        {/* Welcome Message */}
         <div className="mb-12">
           <div className="flex flex-col items-center text-center">
             <h2 className="font-headline text-2xl font-bold">
@@ -532,5 +556,7 @@ export default function DashboardPage() {
   );
 }
 
+
+    
 
     
