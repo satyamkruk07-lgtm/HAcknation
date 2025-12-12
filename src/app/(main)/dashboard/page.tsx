@@ -241,18 +241,18 @@ export default function DashboardPage() {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/50" />
-          <div className="relative flex justify-end items-center p-8 gap-6">
-            <div className="text-right">
-              <h1 className="font-headline text-3xl font-bold text-white">Shivalik College of Engineering</h1>
-              <Badge variant="destructive" className="mt-2 text-lg">NAAC Grade A+</Badge>
-            </div>
-            <Image
+          <div className="relative flex justify-between items-center p-8 gap-6">
+             <Image
               src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
               alt="Shivalik College Logo"
               width={100}
               height={100}
               className="rounded-full"
             />
+            <div className="text-right">
+              <h1 className="font-headline text-3xl font-bold text-white">Shivalik College of Engineering</h1>
+              <Badge variant="destructive" className="mt-2 text-lg">NAAC Grade A+</Badge>
+            </div>
           </div>
         </div>
 
