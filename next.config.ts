@@ -64,6 +64,12 @@ const nextConfig: NextConfig = {
         hostname: 'shivalikcollege.edu.in',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'tse3.mm.bing.net',
+        port: '',
+        pathname: '/**',
       }
     ],
   },

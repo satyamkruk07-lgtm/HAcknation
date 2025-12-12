@@ -232,36 +232,46 @@ export default function DashboardPage() {
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
       <div className="container py-12">
-        <div className="relative mb-12 border-b pb-8">
-            <div className="absolute top-0 right-0 flex items-center gap-2">
-                <Button variant="outline" size="icon" asChild>
-                    <a href="mailto:info@shivalikcollege.edu.in" aria-label="Email Us">
-                        <Mail className="h-5 w-5" />
-                    </a>
-                </Button>
-                <Button variant="outline" size="icon" asChild>
-                    <a href="tel:+919997155111" aria-label="Call Us">
-                        <Phone className="h-5 w-5" />
-                    </a>
-                </Button>
-            </div>
-            <div className="flex justify-center items-center gap-8">
-              <Image src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg" alt="Shivalik College Logo" width={80} height={80} className="rounded-full" />
-              <div className="text-center">
-                <h1 className="text-5xl font-bold font-headline tracking-tighter text-destructive">
-                  Shivalik
-                </h1>
-                <p className="text-xl text-foreground font-bold">
-                  College of Engineering
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="text-center">
-                  <p className="text-2xl font-black text-destructive uppercase">NAAC</p>
-                  <p className="text-xl font-bold">Grade</p>
+        <div className="relative mb-12 border-b pb-8 overflow-hidden rounded-lg">
+            <Image
+                src="https://tse3.mm.bing.net/th/id/OIP.JnCUQBVNssl3sTwTOt84bgHaE8?cb=ucfimg2&ucfimg=1&rs=1&pid=ImgDetMain&o=7&rm=3"
+                alt="Shivalik College Campus"
+                layout="fill"
+                objectFit="cover"
+                className="z-0"
+            />
+            <div className="absolute inset-0 bg-black/60 z-10"></div>
+            <div className="relative z-20">
+                <div className="absolute top-4 right-4 flex items-center gap-2">
+                    <Button variant="outline" size="icon" asChild>
+                        <a href="mailto:info@shivalikcollege.edu.in" aria-label="Email Us">
+                            <Mail className="h-5 w-5" />
+                        </a>
+                    </Button>
+                    <Button variant="outline" size="icon" asChild>
+                        <a href="tel:+919997155111" aria-label="Call Us">
+                            <Phone className="h-5 w-5" />
+                        </a>
+                    </Button>
                 </div>
-                <div className="text-5xl font-black text-destructive">A+</div>
-              </div>
+                <div className="flex justify-center items-center gap-8 text-white p-8">
+                  <Image src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg" alt="Shivalik College Logo" width={80} height={80} className="rounded-full" />
+                  <div className="text-center">
+                    <h1 className="text-5xl font-bold font-headline tracking-tighter text-white">
+                      Shivalik
+                    </h1>
+                    <p className="text-xl text-white/90 font-bold">
+                      College of Engineering
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-center">
+                      <p className="text-2xl font-black text-white/90 uppercase">NAAC</p>
+                      <p className="text-xl font-bold">Grade</p>
+                    </div>
+                    <div className="text-5xl font-black text-white">A+</div>
+                  </div>
+                </div>
             </div>
         </div>
 
