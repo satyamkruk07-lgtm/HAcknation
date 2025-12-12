@@ -283,6 +283,7 @@ export default function ProfilePage() {
                           size="icon"
                           className="h-12 w-12 text-white hover:bg-white/20"
                           onClick={() => fileInputRef.current?.click()}
+                          disabled={!!userProfile?.registrationType}
                         >
                           <Upload className="h-6 w-6" />
                         </Button>
@@ -294,6 +295,7 @@ export default function ProfilePage() {
                       className="hidden"
                       accept="image/png, image/jpeg, image/gif"
                       onChange={handleImageUpload}
+                      disabled={!!userProfile?.registrationType}
                     />
                 </div>
                 <div>
@@ -319,7 +321,7 @@ export default function ProfilePage() {
                             <FormItem>
                             <FormLabel>Full Name</FormLabel>
                             <FormControl>
-                                <Input placeholder="Grace Hopper" {...field} />
+                                <Input placeholder="Grace Hopper" {...field} disabled={!!userProfile?.registrationType} />
                             </FormControl>
                             <FormMessage />
                             </FormItem>
@@ -332,7 +334,7 @@ export default function ProfilePage() {
                             <FormItem>
                               <FormLabel>Phone Number</FormLabel>
                               <FormControl>
-                                <Input type="tel" placeholder="9876543210" {...field} />
+                                <Input type="tel" placeholder="9876543210" {...field} disabled={!!userProfile?.registrationType} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -345,7 +347,7 @@ export default function ProfilePage() {
                             <FormItem>
                             <FormLabel>College/University</FormLabel>
                             <FormControl>
-                                <Input placeholder="e.g., Vassar College" {...field} />
+                                <Input placeholder="e.g., Vassar College" {...field} disabled={!!userProfile?.registrationType} />
                             </FormControl>
                             <FormMessage />
                             </FormItem>
@@ -442,7 +444,7 @@ export default function ProfilePage() {
                             <FormItem>
                             <FormLabel>Skills</FormLabel>
                             <FormControl>
-                                <Input placeholder="React, Python, Figma..." {...field} />
+                                <Input placeholder="React, Python, Figma..." {...field} disabled={!!userProfile?.registrationType} />
                             </FormControl>
                             <p className="text-xs text-muted-foreground">
                                 Enter your skills, separated by commas.
@@ -461,6 +463,7 @@ export default function ProfilePage() {
                                 <Textarea
                                 placeholder="Tell us a little bit about yourself."
                                 {...field}
+                                disabled={!!userProfile?.registrationType}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -484,5 +487,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-    
