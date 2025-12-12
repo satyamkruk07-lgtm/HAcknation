@@ -246,7 +246,7 @@ export default function DashboardPage() {
                 </Button>
             </div>
             <div className="flex justify-center items-center gap-8">
-              <Image src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg" alt="Shivalik College Logo" width={80} height={80} />
+              <Image src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg" alt="Shivalik College Logo" width={80} height={80} className="rounded-full" />
               <div className="text-center">
                 <h1 className="text-5xl font-bold font-headline tracking-tighter text-destructive">
                   Shivalik
@@ -565,3 +565,5 @@ export default function DashboardPage() {
   );
 }
 
+
+    
