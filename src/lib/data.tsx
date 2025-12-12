@@ -1,3 +1,4 @@
+
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
 import type { Sponsor, Project, ProjectIdea, ScheduleEvent, Conductor } from './types';
 import { PlaceHolderImages } from './placeholder-images';
@@ -386,7 +387,7 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/ajay-verma-5b825668",
         qualification: "Mr. Verma specializes in Bearing Fault Diagnosis, Mechanics of Machines, Tribology, and Mechanical Vibrations. His prolific contributions to research include 17+ publications in esteemed journals and conferences, along with his role as a Principal Investigator in government-funded research projects. His expertise is widely recognized, serving as a reviewer for top-tier journals and conferences",
         skills: ["Digital Marketing", "SEO", "Content Writing", "Social Media"],
-        phone: "+91 7355128710"
+        phone: "+918938940960"
     },
     {
         id: "6",
@@ -446,6 +447,7 @@ export const conductors: Conductor[] = [
 
 
     
+
 
 
 
