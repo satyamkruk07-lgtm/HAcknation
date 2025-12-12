@@ -25,6 +25,7 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -53,6 +54,7 @@ const profileFormSchema = z.object({
   registrationType: z.enum(['individual', 'team'], {
     required_error: 'You need to select a registration type.',
   }),
+  teamMembers: z.string().optional(),
 });
 
 type ProfileFormData = z.infer<typeof profileFormSchema>;
@@ -83,8 +85,11 @@ export default function ProfilePage() {
       bio: '',
       phoneNumber: '',
       registrationType: 'individual',
+      teamMembers: '',
     },
   });
+
+  const registrationType = form.watch('registrationType');
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -101,6 +106,7 @@ export default function ProfilePage() {
         bio: userProfile.bio || '',
         phoneNumber: userProfile.phoneNumber || '',
         registrationType: userProfile.registrationType || 'individual',
+        teamMembers: userProfile.teamMembers?.join(', ') || '',
       });
     } else if (user) {
       form.reset({
@@ -110,6 +116,7 @@ export default function ProfilePage() {
         bio: '',
         phoneNumber: user.phoneNumber || '',
         registrationType: 'individual',
+        teamMembers: '',
       });
     }
   }, [userProfile, user, form, isProfileLoading]);
@@ -175,7 +182,12 @@ export default function ProfilePage() {
         bio: data.bio,
         phoneNumber: data.phoneNumber,
         registrationType: data.registrationType,
+        teamMembers: data.teamMembers ? data.teamMembers.split(',').map(s => s.trim()) : [],
       };
+
+      if (data.registrationType === 'individual') {
+        updatedData.teamMembers = [];
+      }
 
       await setDoc(userDocRef, updatedData, { merge: true });
 
@@ -353,6 +365,24 @@ export default function ProfilePage() {
                             </FormItem>
                             )}
                         />
+                        {registrationType === 'team' && (
+                            <FormField
+                                control={form.control}
+                                name="teamMembers"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Team Members' Names</FormLabel>
+                                    <FormControl>
+                                    <Input placeholder="John Doe, Jane Smith..." {...field} />
+                                    </FormControl>
+                                    <FormDescription>
+                                    Enter names separated by commas.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                        )}
                         <FormField
                         control={form.control}
                         name="skills"
