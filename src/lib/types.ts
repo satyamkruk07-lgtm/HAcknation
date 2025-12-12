@@ -37,7 +37,7 @@ export type Project = {
 
 export type SubmittedProject = {
   id: string;
-  name: string;
+  name:string;
   studentNames?: string[];
   teamMembers?: string[]; // Add optional teamMembers
   description: string;
@@ -59,6 +59,7 @@ export type UserAccount = {
   photoURL?: string;
   profileBannerUrl?: string;
   phoneNumber?: string;
+  registrationType?: 'individual' | 'team';
 };
 
 export type ProjectIdea = {
