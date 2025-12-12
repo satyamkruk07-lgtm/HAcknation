@@ -364,7 +364,7 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/sartaj-khan-52149724b",
         qualification: "Head of BCA Department",
         skills: ["Event Management", "Public Speaking", "Canva", "Photoshop"],
-        phone: "+91 9760017416"
+        phone: "+919760017416"
     },
     {
         id: "4",
@@ -446,6 +446,7 @@ export const conductors: Conductor[] = [
 
 
     
+
 
 
 
