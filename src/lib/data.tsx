@@ -381,7 +381,7 @@ export const conductors: Conductor[] = [
         id: "5",
         name: "Mr. Akshat Sharma",
         role: "Faculty",
-        imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-akshat')?.imageUrl || `https://picsum.photos/seed/5/128/128`,
+        imageUrl: "https://images.unsplash.com/photo-1765528447514-b85fbdd0e43d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         email: "rakhi@shivalikcollege.eduin",
         linkedin: "https://www.linkedin.com/in/rakhi-/",
         qualification: "M.Tech in CSE",
@@ -446,6 +446,7 @@ export const conductors: Conductor[] = [
 
 
     
+
 
 
 
