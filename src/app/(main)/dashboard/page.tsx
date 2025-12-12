@@ -448,7 +448,7 @@ export default function DashboardPage() {
         {/* Conducted By Section */}
         <div className="mt-12 flex flex-col items-center">
             <h2 className="mb-8 font-headline text-2xl font-bold text-center">Conducted By</h2>
-            <div className="flex flex-col items-center gap-8">
+            <div className="flex flex-col items-center gap-6">
                 {/* Top row with 1 person */}
                 {topConductor && (
                     <div className="flex justify-center">
@@ -459,11 +459,11 @@ export default function DashboardPage() {
                                 className="rounded-full"
                             >
                                 <Image
-                                    src={topConductor.imageUrl || `https://picsum.photos/seed/${topConductor.id}/128/128`}
+                                    src={topConductor.imageUrl || `https://picsum.photos/seed/${topConductor.id}/96/96`}
                                     alt={`Portrait of ${topConductor.name}`}
-                                    width={128}
-                                    height={128}
-                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover"
+                                    width={96}
+                                    height={96}
+                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-24 w-24"
                                     data-ai-hint="person portrait"
                                 />
                             </button>
@@ -475,7 +475,7 @@ export default function DashboardPage() {
                     </div>
                 )}
                 {/* Bottom row with the rest */}
-                <div className="flex justify-center gap-16 flex-wrap">
+                <div className="flex justify-center gap-12 flex-wrap">
                     {otherConductors.map((conductor) => (
                         <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
                              <button 
@@ -484,11 +484,11 @@ export default function DashboardPage() {
                                 className="rounded-full"
                              >
                                 <Image
-                                    src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/128/128`}
+                                    src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/96/96`}
                                     alt={`Portrait of ${conductor.name}`}
-                                    width={128}
-                                    height={128}
-                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover"
+                                    width={96}
+                                    height={96}
+                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-24 w-24"
                                     data-ai-hint="person portrait"
                                 />
                             </button>
@@ -563,7 +563,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
-
-    
