@@ -247,7 +247,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex justify-center items-center gap-8">
               <div className="h-20 w-20 rounded-full bg-destructive/10 border-4 border-destructive/20 flex items-center justify-center">
-                <Image src="https://www.shivalikcollege.edu.in/wp-content/uploads/2024/05/logo-red.png" alt="Shivalik College Logo" width={60} height={60} />
+                <Image src="https://image3.mouthshut.com/images/imagesp/925718552s.png" alt="Shivalik College Logo" width={60} height={60} />
               </div>
               <div className="text-center">
                 <h1 className="text-5xl font-bold font-headline tracking-tighter text-destructive">
@@ -566,3 +566,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
