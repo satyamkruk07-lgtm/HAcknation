@@ -382,10 +382,13 @@ export default function ProfilePage() {
                                     </FormItem>
                                 </RadioGroup>
                                 </FormControl>
-                                {!!userProfile?.registrationType && (
-                                  <FormDescription>
-                                    Registration type cannot be changed after it's set.
-                                  </FormDescription>
+                                {userProfile?.registrationType === 'team' && (
+                                  <div className="text-sm text-muted-foreground pt-2">
+                                    <p className="font-medium text-foreground">Team Name: <span className="font-normal">{userProfile.teamName}</span></p>
+                                    {userProfile.teamMembers && userProfile.teamMembers.length > 0 && (
+                                      <p className="font-medium text-foreground">Members: <span className="font-normal">{userProfile.teamMembers.join(', ')}</span></p>
+                                    )}
+                                  </div>
                                 )}
                                 <FormMessage />
                             </FormItem>
@@ -471,5 +474,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-    
