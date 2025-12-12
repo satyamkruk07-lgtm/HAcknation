@@ -260,12 +260,12 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Button asChild size="icon" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:text-white">
+              <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
                 <a href="tel:+917060550243">
                   <Phone className="h-5 w-5" />
                 </a>
               </Button>
-              <Button asChild size="icon" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:text-white">
+              <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
                 <a href="mailto:devesh.kumar@shivalikcollege.edu.in">
                   <Mail className="h-5 w-5" />
                 </a>
