@@ -54,14 +54,14 @@ service cloud.firestore {
 
     /**
      * @description Rule for the /users/{userId} collection.
-     * Any signed-in user can list all users to find teammates.
+     * Any signed-in user can read all users to find teammates.
      * A user can only create, update, or delete their own profile.
      */
     match /users/{userId} {
       allow get: if true;
+      allow list: if isSignedIn();
       allow create: if isOwner(userId);
       allow update, delete: if isExistingOwner(userId);
-      allow list: if isSignedIn(); // Allow any signed-in user to list users for team formation.
     }
     
     /**
