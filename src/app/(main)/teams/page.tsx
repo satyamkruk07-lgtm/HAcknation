@@ -11,12 +11,12 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Phone } from 'lucide-react';
+import { Mail, Phone, Users } from 'lucide-react';
 import type { UserAccount } from '@/lib/types';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query, orderBy, where } from 'firebase/firestore';
+import { collection, query, orderBy } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 function ProfileCardSkeleton() {
@@ -96,7 +96,7 @@ export default function TeamsPage() {
 
       <div className="mt-12">
         <h2 className="mb-6 font-headline text-2xl font-bold">
-          Looking for a Team
+          Available Hackers
         </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {teamProfiles && teamProfiles.length > 0 ? (
@@ -129,18 +129,26 @@ export default function TeamsPage() {
                       ))}
                     </div>
                   </CardContent>
-                  <CardFooter className="flex gap-2">
-                    <Button asChild className="w-full">
-                      <a href={`mailto:${profile.email}`}>
-                        <Mail className="mr-2 h-4 w-4" /> Connect
-                      </a>
-                    </Button>
-                    {profile.phoneNumber && (
-                      <Button asChild variant="outline" className="w-full">
-                          <a href={`tel:${profile.phoneNumber}`}>
-                              <Phone className="mr-2 h-4 w-4" /> Call
-                          </a>
-                      </Button>
+                  <CardFooter>
+                    {profile.registrationType === 'team' ? (
+                        <Badge variant="outline" className="w-full justify-center">
+                           <Users className="mr-2 h-4 w-4" /> Already in a team
+                        </Badge>
+                    ) : (
+                        <div className="flex w-full gap-2">
+                            <Button asChild className="w-full">
+                            <a href={`mailto:${profile.email}`}>
+                                <Mail className="mr-2 h-4 w-4" /> Connect
+                            </a>
+                            </Button>
+                            {profile.phoneNumber && (
+                            <Button asChild variant="outline" className="w-full">
+                                <a href={`tel:${profile.phoneNumber}`}>
+                                    <Phone className="mr-2 h-4 w-4" /> Call
+                                </a>
+                            </Button>
+                            )}
+                        </div>
                     )}
                   </CardFooter>
                 </Card>
