@@ -250,7 +250,9 @@ export default function DashboardPage() {
               className="rounded-full"
             />
             <div>
-              <h1 className="font-headline text-3xl font-bold text-white">Shivalik College of Engineering</h1>
+              <h1 className="font-headline text-3xl font-bold text-white">
+                Shivalik <br /> College of Engineering
+              </h1>
               <Badge variant="destructive" className="mt-2 text-lg">NAAC Grade A+</Badge>
             </div>
           </div>
@@ -560,3 +562,4 @@ export default function DashboardPage() {
     
 
     
+
