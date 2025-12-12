@@ -37,6 +37,7 @@ import type { UserAccount } from '@/lib/types';
 import { updateProfile } from 'firebase/auth';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -49,6 +50,9 @@ const profileFormSchema = z.object({
       message: 'Phone number must be 10 digits.',
     }
   ),
+  registrationType: z.enum(['individual', 'team'], {
+    required_error: 'You need to select a registration type.',
+  }),
 });
 
 type ProfileFormData = z.infer<typeof profileFormSchema>;
@@ -78,6 +82,7 @@ export default function ProfilePage() {
       skills: '',
       bio: '',
       phoneNumber: '',
+      registrationType: 'individual',
     },
   });
 
@@ -95,6 +100,7 @@ export default function ProfilePage() {
         skills: userProfile.skills?.join(', ') || '',
         bio: userProfile.bio || '',
         phoneNumber: userProfile.phoneNumber || '',
+        registrationType: userProfile.registrationType || 'individual',
       });
     } else if (user) {
       form.reset({
@@ -103,6 +109,7 @@ export default function ProfilePage() {
         skills: '',
         bio: '',
         phoneNumber: user.phoneNumber || '',
+        registrationType: 'individual',
       });
     }
   }, [userProfile, user, form, isProfileLoading]);
@@ -167,6 +174,7 @@ export default function ProfilePage() {
         skills: data.skills ? data.skills.split(',').map((s) => s.trim()) : [],
         bio: data.bio,
         phoneNumber: data.phoneNumber,
+        registrationType: data.registrationType,
       };
 
       await setDoc(userDocRef, updatedData, { merge: true });
@@ -312,6 +320,40 @@ export default function ProfilePage() {
                         )}
                         />
                         <FormField
+                            control={form.control}
+                            name="registrationType"
+                            render={({ field }) => (
+                            <FormItem className="space-y-3">
+                                <FormLabel>Registration Type</FormLabel>
+                                <FormControl>
+                                <RadioGroup
+                                    onValueChange={field.onChange}
+                                    value={field.value}
+                                    className="flex flex-row space-x-4"
+                                >
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <RadioGroupItem value="individual" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                        Individual
+                                    </FormLabel>
+                                    </FormItem>
+                                    <FormItem className="flex items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                        <RadioGroupItem value="team" />
+                                    </FormControl>
+                                    <FormLabel className="font-normal">
+                                        Team
+                                    </FormLabel>
+                                    </FormItem>
+                                </RadioGroup>
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
                         control={form.control}
                         name="skills"
                         render={({ field }) => (
@@ -358,7 +400,5 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-    
 
     
