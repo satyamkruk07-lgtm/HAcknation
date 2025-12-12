@@ -266,7 +266,7 @@ export default function DashboardPage() {
                 </a>
               </Button>
               <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
-                <a href="mailto:devesh.kumar@shivalikcollege.edu.in">
+                <a href="mailto:info@shivalikcollege.edu.in">
                   <Mail className="h-5 w-5" />
                 </a>
               </Button>
