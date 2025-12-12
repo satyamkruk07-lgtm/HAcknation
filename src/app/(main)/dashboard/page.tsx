@@ -222,8 +222,8 @@ export default function DashboardPage() {
     );
   }
 
-  const topConductors = conductors.slice(0, 2);
-  const bottomConductors = conductors.slice(2);
+  const topConductor = conductors.find(c => c.name === "Mr. Kumar Satyam");
+  const otherConductors = conductors.filter(c => c.name !== "Mr. Kumar Satyam");
   
   const handleConductorSelect = (conductor: Conductor) => {
     setSelectedConductor(conductor);
@@ -449,18 +449,18 @@ export default function DashboardPage() {
         <div className="mt-12 flex flex-col items-center">
             <h2 className="mb-8 font-headline text-2xl font-bold text-center">Conducted By</h2>
             <div className="flex flex-col items-center gap-8">
-                {/* Top row with 2 people */}
-                <div className="flex justify-center gap-16">
-                    {topConductors.map((conductor) => (
-                        <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
+                {/* Top row with 1 person */}
+                {topConductor && (
+                    <div className="flex justify-center">
+                        <div key={topConductor.id} className="flex flex-col items-center text-center gap-2">
                             <button 
-                                onClick={() => handleConductorSelect(conductor)} 
-                                onTouchEnd={(e) => { e.preventDefault(); handleConductorSelect(conductor); }}
+                                onClick={() => handleConductorSelect(topConductor)} 
+                                onTouchEnd={(e) => { e.preventDefault(); handleConductorSelect(topConductor); }}
                                 className="rounded-full"
                             >
                                 <Image
-                                    src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/128/128`}
-                                    alt={`Portrait of ${conductor.name}`}
+                                    src={topConductor.imageUrl || `https://picsum.photos/seed/${topConductor.id}/128/128`}
+                                    alt={`Portrait of ${topConductor.name}`}
                                     width={128}
                                     height={128}
                                     className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover"
@@ -468,15 +468,15 @@ export default function DashboardPage() {
                                 />
                             </button>
                             <div className="mt-2">
-                                <h3 className="font-semibold text-base">{conductor.name}</h3>
-                                <p className="text-sm text-muted-foreground">{conductor.role}</p>
+                                <h3 className="font-semibold text-base">{topConductor.name}</h3>
+                                <p className="text-sm text-muted-foreground">{topConductor.role}</p>
                             </div>
                         </div>
-                    ))}
-                </div>
-                {/* Bottom row with 4 people */}
+                    </div>
+                )}
+                {/* Bottom row with the rest */}
                 <div className="flex justify-center gap-16 flex-wrap">
-                    {bottomConductors.map((conductor) => (
+                    {otherConductors.map((conductor) => (
                         <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
                              <button 
                                 onClick={() => handleConductorSelect(conductor)}
@@ -563,5 +563,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     
