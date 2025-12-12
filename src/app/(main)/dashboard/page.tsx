@@ -242,7 +242,7 @@ export default function DashboardPage() {
           />
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative flex justify-between items-center p-8">
-            <div className="flex items-center gap-6 text-center">
+            <div className="flex items-center gap-6">
               <Image
                 src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
                 alt="Shivalik College Logo"
@@ -571,5 +571,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     
