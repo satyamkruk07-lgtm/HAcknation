@@ -261,7 +261,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex items-center gap-4">
               <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
-                <a href="tel:9997155111">
+                <a href="tel:+919997155111">
                   <Phone className="h-5 w-5" />
                 </a>
               </Button>
