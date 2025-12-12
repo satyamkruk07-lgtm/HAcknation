@@ -347,7 +347,7 @@ export const conductors: Conductor[] = [
     {
         id: "1",
         name: "Mr. Kumar Satyam",
-        role: "Student",
+        role: "Website Head",
         imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-satyam')?.imageUrl || `https://picsum.photos/seed/1/128/128`,
         email: "devesh.kumar@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/dr-devesh-kumar-0a849725/",
@@ -446,4 +446,5 @@ export const conductors: Conductor[] = [
 
 
     
+
 
