@@ -198,6 +198,12 @@ export default function ProfilePage() {
         teamMembers: data.teamMembers ? data.teamMembers.split(',').map(s => s.trim()) : [],
       };
 
+      if (userProfile?.registrationType) {
+        delete updatedData.registrationType;
+        delete updatedData.teamName;
+        delete updatedData.teamMembers;
+      }
+
       if (data.registrationType === 'individual') {
         updatedData.teamName = '';
         updatedData.teamMembers = [];
@@ -356,6 +362,7 @@ export default function ProfilePage() {
                                     onValueChange={field.onChange}
                                     value={field.value}
                                     className="flex flex-row space-x-4"
+                                    disabled={!!userProfile?.registrationType}
                                 >
                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
@@ -375,11 +382,16 @@ export default function ProfilePage() {
                                     </FormItem>
                                 </RadioGroup>
                                 </FormControl>
+                                {!!userProfile?.registrationType && (
+                                  <FormDescription>
+                                    Registration type cannot be changed after it's set.
+                                  </FormDescription>
+                                )}
                                 <FormMessage />
                             </FormItem>
                             )}
                         />
-                        {registrationType === 'team' && (
+                        {registrationType === 'team' && !userProfile?.registrationType && (
                           <>
                             <FormField
                                 control={form.control}
