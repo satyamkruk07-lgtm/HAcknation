@@ -241,19 +241,33 @@ export default function DashboardPage() {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/50" />
-          <div className="relative flex justify-center items-center p-8 gap-6 text-center">
-             <Image
-              src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
-              alt="Shivalik College Logo"
-              width={100}
-              height={100}
-              className="rounded-full"
-            />
-            <div>
-              <h1 className="font-headline text-3xl font-bold text-white">
-                Shivalik <br /> College of Engineering
-              </h1>
-              <Badge variant="destructive" className="mt-2 text-lg">NAAC Grade A+</Badge>
+          <div className="relative flex justify-between items-center p-8">
+            <div className="flex items-center gap-6 text-center">
+              <Image
+                src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
+                alt="Shivalik College Logo"
+                width={100}
+                height={100}
+                className="rounded-full"
+              />
+              <div className="text-left">
+                <h1 className="font-headline text-3xl font-bold text-white">
+                  Shivalik <br /> College of Engineering
+                </h1>
+                <Badge variant="destructive" className="mt-2 text-lg">NAAC Grade A+</Badge>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <Button asChild variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:text-white">
+                <a href="tel:+917060550243">
+                  <Phone className="mr-2 h-4 w-4" /> Call
+                </a>
+              </Button>
+              <Button asChild variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:text-white">
+                <a href="mailto:devesh.kumar@shivalikcollege.edu.in">
+                  <Mail className="mr-2 h-4 w-4" /> Mail
+                </a>
+              </Button>
             </div>
           </div>
         </div>
@@ -557,13 +571,5 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-
-    
-
-    
-
-
-
 
     
