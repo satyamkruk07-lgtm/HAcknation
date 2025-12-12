@@ -395,7 +395,7 @@ export const conductors: Conductor[] = [
         imageUrl: "https://images.unsplash.com/photo-1765519817953-8f4206a73b70?q=80&w=738&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         email: "anshul.namdev@shivalikcollege.edu.in",
         linkedin: "https://www.linkedin.com/in/anshul-namdev",
-        qualification: "M.Tech in CSE",
+        qualification: "UG B.TECH ,PG M.TECH , PHD Pursuin",
         skills: ["Cloud Computing", "AWS", "DevOps", "Docker"],
         phone: "+91 9076994339"
     }
@@ -446,6 +446,7 @@ export const conductors: Conductor[] = [
 
 
     
+
 
 
 
