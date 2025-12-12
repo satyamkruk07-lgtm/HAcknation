@@ -58,8 +58,7 @@ service cloud.firestore {
      * A user can only create, update, or delete their own profile.
      */
     match /users/{userId} {
-      allow get: if true;
-      allow list: if isSignedIn();
+      allow get, list: if isSignedIn();
       allow create: if isOwner(userId);
       allow update, delete: if isExistingOwner(userId);
     }
