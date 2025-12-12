@@ -249,11 +249,11 @@ export default function DashboardPage() {
               height={100}
               className="rounded-full"
             />
-            <div>
+            <div className="flex items-end gap-4">
               <h1 className="font-headline text-3xl font-bold text-white">
                 Shivalik <br /> College of Engineering
               </h1>
-              <Badge variant="destructive" className="mt-2 text-lg">NAAC Grade A+</Badge>
+              <Badge variant="destructive" className="text-lg mb-1">NAAC Grade A+</Badge>
             </div>
           </div>
         </div>
@@ -562,4 +562,5 @@ export default function DashboardPage() {
     
 
     
+
 
