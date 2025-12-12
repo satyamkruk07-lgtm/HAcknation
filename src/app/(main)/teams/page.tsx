@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Mail, Phone } from 'lucide-react';
 import type { UserAccount } from '@/lib/types';
 import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { collection, query, orderBy, where } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
@@ -56,7 +56,11 @@ export default function TeamsPage() {
   
   const usersCollectionQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
-    return query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'));
+    return query(
+      collection(firestore, 'users'),
+      where('registrationType', '==', 'individual'),
+      orderBy('registrationDate', 'desc')
+    );
   }, [firestore, user]);
 
   const { data: teamProfiles, isLoading } = useCollection<UserAccount>(usersCollectionQuery);
@@ -96,52 +100,58 @@ export default function TeamsPage() {
           Looking for a Team
         </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {teamProfiles && teamProfiles.map((profile) => {
-            const imageUrl = profile.photoURL || `https://picsum.photos/seed/${profile.id}/200/200`;
+          {teamProfiles && teamProfiles.length > 0 ? (
+            teamProfiles.map((profile) => {
+              const imageUrl = profile.photoURL || `https://picsum.photos/seed/${profile.id}/200/200`;
 
-            return (
-              <Card key={profile.id} className="flex flex-col transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
-                <CardHeader className="flex flex-row items-center gap-4">
-                  <Image
-                    src={imageUrl}
-                    alt={profile.name}
-                    width={64}
-                    height={64}
-                    className="rounded-full"
-                    data-ai-hint="person portrait"
-                  />
-                  <div>
-                    <CardTitle>{profile.name}</CardTitle>
-                    <CardDescription>{profile.college || 'Hacker'}</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 space-y-4">
-                  <p className='text-sm text-muted-foreground line-clamp-2 min-h-[40px]'>{profile.bio}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {(profile.skills || []).map((skill) => (
-                      <Badge key={skill} variant="secondary">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-                <CardFooter className="flex gap-2">
-                  <Button asChild className="w-full">
-                    <a href={`mailto:${profile.email}`}>
-                      <Mail className="mr-2 h-4 w-4" /> Connect
-                    </a>
-                  </Button>
-                  {profile.phoneNumber && (
-                    <Button asChild variant="outline" className="w-full">
-                        <a href={`tel:${profile.phoneNumber}`}>
-                            <Phone className="mr-2 h-4 w-4" /> Call
-                        </a>
+              return (
+                <Card key={profile.id} className="flex flex-col transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
+                  <CardHeader className="flex flex-row items-center gap-4">
+                    <Image
+                      src={imageUrl}
+                      alt={profile.name}
+                      width={64}
+                      height={64}
+                      className="rounded-full"
+                      data-ai-hint="person portrait"
+                    />
+                    <div>
+                      <CardTitle>{profile.name}</CardTitle>
+                      <CardDescription>{profile.college || 'Hacker'}</CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-1 space-y-4">
+                    <p className='text-sm text-muted-foreground line-clamp-2 min-h-[40px]'>{profile.bio}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {(profile.skills || []).map((skill) => (
+                        <Badge key={skill} variant="secondary">
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex gap-2">
+                    <Button asChild className="w-full">
+                      <a href={`mailto:${profile.email}`}>
+                        <Mail className="mr-2 h-4 w-4" /> Connect
+                      </a>
                     </Button>
-                  )}
-                </CardFooter>
-              </Card>
-            );
-          })}
+                    {profile.phoneNumber && (
+                      <Button asChild variant="outline" className="w-full">
+                          <a href={`tel:${profile.phoneNumber}`}>
+                              <Phone className="mr-2 h-4 w-4" /> Call
+                          </a>
+                      </Button>
+                    )}
+                  </CardFooter>
+                </Card>
+              );
+            })
+          ) : (
+            <div className="col-span-full py-10 text-center text-muted-foreground">
+              <p>No individual participants are looking for a team right now. Check back later!</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
