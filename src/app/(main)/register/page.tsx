@@ -38,13 +38,13 @@ const formSchema = z
   .object({
     name: z.string().min(1, 'Name is required'),
     email: z.string().email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string(),
     registrationType: z.enum(['individual', 'team'], {
       required_error: 'You need to select a registration type.',
     }),
     teamName: z.string().optional(),
     teamMembers: z.string().optional(),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -191,7 +191,7 @@ export default function RegisterPage() {
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="flex flex-col space-y-1"
+                        className="flex flex-row space-x-4"
                       >
                         <FormItem className="flex items-center space-x-3 space-y-0">
                           <FormControl>
