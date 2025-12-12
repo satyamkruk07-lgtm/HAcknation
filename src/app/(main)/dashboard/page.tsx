@@ -254,22 +254,22 @@ export default function DashboardPage() {
                         </a>
                     </Button>
                 </div>
-                <div className="flex justify-center items-center gap-8 text-white p-8">
-                  <Image src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg" alt="Shivalik College Logo" width={80} height={80} className="rounded-full" />
-                  <div className="text-center">
-                    <h1 className="text-5xl font-bold font-headline tracking-tighter text-white">
+                <div className="flex justify-end items-center gap-8 text-white p-12">
+                  <div className="text-right">
+                    <h1 className="text-6xl font-bold font-headline tracking-tighter text-white">
                       Shivalik
                     </h1>
-                    <p className="text-xl text-white/90 font-bold">
+                    <p className="text-2xl text-white/90 font-bold">
                       College of Engineering
                     </p>
                   </div>
+                  <Image src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg" alt="Shivalik College Logo" width={100} height={100} className="rounded-full" />
                   <div className="flex items-center gap-2">
                     <div className="text-center">
-                      <p className="text-2xl font-black text-white/90 uppercase">NAAC</p>
-                      <p className="text-xl font-bold">Grade</p>
+                      <p className="text-3xl font-black text-white/90 uppercase">NAAC</p>
+                      <p className="text-2xl font-bold">Grade</p>
                     </div>
-                    <div className="text-5xl font-black text-white">A+</div>
+                    <div className="text-6xl font-black text-white">A+</div>
                   </div>
                 </div>
             </div>
