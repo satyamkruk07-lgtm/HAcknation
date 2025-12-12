@@ -372,7 +372,7 @@ export const conductors: Conductor[] = [
         role: "Faculty",
         imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-paramjeet')?.imageUrl || `https://picsum.photos/seed/4/128/128`,
         email: "manas.kumar@shivalikcollege.edu.in",
-        linkedin: "https://www.linkedin.com/in/manas-kumar-87913b168/",
+        linkedin: "https://www.linkedin.com/in/paramjeetsingh22",
         qualification: "M.Tech in CSE",
         skills: ["Competitive Programming", "Java", "C++", "DSA"],
         phone: "+91 8923859863"
@@ -446,6 +446,7 @@ export const conductors: Conductor[] = [
 
 
     
+
 
 
 
