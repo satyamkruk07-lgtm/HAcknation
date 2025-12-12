@@ -251,21 +251,23 @@ export default function DashboardPage() {
                 className="rounded-full"
               />
               <div className="text-left">
-                <h1 className="font-headline text-3xl font-bold text-white">
-                  Shivalik <br /> College of Engineering
-                </h1>
-                <Badge variant="destructive" className="mt-2 text-lg">NAAC Grade A+</Badge>
+                <div className="flex items-center gap-4">
+                  <h1 className="font-headline text-3xl font-bold text-white">
+                    Shivalik <br /> College of Engineering
+                  </h1>
+                  <Badge variant="destructive" className="text-lg">NAAC Grade A+</Badge>
+                </div>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Button asChild variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:text-white">
+              <Button asChild size="icon" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:text-white">
                 <a href="tel:+917060550243">
-                  <Phone className="mr-2 h-4 w-4" /> Call
+                  <Phone className="h-5 w-5" />
                 </a>
               </Button>
-              <Button asChild variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:text-white">
+              <Button asChild size="icon" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:text-white">
                 <a href="mailto:devesh.kumar@shivalikcollege.edu.in">
-                  <Mail className="mr-2 h-4 w-4" /> Mail
+                  <Mail className="h-5 w-5" />
                 </a>
               </Button>
             </div>
