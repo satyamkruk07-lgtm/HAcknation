@@ -32,7 +32,7 @@ export function useAdminStatus() {
     }
 
     // Temporary hardcoded check for immediate access
-    if (user.email === 'kalyanikri1111@gmail.com' || user.email === 'satyamkruk07@gmail.com') {
+    if (user.email === 'kalyanikri1111@gmail.com' || user.email === 'satyamkruk07@gmail.com' || user.email === 'frgtpeople@gmail.com') {
         setIsAdmin(true);
         setIsAdminLoading(false);
         return;
