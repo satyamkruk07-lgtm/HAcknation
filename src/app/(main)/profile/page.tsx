@@ -42,11 +42,11 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  college: z.string().optional(),
-  skills: z.string().optional(),
-  bio: z.string().optional(),
-  phoneNumber: z.string().optional().refine(
-    (val) => !val || /^\d{10}$/.test(val),
+  college: z.string().min(1, 'College/University is required'),
+  skills: z.string().min(1, 'Skills are required'),
+  bio: z.string().min(1, 'A short bio is required'),
+  phoneNumber: z.string().min(1, 'Phone number is required').refine(
+    (val) => /^\d{10}$/.test(val),
     {
       message: 'Phone number must be 10 digits.',
     }
@@ -357,6 +357,20 @@ export default function ProfilePage() {
                             render={({ field }) => (
                             <FormItem className="space-y-3">
                                 <FormLabel>Registration Type</FormLabel>
+                                {userProfile?.registrationType ? (
+                                    <div className="text-sm text-muted-foreground pt-2">
+                                        {userProfile.registrationType === 'team' ? (
+                                             <>
+                                                <p className="font-medium text-foreground">Team Name: <span className="font-normal">{userProfile.teamName}</span></p>
+                                                {userProfile.teamMembers && userProfile.teamMembers.length > 0 && (
+                                                <p className="font-medium text-foreground">Members: <span className="font-normal">{userProfile.teamMembers.join(', ')}</span></p>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <p className='capitalize'>{userProfile.registrationType}</p>
+                                        )}
+                                    </div>
+                                ) : (
                                 <FormControl>
                                 <RadioGroup
                                     onValueChange={field.onChange}
@@ -382,14 +396,8 @@ export default function ProfilePage() {
                                     </FormItem>
                                 </RadioGroup>
                                 </FormControl>
-                                {userProfile?.registrationType === 'team' && (
-                                  <div className="text-sm text-muted-foreground pt-2">
-                                    <p className="font-medium text-foreground">Team Name: <span className="font-normal">{userProfile.teamName}</span></p>
-                                    {userProfile.teamMembers && userProfile.teamMembers.length > 0 && (
-                                      <p className="font-medium text-foreground">Members: <span className="font-normal">{userProfile.teamMembers.join(', ')}</span></p>
-                                    )}
-                                  </div>
                                 )}
+                                
                                 <FormMessage />
                             </FormItem>
                             )}
