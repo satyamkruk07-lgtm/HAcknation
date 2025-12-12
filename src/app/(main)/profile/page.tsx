@@ -54,7 +54,16 @@ const profileFormSchema = z.object({
   registrationType: z.enum(['individual', 'team'], {
     required_error: 'You need to select a registration type.',
   }),
+  teamName: z.string().optional(),
   teamMembers: z.string().optional(),
+}).refine((data) => {
+    if (data.registrationType === 'team') {
+      return !!data.teamName && data.teamName.length > 0;
+    }
+    return true;
+}, {
+    message: 'Team name is required for team registration.',
+    path: ['teamName'],
 });
 
 type ProfileFormData = z.infer<typeof profileFormSchema>;
@@ -85,6 +94,7 @@ export default function ProfilePage() {
       bio: '',
       phoneNumber: '',
       registrationType: 'individual',
+      teamName: '',
       teamMembers: '',
     },
   });
@@ -106,6 +116,7 @@ export default function ProfilePage() {
         bio: userProfile.bio || '',
         phoneNumber: userProfile.phoneNumber || '',
         registrationType: userProfile.registrationType || 'individual',
+        teamName: userProfile.teamName || '',
         teamMembers: userProfile.teamMembers?.join(', ') || '',
       });
     } else if (user) {
@@ -116,6 +127,7 @@ export default function ProfilePage() {
         bio: '',
         phoneNumber: user.phoneNumber || '',
         registrationType: 'individual',
+        teamName: '',
         teamMembers: '',
       });
     }
@@ -182,10 +194,12 @@ export default function ProfilePage() {
         bio: data.bio,
         phoneNumber: data.phoneNumber,
         registrationType: data.registrationType,
+        teamName: data.teamName,
         teamMembers: data.teamMembers ? data.teamMembers.split(',').map(s => s.trim()) : [],
       };
 
       if (data.registrationType === 'individual') {
+        updatedData.teamName = '';
         updatedData.teamMembers = [];
       }
 
@@ -366,6 +380,20 @@ export default function ProfilePage() {
                             )}
                         />
                         {registrationType === 'team' && (
+                          <>
+                            <FormField
+                                control={form.control}
+                                name="teamName"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Team Name</FormLabel>
+                                    <FormControl>
+                                    <Input placeholder="The Innovators" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
                             <FormField
                                 control={form.control}
                                 name="teamMembers"
@@ -382,6 +410,7 @@ export default function ProfilePage() {
                                 </FormItem>
                                 )}
                             />
+                          </>
                         )}
                         <FormField
                         control={form.control}
