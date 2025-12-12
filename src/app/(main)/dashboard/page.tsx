@@ -1,8 +1,7 @@
-
 'use client';
 
 import React from 'react';
-import { useUser, useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -25,13 +24,14 @@ import {
   GitBranch,
   BookOpen,
   Briefcase,
-  Linkedin
+  Linkedin,
+  AlertCircle
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { sponsors, conductors } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
-import type { Announcement, Conductor } from '@/lib/types';
-import { collection, query, orderBy, limit } from 'firebase/firestore';
+import type { Announcement, Conductor, UserAccount } from '@/lib/types';
+import { collection, query, orderBy, limit, doc } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 import {
@@ -40,8 +40,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const features = [
   {
@@ -195,13 +195,22 @@ export default function DashboardPage() {
 
   const { data: announcements, isLoading: areAnnouncementsLoading } = useCollection<Announcement>(announcementsQuery);
   
+  const userDocRef = useMemoFirebase(() => {
+    if (!firestore || !user?.uid) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [firestore, user?.uid]);
+
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserAccount>(userDocRef);
+
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/login');
     }
   }, [user, isUserLoading, router]);
 
-  if (isUserLoading || !user) {
+  const isContentLoading = isUserLoading || isProfileLoading;
+
+  if (isContentLoading || !user) {
     return (
       <div className="container py-12">
         <div className="space-y-4">
@@ -228,6 +237,8 @@ export default function DashboardPage() {
   const handleConductorSelect = (conductor: Conductor) => {
     setSelectedConductor(conductor);
   };
+
+  const showProfileDisclaimer = !isProfileLoading && userProfile && !userProfile.registrationType;
 
   return (
     <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
@@ -275,7 +286,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Welcome Message */}
-        <div className="mb-12">
+        <div className="mb-8">
           <div className="flex flex-col items-center text-center">
             <h2 className="font-headline text-2xl font-bold">
               Welcome, {user.displayName || 'Hacker'}!
@@ -285,6 +296,22 @@ export default function DashboardPage() {
             </p>
           </div>
         </div>
+
+        {/* Profile Completion Disclaimer */}
+        {showProfileDisclaimer && (
+            <div className="mb-8 max-w-2xl mx-auto">
+                <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Action Required</AlertTitle>
+                    <AlertDescription>
+                       Please complete your profile to get the full experience.
+                       <Button variant="link" asChild className="p-0 h-auto ml-2">
+                           <Link href="/profile">Complete Your Profile</Link>
+                       </Button>
+                    </AlertDescription>
+                </Alert>
+            </div>
+        )}
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
