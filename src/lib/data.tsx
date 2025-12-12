@@ -397,7 +397,7 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/anshul-namdev",
         qualification: "UG B.TECH ,PG M.TECH , PHD Pursuing",
         skills: ["Cloud Computing", "AWS", "DevOps", "Docker"],
-        phone: "+91 9076994339"
+        phone: "+918375052135"
     }
 ];
 
@@ -446,6 +446,7 @@ export const conductors: Conductor[] = [
 
 
     
+
 
 
 
