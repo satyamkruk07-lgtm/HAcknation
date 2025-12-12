@@ -43,10 +43,21 @@ const formSchema = z
     registrationType: z.enum(['individual', 'team'], {
       required_error: 'You need to select a registration type.',
     }),
+    teamName: z.string().optional(),
+    teamMembers: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ['confirmPassword'],
+  })
+  .refine((data) => {
+    if (data.registrationType === 'team') {
+      return !!data.teamName && data.teamName.length > 0;
+    }
+    return true;
+  }, {
+    message: 'Team name is required when registering as a team.',
+    path: ['teamName'],
   });
 
 type FormData = z.infer<typeof formSchema>;
@@ -65,8 +76,13 @@ export default function RegisterPage() {
       email: '',
       password: '',
       confirmPassword: '',
+      registrationType: 'individual',
+      teamName: '',
+      teamMembers: '',
     },
   });
+
+  const registrationType = form.watch('registrationType');
 
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
@@ -88,7 +104,8 @@ export default function RegisterPage() {
       await sendEmailVerification(user);
 
       const userDocRef = doc(firestore, 'users', user.uid);
-      await setDoc(userDocRef, {
+      
+      const userData: any = {
         id: user.uid,
         email: data.email,
         name: data.name,
@@ -96,7 +113,14 @@ export default function RegisterPage() {
         registrationDate: new Date().toISOString(),
         emailVerified: user.emailVerified,
         registrationType: data.registrationType,
-      });
+      };
+
+      if (data.registrationType === 'team') {
+        userData.teamName = data.teamName;
+        userData.teamMembers = data.teamMembers?.split(',').map(s => s.trim()).filter(s => s);
+      }
+
+      await setDoc(userDocRef, userData);
 
       router.push('/login?registered=true');
 
@@ -217,6 +241,39 @@ export default function RegisterPage() {
                   </FormItem>
                 )}
               />
+              {registrationType === 'team' && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="teamName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Team Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="The Innovators" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="teamMembers"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Team Members' Names</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John Doe, Jane Smith..." {...field} />
+                        </FormControl>
+                        <FormDescription>
+                          Enter names separated by commas.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
             </CardContent>
             <CardFooter className="flex flex-col items-stretch gap-4">
               <Button type="submit" disabled={isSubmitting} className="w-full">

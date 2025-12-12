@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from "lucide-react";
 import type { Timestamp } from 'firebase/firestore';
 
@@ -60,6 +61,8 @@ export type UserAccount = {
   profileBannerUrl?: string;
   phoneNumber?: string;
   registrationType?: 'individual' | 'team';
+  teamName?: string;
+  teamMembers?: string[];
 };
 
 export type ProjectIdea = {
