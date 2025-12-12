@@ -349,8 +349,8 @@ export const conductors: Conductor[] = [
         name: "Mr. Kumar Satyam",
         role: "Website Head",
         imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-satyam')?.imageUrl || `https://picsum.photos/seed/1/128/128`,
-        email: "devesh.kumar@shivalikcollege.edu.in",
-        linkedin: "https://www.linkedin.com/in/dr-devesh-kumar-0a849725/",
+        email: "satyamkruk07@gmail.com",
+        linkedin: "https://www.linkedin.com/in/kumar-satyam-055841394",
         qualification: "BCA",
         skills: ["Python", "C"],
         phone: "+917060550243"
@@ -446,6 +446,7 @@ export const conductors: Conductor[] = [
 
 
     
+
 
 
 
