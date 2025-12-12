@@ -361,7 +361,7 @@ export const conductors: Conductor[] = [
         role: "Head Of Department",
         imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-sartaj')?.imageUrl || `https://picsum.photos/seed/3/128/128`,
         email: "kalyani.kumari@shivalikcollege.edu.in",
-        linkedin: "https://www.linkedin.com/in/kalyani-kumari-b97280249/",
+        linkedin: "https://www.linkedin.com/in/sartaj-khan-52149724b",
         qualification: "Head of BCA Department",
         skills: ["Event Management", "Public Speaking", "Canva", "Photoshop"],
         phone: "+91 9760017416"
@@ -446,6 +446,7 @@ export const conductors: Conductor[] = [
 
 
     
+
 
 
 
