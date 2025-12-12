@@ -463,7 +463,6 @@ export default function DashboardPage() {
                         <div key={topConductor.id} className="flex flex-col items-center text-center gap-2">
                             <button 
                                 onClick={() => handleConductorSelect(topConductor)} 
-                                onTouchEnd={(e) => { e.preventDefault(); handleConductorSelect(topConductor); }}
                                 className="rounded-full"
                             >
                                 <Image
@@ -488,7 +487,6 @@ export default function DashboardPage() {
                         <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
                              <button 
                                 onClick={() => handleConductorSelect(conductor)}
-                                onTouchEnd={(e) => { e.preventDefault(); handleConductorSelect(conductor); }}
                                 className="rounded-full"
                              >
                                 <Image
@@ -571,6 +569,8 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     
 
