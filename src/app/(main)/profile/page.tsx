@@ -459,12 +459,14 @@ export default function ProfilePage() {
                             </FormItem>
                         )}
                         />
-                        <Button type="submit" disabled={isSubmitting || isUploading}>
-                        {isSubmitting && (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {!userProfile?.registrationType && (
+                          <Button type="submit" disabled={isSubmitting || isUploading}>
+                            {isSubmitting && (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            )}
+                            Update Profile
+                          </Button>
                         )}
-                        Update Profile
-                        </Button>
                     </form>
                     </Form>
                 </CardContent>
@@ -474,3 +476,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    
