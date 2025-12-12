@@ -511,7 +511,7 @@ export default function DashboardPage() {
                     alt={selectedConductor.name}
                     width={96}
                     height={96}
-                    className="rounded-full border-4 border-background shadow-lg"
+                    className="rounded-full border-4 border-background shadow-lg object-cover"
                     data-ai-hint="person portrait"
                   />
               <div className='pt-2'>
