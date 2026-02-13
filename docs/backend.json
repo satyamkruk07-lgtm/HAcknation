@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "Event": {
@@ -52,18 +53,27 @@
           "type": "string",
           "description": "Unique identifier for the user."
         },
-        "firstName": {
-          "type": "string",
-          "description": "First name of the user."
-        },
-        "lastName": {
-          "type": "string",
-          "description": "Last name of the user."
-        },
         "email": {
           "type": "string",
           "description": "Email address of the user.",
           "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of the user."
+        },
+        "registrationDate": {
+          "type": "string",
+          "description": "The date the user registered.",
+          "format": "date-time"
+        },
+        "emailVerified": {
+          "type": "boolean",
+          "description": "Whether the user has verified their email."
+        },
+        "college": {
+          "type": "string",
+          "description": "The user's college or university."
         },
         "skills": {
           "type": "array",
@@ -71,13 +81,62 @@
           "items": {
             "type": "string"
           }
+        },
+        "bio": {
+          "type": "string",
+          "description": "A short bio about the user."
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL of the user's profile picture.",
+          "format": "uri"
+        },
+        "profileBannerUrl": {
+          "type": "string",
+          "description": "URL of the user's profile banner.",
+          "format": "uri"
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "The user's phone number."
+        },
+        "registrationType": {
+          "type": "string",
+          "description": "Whether the user registered as an individual or part of a team.",
+          "enum": [
+            "individual",
+            "team"
+          ]
+        },
+        "teamName": {
+          "type": "string",
+          "description": "The name of the user's team, if applicable."
+        },
+        "teamMembers": {
+          "type": "array",
+          "description": "The members of the user's team, if applicable.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mentorName": {
+          "type": "string",
+          "description": "The name of the user's mentor."
+        },
+        "department": {
+          "type": "string",
+          "description": "The user's department."
+        },
+        "leaderName": {
+          "type": "string",
+          "description": "The name of the team leader, if applicable."
         }
       },
       "required": [
         "id",
-        "firstName",
-        "lastName",
-        "email"
+        "email",
+        "name",
+        "registrationDate"
       ]
     },
     "Team": {

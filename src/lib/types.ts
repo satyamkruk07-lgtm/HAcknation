@@ -65,6 +65,7 @@ export type UserAccount = {
   teamMembers?: string[];
   mentorName?: string;
   department?: string;
+  leaderName?: string;
 };
 
 export type ProjectIdea = {

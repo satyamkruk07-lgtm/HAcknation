@@ -56,6 +56,7 @@ const profileFormSchema = z.object({
   registrationType: z.enum(['individual', 'team'], {
     required_error: 'You need to select a registration type.',
   }),
+  leaderName: z.string().optional(),
   teamName: z.string().optional(),
   teamMembers: z.string().optional(),
 }).refine((data) => {
@@ -66,6 +67,14 @@ const profileFormSchema = z.object({
 }, {
     message: 'Team name is required for team registration.',
     path: ['teamName'],
+}).refine((data) => {
+    if (data.registrationType === 'team') {
+      return !!data.leaderName && data.leaderName.length > 0;
+    }
+    return true;
+}, {
+    message: "Team Leader's name is required for team registration.",
+    path: ['leaderName'],
 });
 
 type ProfileFormData = z.infer<typeof profileFormSchema>;
@@ -98,6 +107,7 @@ export default function ProfilePage() {
       bio: '',
       phoneNumber: '',
       registrationType: 'individual',
+      leaderName: '',
       teamName: '',
       teamMembers: '',
     },
@@ -122,6 +132,7 @@ export default function ProfilePage() {
         bio: userProfile.bio || '',
         phoneNumber: userProfile.phoneNumber || '',
         registrationType: userProfile.registrationType || 'individual',
+        leaderName: userProfile.leaderName || '',
         teamName: userProfile.teamName || '',
         teamMembers: userProfile.teamMembers?.join(', ') || '',
       });
@@ -135,6 +146,7 @@ export default function ProfilePage() {
         bio: '',
         phoneNumber: user.phoneNumber || '',
         registrationType: 'individual',
+        leaderName: '',
         teamName: '',
         teamMembers: '',
       });
@@ -200,23 +212,23 @@ export default function ProfilePage() {
         college: data.college,
         mentorName: data.mentorName,
         department: data.department,
-        skills: data.skills ? data.skills.split(',').map((s) => s.trim()) : [],
+        skills: data.skills.split(',').map((s) => s.trim()),
         bio: data.bio,
         phoneNumber: data.phoneNumber,
         registrationType: data.registrationType,
+        leaderName: data.leaderName,
         teamName: data.teamName,
         teamMembers: data.teamMembers ? data.teamMembers.split(',').map(s => s.trim()) : [],
       };
 
       if (userProfile?.registrationType) {
         delete updatedData.registrationType;
-        delete updatedData.teamName;
-        delete updatedData.teamMembers;
       }
 
       if (data.registrationType === 'individual') {
         updatedData.teamName = '';
         updatedData.teamMembers = [];
+        updatedData.leaderName = '';
       }
 
       await setDoc(userDocRef, updatedData, { merge: true });
@@ -393,25 +405,12 @@ export default function ProfilePage() {
                             render={({ field }) => (
                             <FormItem className="space-y-3">
                                 <FormLabel>Registration Type</FormLabel>
-                                {userProfile?.registrationType ? (
-                                    <div className="text-sm text-muted-foreground pt-2">
-                                        {userProfile.registrationType === 'team' ? (
-                                             <>
-                                                <p className="font-medium text-foreground">Team Name: <span className="font-normal">{userProfile.teamName}</span></p>
-                                                {userProfile.teamMembers && userProfile.teamMembers.length > 0 && (
-                                                <p className="font-medium text-foreground">Members: <span className="font-normal">{userProfile.teamMembers.join(', ')}</span></p>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <p className='capitalize'>{userProfile.registrationType}</p>
-                                        )}
-                                    </div>
-                                ) : (
                                 <FormControl>
                                 <RadioGroup
                                     onValueChange={field.onChange}
                                     value={field.value}
                                     className="flex flex-row space-x-4"
+                                    disabled={!!userProfile?.registrationType}
                                 >
                                     <FormItem className="flex items-center space-x-3 space-y-0">
                                     <FormControl>
@@ -431,14 +430,25 @@ export default function ProfilePage() {
                                     </FormItem>
                                 </RadioGroup>
                                 </FormControl>
-                                )}
-                                
                                 <FormMessage />
                             </FormItem>
                             )}
                         />
-                        {registrationType === 'team' && !userProfile?.registrationType && (
+                        {registrationType === 'team' && (
                           <>
+                            <FormField
+                                control={form.control}
+                                name="leaderName"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Team Leader's Name</FormLabel>
+                                    <FormControl>
+                                    <Input placeholder="e.g., Ada Lovelace" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
                             <FormField
                                 control={form.control}
                                 name="teamName"
