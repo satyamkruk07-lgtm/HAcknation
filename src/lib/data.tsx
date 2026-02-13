@@ -368,17 +368,6 @@ export const conductors: Conductor[] = [
         phone: "+919760017416"
     },
     {
-        id: "4",
-        name: "Mr. Paramjeet Singh",
-        role: "Faculty",
-        imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-paramjeet')?.imageUrl || `https://picsum.photos/seed/4/128/128`,
-        email: "manas.kumar@shivalikcollege.edu.in",
-        linkedin: "https://www.linkedin.com/in/paramjeetsingh22",
-        qualification: "M.Tech in CSE",
-        skills: ["Competitive Programming", "Java", "C++", "DSA"],
-        phone: "+918923859863"
-    },
-    {
         id: "5",
         name: "Mr. Ajay Kumar Verma",
         role: "Associate Dean-CBII & CEO, iHub Shivalik",
