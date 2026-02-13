@@ -262,7 +262,7 @@ export default function DashboardPage() {
                 className="rounded-full"
               />
               <div className="text-left">
-                <div className="flex items-start gap-4">
+                <div className="flex items-center gap-4">
                   <h1 className="font-headline text-3xl font-bold text-white">
                     Shivalik <br /> College of Engineering
                   </h1>
