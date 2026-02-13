@@ -272,8 +272,8 @@ export default function DashboardPage() {
                 <Image
                     src="https://image2url.com/r2/default/images/1770980427628-5a0a7bba-af9b-4dee-98cc-c1b29fddac2b.png"
                     alt="Ranked among Top 10 Engineering Colleges in North India"
-                    width={400}
-                    height={94}
+                    width={300}
+                    height={71}
                     className="mt-4"
                 />
               </div>
@@ -606,5 +606,7 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
 
     
