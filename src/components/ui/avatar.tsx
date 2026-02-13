@@ -12,7 +12,7 @@ const Avatar = React.forwardRef<
   <AvatarPrimitive.Root
     ref={ref}
     className={cn(
-      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-primary/20",
+      "relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full border-2 border-primary/20 transition-all duration-300 hover:rounded-md",
       className
     )}
     {...props}
@@ -39,7 +39,7 @@ const AvatarFallback = React.forwardRef<
   <AvatarPrimitive.Fallback
     ref={ref}
     className={cn(
-      "flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-secondary to-muted font-semibold text-foreground/80 [text-shadow:0_1px_0_hsl(var(--card))]",
+      "flex h-full w-full items-center justify-center bg-gradient-to-br from-secondary to-muted font-semibold text-foreground/80 [text-shadow:0_1px_0_hsl(var(--card))]",
       className
     )}
     {...props}
