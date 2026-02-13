@@ -119,6 +119,11 @@ export default function TeamsPage() {
                       <CardTitle>{profile.name}</CardTitle>
                       <CardDescription>
                         {[profile.department, profile.college].filter(Boolean).join(', ') || 'Hacker'}
+                        {profile.mentorName && (
+                          <span className="mt-1 block text-xs">
+                            Mentor: {profile.mentorName}
+                          </span>
+                        )}
                       </CardDescription>
                     </div>
                   </CardHeader>
