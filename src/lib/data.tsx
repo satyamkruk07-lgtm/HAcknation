@@ -354,7 +354,6 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/kumar-satyam-055841394",
         qualification: "BCA",
         skills: ["Python", "C"],
-        phone: "+917060550243"
     },
     {
         id: "3",
@@ -365,7 +364,6 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/sartaj-khan-52149724b",
         qualification: "Head of BCA Department",
         skills: ["Event Management", "Public Speaking", "Canva", "Photoshop"],
-        phone: "+919760017416"
     },
     {
         id: "6",
@@ -376,7 +374,6 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/kshitij-jain-531029109",
         qualification: "UG B.TECH ,PG M.TECH , PHD Pursuing",
         skills: ["Cloud Computing", "AWS", "DevOps", "Docker"],
-        phone: "+918375052135"
     },
     {
         id: "5",
@@ -387,7 +384,6 @@ export const conductors: Conductor[] = [
         linkedin: "https://www.linkedin.com/in/ajay-verma-5b825668",
         qualification: "Mr. Verma specializes in Bearing Fault Diagnosis, Mechanics of Machines, Tribology, and Mechanical Vibrations. His prolific contributions to research include 17+ publications in esteemed journals and conferences, along with his role as a Principal Investigator in government-funded research projects. His expertise is widely recognized, serving as a reviewer for top-tier journals and conferences",
         skills: ["Digital Marketing", "SEO", "Content Writing", "Social Media"],
-        phone: "+918938940960"
     }
 ];
 

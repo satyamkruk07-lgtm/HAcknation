@@ -84,8 +84,7 @@ export type Conductor = {
   linkedin: string;
   qualification: string;
   skills: string[];
-  phone?: string;
-}
+};
 
 export type Judgment = {
     id: string;
