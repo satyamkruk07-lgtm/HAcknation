@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -467,12 +466,12 @@ export default function ProfilePage() {
                                 name="teamMembers"
                                 render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Team Members' Names</FormLabel>
+                                    <FormLabel>Team Members</FormLabel>
                                     <FormControl>
-                                    <Input placeholder="John Doe, Jane Smith..." {...field} />
+                                    <Input placeholder="John Doe (CS), Jane Smith (IT)..." {...field} />
                                     </FormControl>
                                     <FormDescription>
-                                    Enter names separated by commas.
+                                    Enter each member's name and department, separated by commas.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>
