@@ -253,31 +253,33 @@ export default function DashboardPage() {
           />
           <div className="absolute inset-0 bg-black/50" />
           <div className="relative flex justify-between items-center p-8">
-            <div className="flex items-center gap-6">
-              <Image
-                src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
-                alt="Shivalik College Logo"
-                width={100}
-                height={100}
-                className="rounded-full"
-              />
-              <div className="text-left">
-                <div className="flex items-center gap-4">
-                  <h1 className="font-headline text-3xl font-bold text-white">
-                    Shivalik <br /> College of Engineering
-                  </h1>
-                  <div className="flex flex-col items-center gap-2">
-                    <Badge variant="destructive" className="text-lg">NAAC Grade A+</Badge>
-                    <Image
-                        src="https://image2url.com/r2/default/images/1770980427628-5a0a7bba-af9b-4dee-98cc-c1b29fddac2b.png"
-                        alt="Ranked among Top 10 Engineering Colleges in North India"
-                        width={100}
-                        height={100}
-                    />
+            <a href="https://shivalikcollege.edu.in/" target="_blank" rel="noopener noreferrer">
+              <div className="flex items-center gap-6">
+                <Image
+                  src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
+                  alt="Shivalik College Logo"
+                  width={100}
+                  height={100}
+                  className="rounded-full"
+                />
+                <div className="text-left">
+                  <div className="flex items-center gap-4">
+                    <h1 className="font-headline text-3xl font-bold text-white">
+                      Shivalik <br /> College of Engineering
+                    </h1>
+                    <div className="flex flex-col items-center gap-2">
+                      <Badge variant="destructive" className="text-lg">NAAC Grade A+</Badge>
+                      <Image
+                          src="https://image2url.com/r2/default/images/1770980427628-5a0a7bba-af9b-4dee-98cc-c1b29fddac2b.png"
+                          alt="Ranked among Top 10 Engineering Colleges in North India"
+                          width={100}
+                          height={100}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </a>
             <div className="flex items-center gap-4">
               <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
                 <a href="tel:+919997155111">
