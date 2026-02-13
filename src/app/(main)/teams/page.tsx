@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -116,7 +117,9 @@ export default function TeamsPage() {
                     />
                     <div>
                       <CardTitle>{profile.name}</CardTitle>
-                      <CardDescription>{profile.college || 'Hacker'}</CardDescription>
+                      <CardDescription>
+                        {[profile.department, profile.college].filter(Boolean).join(', ') || 'Hacker'}
+                      </CardDescription>
                     </div>
                   </CardHeader>
                   <CardContent className="flex-1 space-y-4">

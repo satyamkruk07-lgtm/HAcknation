@@ -63,6 +63,8 @@ export type UserAccount = {
   registrationType?: 'individual' | 'team';
   teamName?: string;
   teamMembers?: string[];
+  mentorName?: string;
+  department?: string;
 };
 
 export type ProjectIdea = {

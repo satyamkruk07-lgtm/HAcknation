@@ -43,6 +43,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   college: z.string().min(1, 'College/University is required'),
+  mentorName: z.string().min(1, 'Mentor name is required'),
+  department: z.string().min(1, 'Department is required'),
   skills: z.string().min(1, 'Skills are required'),
   bio: z.string().min(1, 'A short bio is required'),
   phoneNumber: z.string().min(1, 'Phone number is required').refine(
@@ -90,6 +92,8 @@ export default function ProfilePage() {
     defaultValues: {
       name: '',
       college: '',
+      mentorName: '',
+      department: '',
       skills: '',
       bio: '',
       phoneNumber: '',
@@ -112,6 +116,8 @@ export default function ProfilePage() {
       form.reset({
         name: userProfile.name || user?.displayName || '',
         college: userProfile.college || '',
+        mentorName: userProfile.mentorName || '',
+        department: userProfile.department || '',
         skills: userProfile.skills?.join(', ') || '',
         bio: userProfile.bio || '',
         phoneNumber: userProfile.phoneNumber || '',
@@ -123,6 +129,8 @@ export default function ProfilePage() {
       form.reset({
         name: user.displayName || '',
         college: '',
+        mentorName: '',
+        department: '',
         skills: '',
         bio: '',
         phoneNumber: user.phoneNumber || '',
@@ -190,6 +198,8 @@ export default function ProfilePage() {
       const updatedData: Partial<UserAccount> = {
         name: data.name,
         college: data.college,
+        mentorName: data.mentorName,
+        department: data.department,
         skills: data.skills ? data.skills.split(',').map((s) => s.trim()) : [],
         bio: data.bio,
         phoneNumber: data.phoneNumber,
@@ -352,6 +362,32 @@ export default function ProfilePage() {
                             <FormMessage />
                             </FormItem>
                         )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="mentorName"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Mentor Name</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g., Dr. Alan Turing" {...field} disabled={!!userProfile?.registrationType} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="department"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Department</FormLabel>
+                              <FormControl>
+                                <Input placeholder="e.g., Computer Science" {...field} disabled={!!userProfile?.registrationType} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
                         <FormField
                             control={form.control}
