@@ -249,9 +249,8 @@ export default function DashboardPage() {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/50" />
-          <a href="https://shivalikcollege.edu.in/" target="_blank" rel="noopener noreferrer" className="relative block">
-            <div className="flex justify-between items-center p-8">
-              <div className="flex items-center gap-6">
+          <div className="relative flex justify-between items-center p-8">
+              <a href="https://shivalikcollege.edu.in/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-6">
                 <Image
                   src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
                   alt="Shivalik College Logo"
@@ -275,7 +274,7 @@ export default function DashboardPage() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </a>
               <div className="flex items-center gap-4">
                 <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
                   <a href="tel:+919997155111">
@@ -288,8 +287,7 @@ export default function DashboardPage() {
                   </a>
                 </Button>
               </div>
-            </div>
-          </a>
+          </div>
         </div>
 
         {/* Welcome Message */}
