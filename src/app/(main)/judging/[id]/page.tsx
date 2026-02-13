@@ -17,6 +17,7 @@ export default function ProjectJudgingPage({
 }: {
   params: { id: string };
 }) {
+  const { id } = params;
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
@@ -31,9 +32,9 @@ export default function ProjectJudgingPage({
   }, [user, isUserLoading]);
   
   const projectRef = useMemoFirebase(() => {
-    if (!firestore || !params.id) return null;
-    return doc(firestore, 'projects', params.id);
-  }, [firestore, params.id]);
+    if (!firestore || !id) return null;
+    return doc(firestore, 'projects', id);
+  }, [firestore, id]);
 
   const { data: project, isLoading: isProjectLoading, error } = useDoc<SubmittedProject>(projectRef);
   
@@ -102,7 +103,7 @@ export default function ProjectJudgingPage({
           </div>
         </div>
         
-        <JudgingForm projectId={params.id} />
+        <JudgingForm projectId={id} />
       </div>
     </div>
   );
