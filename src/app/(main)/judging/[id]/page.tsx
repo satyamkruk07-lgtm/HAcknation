@@ -8,16 +8,13 @@ import { useDoc, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { SubmittedProject } from '@/lib/types';
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { getAuth, signInAnonymously } from 'firebase/auth';
 
-export default function ProjectJudgingPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
+export default function ProjectJudgingPage() {
+  const params = useParams<{ id: string }>();
+  const id = params.id;
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
   const router = useRouter();
