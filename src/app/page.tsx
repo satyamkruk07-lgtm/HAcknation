@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { MainNav } from '@/components/main-nav';
 import { Footer } from '@/components/footer';
+import { ConductedBy } from '@/components/conducted-by';
 
 const heroImage = PlaceHolderImages.find(p => p.id === "hero");
 
@@ -134,6 +135,12 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section id="conducted-by" className="py-20 bg-muted/40">
+          <div className="container">
+            <ConductedBy />
           </div>
         </section>
 

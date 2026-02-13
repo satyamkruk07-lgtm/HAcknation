@@ -29,20 +29,14 @@ import {
   Globe,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { sponsors, conductors } from '@/lib/data';
+import { sponsors } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import type { Announcement, Conductor, UserAccount } from '@/lib/types';
 import { collection, query, orderBy, limit, doc } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ConductedBy } from '@/components/conducted-by';
 
 const features = [
   {
@@ -187,7 +181,6 @@ export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
   const firestore = useFirestore();
   const router = useRouter();
-  const [selectedConductor, setSelectedConductor] = useState<Conductor | null>(null);
 
   const announcementsQuery = useMemoFirebase(() => {
     if (!firestore || !user) return null;
@@ -232,13 +225,6 @@ export default function DashboardPage() {
     );
   }
   
-  const handleConductorSelect = (conductor: Conductor) => {
-    setSelectedConductor(conductor);
-  };
-  
-  const mainConductor = conductors.find(c => c.name === "Mr. Kumar Satyam");
-  const otherConductors = conductors.filter(c => c.name !== "Mr. Kumar Satyam");
-
   const showProfileDisclaimer = !isProfileLoading && userProfile && !userProfile.registrationType;
 
   return (
@@ -499,112 +485,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Conducted By Section */}
-        <div className="mt-12">
-            <h2 className="mb-8 font-headline text-2xl font-bold text-center">Conducted By</h2>
-            <div className="flex flex-col items-center gap-12">
-                {/* Top Row: Main Conductor */}
-                {mainConductor && (
-                    <div className="flex justify-center">
-                        <div key={mainConductor.id} className="flex flex-col items-center text-center gap-2">
-                            <button 
-                                onClick={() => handleConductorSelect(mainConductor)}
-                                className="rounded-full"
-                            >
-                                <Image
-                                    src={mainConductor.imageUrl || `https://picsum.photos/seed/${mainConductor.id}/128/128`}
-                                    alt={`Portrait of ${mainConductor.name}`}
-                                    width={128}
-                                    height={128}
-                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-32 w-32"
-                                    data-ai-hint="person portrait"
-                                />
-                            </button>
-                            <div className="mt-2">
-                                <h3 className="font-semibold text-lg">{mainConductor.name}</h3>
-                                <p className="text-base text-muted-foreground">{mainConductor.role}</p>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Bottom Row: Other Conductors */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-12">
-                    {otherConductors.map((conductor) => (
-                        <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
-                            <button 
-                                onClick={() => handleConductorSelect(conductor)}
-                                className="rounded-full"
-                            >
-                                <Image
-                                    src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/96/96`}
-                                    alt={`Portrait of ${conductor.name}`}
-                                    width={96}
-                                    height={96}
-                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-24 w-24"
-                                    data-ai-hint="person portrait"
-                                />
-                            </button>
-                            <div className="mt-2">
-                                <h3 className="font-semibold text-base">{conductor.name}</h3>
-                                <p className="text-sm text-muted-foreground">{conductor.role}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
+        <ConductedBy />
       </div>
-      {selectedConductor && (
-        <Dialog open={!!selectedConductor} onOpenChange={(open) => !open && setSelectedConductor(null)}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader className="items-center text-center">
-                <Image
-                    src={selectedConductor.imageUrl || `https://picsum.photos/seed/${selectedConductor.id}/96/96`}
-                    alt={selectedConductor.name}
-                    width={96}
-                    height={96}
-                    className="rounded-full border-4 border-background shadow-lg object-cover"
-                    data-ai-hint="person portrait"
-                  />
-              <div className='pt-2'>
-                <DialogTitle className="text-2xl font-headline">{selectedConductor.name}</DialogTitle>
-                <DialogDescription>{selectedConductor.role}</DialogDescription>
-              </div>
-            </DialogHeader>
-            <div className="py-4 grid gap-6">
-                <div className='space-y-4'>
-                    <h4 className="font-semibold text-center text-muted-foreground text-sm uppercase tracking-wider">Contact</h4>
-                    <div className='flex items-center justify-center gap-4'>
-                        <Button variant="outline" size="icon" asChild>
-                            <a href={`mailto:${selectedConductor.email}`} aria-label="Email">
-                                <Mail className="h-5 w-5" />
-                            </a>
-                        </Button>
-                         <Button variant="outline" size="icon" asChild>
-                            <a href={selectedConductor.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-                                <Linkedin className="h-5 w-5" />
-                            </a>
-                        </Button>
-                    </div>
-                </div>
-
-                <div className='space-y-2 text-center'>
-                    <h4 className="font-semibold text-muted-foreground text-sm uppercase tracking-wider">Qualification</h4>
-                    <p className="text-sm flex items-center justify-center gap-2"><BookOpen className="h-4 w-4 text-accent" /> {selectedConductor.qualification}</p>
-                </div>
-
-                <div className='space-y-3 text-center'>
-                    <h4 className="font-semibold text-muted-foreground text-sm uppercase tracking-wider">Skills</h4>
-                    <div className="flex flex-wrap gap-2 justify-center">
-                        {selectedConductor.skills.map(skill => (
-                            <Badge key={skill} variant="secondary">{skill}</Badge>
-                        ))}
-                    </div>
-                </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 }
