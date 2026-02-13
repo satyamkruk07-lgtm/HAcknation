@@ -25,7 +25,8 @@ import {
   BookOpen,
   Briefcase,
   Linkedin,
-  AlertCircle
+  AlertCircle,
+  Globe,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { sponsors, conductors } from '@/lib/data';
@@ -278,7 +279,8 @@ export default function DashboardPage() {
                       </div>
                   </div>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col items-center gap-2">
+                <div className="flex items-center gap-4">
                   <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
                       <a href="tel:+919997155111">
                           <Phone className="h-5 w-5" />
@@ -289,6 +291,12 @@ export default function DashboardPage() {
                           <Mail className="h-5 w-5" />
                       </a>
                   </Button>
+                </div>
+                <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
+                    <a href="https://shivalikcollege.edu.in/" target="_blank" rel="noopener noreferrer">
+                        <Globe className="h-5 w-5" />
+                    </a>
+                </Button>
               </div>
           </div>
         </div>
