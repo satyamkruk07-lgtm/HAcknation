@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -272,8 +271,8 @@ export default function DashboardPage() {
                 <Image
                     src="https://image2url.com/r2/default/images/1770980427628-5a0a7bba-af9b-4dee-98cc-c1b29fddac2b.png"
                     alt="Ranked among Top 10 Engineering Colleges in North India"
-                    width={300}
-                    height={71}
+                    width={100}
+                    height={100}
                     className="mt-4"
                 />
               </div>
@@ -606,7 +605,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
-
-    
