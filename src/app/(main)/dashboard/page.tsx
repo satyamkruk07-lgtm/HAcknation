@@ -234,6 +234,9 @@ export default function DashboardPage() {
   const handleConductorSelect = (conductor: Conductor) => {
     setSelectedConductor(conductor);
   };
+  
+  const mainConductor = conductors.find(c => c.name === "Mr. Kumar Satyam");
+  const otherConductors = conductors.filter(c => c.name !== "Mr. Kumar Satyam");
 
   const showProfileDisclaimer = !isProfileLoading && userProfile && !userProfile.registrationType;
 
@@ -249,43 +252,43 @@ export default function DashboardPage() {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/50" />
-          <div className="relative flex justify-between items-center p-8">
+           <div className="relative flex justify-between items-center p-8">
               <a href="https://shivalikcollege.edu.in/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-6">
-                <Image
-                  src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
-                  alt="Shivalik College Logo"
-                  width={100}
-                  height={100}
-                  className="rounded-full"
-                />
-                <div className="text-left mt-4">
-                  <div className="flex items-center gap-4">
-                    <h1 className="font-headline text-3xl font-bold text-white">
-                      Shivalik <br /> College of Engineering
-                    </h1>
-                    <div className="flex flex-col items-center gap-2">
-                      <Badge variant="destructive" className="text-lg">NAAC Grade A+</Badge>
-                      <Image
-                          src="https://image2url.com/r2/default/images/1770980427628-5a0a7bba-af9b-4dee-98cc-c1b29fddac2b.png"
-                          alt="Ranked among Top 10 Engineering Colleges in North India"
-                          width={100}
-                          height={100}
-                      />
-                    </div>
+                  <Image
+                      src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
+                      alt="Shivalik College Logo"
+                      width={100}
+                      height={100}
+                      className="rounded-full"
+                  />
+                  <div className="text-left mt-4">
+                      <div className="flex items-center gap-4">
+                          <h1 className="font-headline text-3xl font-bold text-white">
+                              Shivalik <br /> College of Engineering
+                          </h1>
+                          <div className="flex flex-col items-center gap-2">
+                              <Badge variant="destructive" className="text-lg">NAAC Grade A+</Badge>
+                              <Image
+                                  src="https://image2url.com/r2/default/images/1770980427628-5a0a7bba-af9b-4dee-98cc-c1b29fddac2b.png"
+                                  alt="Ranked among Top 10 Engineering Colleges in North India"
+                                  width={100}
+                                  height={100}
+                              />
+                          </div>
+                      </div>
                   </div>
-                </div>
               </a>
               <div className="flex items-center gap-4">
-                <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
-                  <a href="tel:+919997155111">
-                    <Phone className="h-5 w-5" />
-                  </a>
-                </Button>
-                <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
-                  <a href="mailto:info@shivalikcollege.edu.in">
-                    <Mail className="h-5 w-5" />
-                  </a>
-                </Button>
+                  <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
+                      <a href="tel:+919997155111">
+                          <Phone className="h-5 w-5" />
+                      </a>
+                  </Button>
+                  <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
+                      <a href="mailto:info@shivalikcollege.edu.in">
+                          <Mail className="h-5 w-5" />
+                      </a>
+                  </Button>
               </div>
           </div>
         </div>
@@ -490,28 +493,56 @@ export default function DashboardPage() {
         {/* Conducted By Section */}
         <div className="mt-12">
             <h2 className="mb-8 font-headline text-2xl font-bold text-center">Conducted By</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
-                {conductors.map((conductor) => (
-                    <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
-                        <button 
-                            onClick={() => handleConductorSelect(conductor)}
-                            className="rounded-full"
-                        >
-                            <Image
-                                src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/96/96`}
-                                alt={`Portrait of ${conductor.name}`}
-                                width={96}
-                                height={96}
-                                className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-24 w-24"
-                                data-ai-hint="person portrait"
-                            />
-                        </button>
-                        <div className="mt-2">
-                            <h3 className="font-semibold text-base">{conductor.name}</h3>
-                            <p className="text-sm text-muted-foreground">{conductor.role}</p>
+            <div className="flex flex-col items-center gap-12">
+                {/* Top Row: Main Conductor */}
+                {mainConductor && (
+                    <div className="flex justify-center">
+                        <div key={mainConductor.id} className="flex flex-col items-center text-center gap-2">
+                            <button 
+                                onClick={() => handleConductorSelect(mainConductor)}
+                                className="rounded-full"
+                            >
+                                <Image
+                                    src={mainConductor.imageUrl || `https://picsum.photos/seed/${mainConductor.id}/128/128`}
+                                    alt={`Portrait of ${mainConductor.name}`}
+                                    width={128}
+                                    height={128}
+                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-32 w-32"
+                                    data-ai-hint="person portrait"
+                                />
+                            </button>
+                            <div className="mt-2">
+                                <h3 className="font-semibold text-lg">{mainConductor.name}</h3>
+                                <p className="text-base text-muted-foreground">{mainConductor.role}</p>
+                            </div>
                         </div>
                     </div>
-                ))}
+                )}
+
+                {/* Bottom Row: Other Conductors */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-12">
+                    {otherConductors.map((conductor) => (
+                        <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
+                            <button 
+                                onClick={() => handleConductorSelect(conductor)}
+                                className="rounded-full"
+                            >
+                                <Image
+                                    src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/96/96`}
+                                    alt={`Portrait of ${conductor.name}`}
+                                    width={96}
+                                    height={96}
+                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-24 w-24"
+                                    data-ai-hint="person portrait"
+                                />
+                            </button>
+                            <div className="mt-2">
+                                <h3 className="font-semibold text-base">{conductor.name}</h3>
+                                <p className="text-sm text-muted-foreground">{conductor.role}</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
       </div>
