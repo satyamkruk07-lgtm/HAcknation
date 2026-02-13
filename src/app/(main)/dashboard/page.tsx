@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -268,6 +269,13 @@ export default function DashboardPage() {
                   </h1>
                   <Badge variant="destructive" className="text-lg">NAAC Grade A+</Badge>
                 </div>
+                <Image
+                    src="https://image2url.com/r2/default/images/1770980427628-5a0a7bba-af9b-4dee-98cc-c1b29fddac2b.png"
+                    alt="Ranked among Top 10 Engineering Colleges in North India"
+                    width={400}
+                    height={94}
+                    className="mt-4"
+                />
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -598,3 +606,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
