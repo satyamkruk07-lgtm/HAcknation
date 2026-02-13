@@ -230,9 +230,6 @@ export default function DashboardPage() {
       </div>
     );
   }
-
-  const topConductor = conductors.find(c => c.name === "Mr. Kumar Satyam");
-  const otherConductors = conductors.filter(c => c.name !== "Mr. Kumar Satyam");
   
   const handleConductorSelect = (conductor: Conductor) => {
     setSelectedConductor(conductor);
@@ -252,8 +249,8 @@ export default function DashboardPage() {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/50" />
-          <div className="relative flex justify-between items-center p-8">
-            <a href="https://shivalikcollege.edu.in/" target="_blank" rel="noopener noreferrer">
+          <a href="https://shivalikcollege.edu.in/" target="_blank" rel="noopener noreferrer" className="relative block">
+            <div className="flex justify-between items-center p-8">
               <div className="flex items-center gap-6">
                 <Image
                   src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
@@ -262,7 +259,7 @@ export default function DashboardPage() {
                   height={100}
                   className="rounded-full"
                 />
-                <div className="text-left">
+                <div className="text-left mt-4">
                   <div className="flex items-center gap-4">
                     <h1 className="font-headline text-3xl font-bold text-white">
                       Shivalik <br /> College of Engineering
@@ -279,20 +276,20 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
-            </a>
-            <div className="flex items-center gap-4">
-              <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
-                <a href="tel:+919997155111">
-                  <Phone className="h-5 w-5" />
-                </a>
-              </Button>
-              <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
-                <a href="mailto:info@shivalikcollege.edu.in">
-                  <Mail className="h-5 w-5" />
-                </a>
-              </Button>
+              <div className="flex items-center gap-4">
+                <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
+                  <a href="tel:+919997155111">
+                    <Phone className="h-5 w-5" />
+                  </a>
+                </Button>
+                <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
+                  <a href="mailto:info@shivalikcollege.edu.in">
+                    <Mail className="h-5 w-5" />
+                  </a>
+                </Button>
+              </div>
             </div>
-          </div>
+          </a>
         </div>
 
         {/* Welcome Message */}
@@ -493,57 +490,30 @@ export default function DashboardPage() {
         </div>
 
         {/* Conducted By Section */}
-        <div className="mt-12 flex flex-col items-center">
+        <div className="mt-12">
             <h2 className="mb-8 font-headline text-2xl font-bold text-center">Conducted By</h2>
-            <div className="flex flex-col items-center gap-6">
-                {/* Top row with 1 person */}
-                {topConductor && (
-                    <div className="flex justify-center">
-                        <div key={topConductor.id} className="flex flex-col items-center text-center gap-2">
-                            <button 
-                                onClick={() => handleConductorSelect(topConductor)} 
-                                className="rounded-full"
-                            >
-                                <Image
-                                    src={topConductor.imageUrl || `https://picsum.photos/seed/${topConductor.id}/96/96`}
-                                    alt={`Portrait of ${topConductor.name}`}
-                                    width={96}
-                                    height={96}
-                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-24 w-24"
-                                    data-ai-hint="person portrait"
-                                />
-                            </button>
-                            <div className="mt-2">
-                                <h3 className="font-semibold text-base">{topConductor.name}</h3>
-                                <p className="text-sm text-muted-foreground">{topConductor.role}</p>
-                            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-12">
+                {conductors.map((conductor) => (
+                    <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
+                        <button 
+                            onClick={() => handleConductorSelect(conductor)}
+                            className="rounded-full"
+                        >
+                            <Image
+                                src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/96/96`}
+                                alt={`Portrait of ${conductor.name}`}
+                                width={96}
+                                height={96}
+                                className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-24 w-24"
+                                data-ai-hint="person portrait"
+                            />
+                        </button>
+                        <div className="mt-2">
+                            <h3 className="font-semibold text-base">{conductor.name}</h3>
+                            <p className="text-sm text-muted-foreground">{conductor.role}</p>
                         </div>
                     </div>
-                )}
-                {/* Bottom row with the rest */}
-                <div className="flex justify-center gap-12 flex-wrap">
-                    {otherConductors.map((conductor) => (
-                        <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
-                             <button 
-                                onClick={() => handleConductorSelect(conductor)}
-                                className="rounded-full"
-                             >
-                                <Image
-                                    src={conductor.imageUrl || `https://picsum.photos/seed/${conductor.id}/96/96`}
-                                    alt={`Portrait of ${conductor.name}`}
-                                    width={96}
-                                    height={96}
-                                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-24 w-24"
-                                    data-ai-hint="person portrait"
-                                />
-                            </button>
-                            <div className="mt-2">
-                                <h3 className="font-semibold text-base">{conductor.name}</h3>
-                                <p className="text-sm text-muted-foreground">{conductor.role}</p>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                ))}
             </div>
         </div>
       </div>
