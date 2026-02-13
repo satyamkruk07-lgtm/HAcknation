@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
 import { ExternalLink, Github, Loader2, Trash2, Download, Trophy, Eye, Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -61,7 +60,6 @@ import Image from 'next/image';
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
   const { user } = useUser();
-  const { toast } = useToast();
   const router = useRouter();
 
   const [title, setTitle] = useState('');
@@ -73,21 +71,11 @@ function CreateAnnouncementForm() {
     e.preventDefault();
 
     if (!user) {
-      toast({
-        variant: 'destructive',
-        title: 'Authentication Error',
-        description: 'You must be logged in to create an announcement.',
-      });
       router.push('/login');
       return;
     }
 
     if (!firestore) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Database connection not found.',
-      });
       return;
     }
 
@@ -102,20 +90,11 @@ function CreateAnnouncementForm() {
         timestamp: serverTimestamp(),
       });
 
-      toast({
-        title: 'Announcement Created!',
-        description: 'The new announcement has been published.',
-      });
 
       setTitle('');
       setContent('');
       setType('Info');
     } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Submission Failed',
-        description: error.message || 'An unknown error occurred.',
-      });
     } finally {
       setIsSubmitting(false);
     }
@@ -299,7 +278,7 @@ function UserManagementTab() {
       </Card>
       {selectedUser && (
         <Dialog open={!!selectedUser} onOpenChange={(open) => !open && setSelectedUser(null)}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <div className="flex items-center gap-4 mb-4">
                   <Image
@@ -316,35 +295,68 @@ function UserManagementTab() {
                   </div>
               </div>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Contact No.</Label>
-                <span className="col-span-3">{selectedUser.phoneNumber || 'Not provided'}</span>
+            <div className="grid gap-4 py-2 text-sm">
+               <div className="grid grid-cols-3 items-center gap-4">
+                <Label className="text-right font-semibold">Contact No.</Label>
+                <span className="col-span-2">{selectedUser.phoneNumber || 'Not provided'}</span>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">College</Label>
-                <span className="col-span-3">{selectedUser.college || 'Not provided'}</span>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <Label className="text-right font-semibold">College</Label>
+                <span className="col-span-2">{selectedUser.college || 'Not provided'}</span>
               </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Registered</Label>
-                <span className="col-span-3">
+               <div className="grid grid-cols-3 items-center gap-4">
+                <Label className="text-right font-semibold">Department</Label>
+                <span className="col-span-2">{selectedUser.department || 'Not provided'}</span>
+              </div>
+               <div className="grid grid-cols-3 items-center gap-4">
+                <Label className="text-right font-semibold">Mentor</Label>
+                <span className="col-span-2">{selectedUser.mentorName || 'Not provided'}</span>
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <Label className="text-right font-semibold">Registered</Label>
+                <span className="col-span-2">
                     {selectedUser.registrationDate ? format(new Date(selectedUser.registrationDate), 'PPP') : 'N/A'}
                 </span>
               </div>
-              <div className="grid grid-cols-4 items-start gap-4">
-                 <Label className="text-right mt-1">Bio</Label>
-                 <p className="col-span-3 text-sm text-muted-foreground">{selectedUser.bio || 'Not provided'}</p>
+              <div className="grid grid-cols-3 items-start gap-4">
+                 <Label className="text-right font-semibold mt-1">Bio</Label>
+                 <p className="col-span-2 text-muted-foreground">{selectedUser.bio || 'Not provided'}</p>
               </div>
-              <div className="grid grid-cols-4 items-start gap-4">
-                <Label className="text-right mt-1">Skills</Label>
-                <div className="col-span-3 flex flex-wrap gap-2">
+              <div className="grid grid-cols-3 items-start gap-4">
+                <Label className="text-right font-semibold mt-1">Skills</Label>
+                <div className="col-span-2 flex flex-wrap gap-2">
                   {(selectedUser.skills && selectedUser.skills.length > 0) ? (
                     selectedUser.skills.map(skill => <Badge key={skill} variant="secondary">{skill}</Badge>)
                   ) : (
-                    <span className="text-sm text-muted-foreground">No skills listed</span>
+                    <span className="text-muted-foreground">No skills listed</span>
                   )}
                 </div>
               </div>
+
+               {selectedUser.registrationType === 'team' && (
+                <>
+                    <div className="my-2 border-t"></div>
+                    <h4 className="font-semibold text-center col-span-full">Team Details</h4>
+                    <div className="grid grid-cols-3 items-center gap-4">
+                        <Label className="text-right font-semibold">Team Name</Label>
+                        <span className="col-span-2">{selectedUser.teamName || 'Not provided'}</span>
+                    </div>
+                    <div className="grid grid-cols-3 items-center gap-4">
+                        <Label className="text-right font-semibold">Leader</Label>
+                        <span className="col-span-2">{selectedUser.leaderName || 'Not provided'}</span>
+                    </div>
+                    <div className="grid grid-cols-3 items-start gap-4">
+                        <Label className="text-right font-semibold mt-1">Members</Label>
+                        <div className="col-span-2 flex flex-wrap gap-2">
+                        {(selectedUser.teamMembers && selectedUser.teamMembers.length > 0) ? (
+                            selectedUser.teamMembers.map(member => <Badge key={member} variant="outline">{member}</Badge>)
+                        ) : (
+                            <span className="text-muted-foreground">No members listed</span>
+                        )}
+                        </div>
+                    </div>
+                </>
+            )}
             </div>
           </DialogContent>
         </Dialog>
@@ -355,7 +367,6 @@ function UserManagementTab() {
 
 function ProjectManagementTab() {
   const firestore = useFirestore();
-  const { toast } = useToast();
   const [projectToDelete, setProjectToDelete] = useState<SubmittedProject | null>(null);
 
   const projectsQuery = useMemoFirebase(() => {
@@ -370,16 +381,7 @@ function ProjectManagementTab() {
 
     try {
       await deleteDoc(doc(firestore, 'projects', projectToDelete.id));
-      toast({
-        title: 'Project Deleted',
-        description: `"${projectToDelete.name}" has been removed.`,
-      });
     } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Deletion Failed',
-        description: error.message || 'An unknown error occurred.',
-      });
     } finally {
       setProjectToDelete(null);
     }
