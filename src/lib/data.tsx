@@ -368,17 +368,6 @@ export const conductors: Conductor[] = [
         phone: "+919760017416"
     },
     {
-        id: "5",
-        name: "Mr. Ajay Kumar Verma",
-        role: "Associate Dean-CBII & CEO, iHub Shivalik",
-        imageUrl: "https://images.unsplash.com/photo-1765528447514-b85fbdd0e43d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        email: "ajayverma84114@gmail.com",
-        linkedin: "https://www.linkedin.com/in/ajay-verma-5b825668",
-        qualification: "Mr. Verma specializes in Bearing Fault Diagnosis, Mechanics of Machines, Tribology, and Mechanical Vibrations. His prolific contributions to research include 17+ publications in esteemed journals and conferences, along with his role as a Principal Investigator in government-funded research projects. His expertise is widely recognized, serving as a reviewer for top-tier journals and conferences",
-        skills: ["Digital Marketing", "SEO", "Content Writing", "Social Media"],
-        phone: "+918938940960"
-    },
-    {
         id: "6",
         name: "Mr. Kshitij Jain",
         role: "Assistant Professor",
@@ -388,6 +377,17 @@ export const conductors: Conductor[] = [
         qualification: "UG B.TECH ,PG M.TECH , PHD Pursuing",
         skills: ["Cloud Computing", "AWS", "DevOps", "Docker"],
         phone: "+918375052135"
+    },
+    {
+        id: "5",
+        name: "Mr. Ajay Kumar Verma",
+        role: "Associate Dean-CBII & CEO, iHub Shivalik",
+        imageUrl: "https://images.unsplash.com/photo-1765528447514-b85fbdd0e43d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        email: "ajayverma84114@gmail.com",
+        linkedin: "https://www.linkedin.com/in/ajay-verma-5b825668",
+        qualification: "Mr. Verma specializes in Bearing Fault Diagnosis, Mechanics of Machines, Tribology, and Mechanical Vibrations. His prolific contributions to research include 17+ publications in esteemed journals and conferences, along with his role as a Principal Investigator in government-funded research projects. His expertise is widely recognized, serving as a reviewer for top-tier journals and conferences",
+        skills: ["Digital Marketing", "SEO", "Content Writing", "Social Media"],
+        phone: "+918938940960"
     }
 ];
 
@@ -460,5 +460,7 @@ export const conductors: Conductor[] = [
 
 
 
+
+    
 
     
