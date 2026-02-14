@@ -10,7 +10,7 @@ import type { SubmittedProject } from '@/lib/types';
 import { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
-import { signInAnonymously } from 'firebase/auth';
+import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 
 export default function ProjectJudgingPage() {
   const params = useParams<{ id: string }>();
@@ -21,12 +21,18 @@ export default function ProjectJudgingPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isUserLoading && !user && auth) {
-      signInAnonymously(auth).catch((error) => {
-        console.error("Anonymous sign-in failed:", error);
-      });
-    }
-  }, [user, isUserLoading, auth]);
+    if (!auth) return;
+    // More robust anonymous sign-in logic.
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (!currentUser) {
+        signInAnonymously(auth).catch((error) => {
+          console.error("Anonymous sign-in failed:", error);
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [auth]);
   
   const projectRef = useMemoFirebase(() => {
     if (!firestore || !id) return null;

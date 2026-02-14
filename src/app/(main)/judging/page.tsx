@@ -16,7 +16,7 @@ import { collection, query, orderBy } from 'firebase/firestore';
 import type { SubmittedProject } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
-import { signInAnonymously } from 'firebase/auth';
+import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import {
   Dialog,
   DialogContent,
@@ -107,13 +107,18 @@ export default function JudgingPage() {
   const { isAdmin, isAdminLoading } = useAdminStatus();
 
   useEffect(() => {
-    // If not loading and no user is signed in, sign them in anonymously.
-    if (!isUserLoading && !user && auth) {
-      signInAnonymously(auth).catch((error) => {
-        console.error("Anonymous sign-in failed:", error);
-      });
-    }
-  }, [user, isUserLoading, auth]);
+    if (!auth) return;
+    // More robust anonymous sign-in logic.
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (!currentUser) {
+        signInAnonymously(auth).catch((error) => {
+          console.error("Anonymous sign-in failed:", error);
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [auth]);
 
   const projectsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
