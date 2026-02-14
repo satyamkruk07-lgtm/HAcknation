@@ -38,7 +38,7 @@ const formSchema = z
   .object({
     name: z.string().min(1, 'Name is required'),
     email: z.string().email('Invalid email address'),
-    mentorName: z.string().min(1, "Mentor's name is required"),
+    mentorName: z.string().optional(),
     registrationType: z.enum(['individual', 'team'], {
       required_error: 'You need to select a registration type.',
     }),
