@@ -172,7 +172,7 @@ export default function RegisterPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>Full Name <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input placeholder="Grace Hopper" {...field} />
                     </FormControl>
@@ -185,7 +185,7 @@ export default function RegisterPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email Address</FormLabel>
+                    <FormLabel>Email Address <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input
                         type="email"
@@ -215,7 +215,7 @@ export default function RegisterPage() {
                 name="registrationType"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <FormLabel>Registration Type</FormLabel>
+                    <FormLabel>Registration Type <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -251,7 +251,7 @@ export default function RegisterPage() {
                     name="teamName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Team Name</FormLabel>
+                        <FormLabel>Team Name <span className="text-destructive">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder="The Innovators" {...field} />
                         </FormControl>
@@ -264,7 +264,7 @@ export default function RegisterPage() {
                     name="leaderName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Team Leader's Name</FormLabel>
+                        <FormLabel>Team Leader's Name <span className="text-destructive">*</span></FormLabel>
                         <FormControl>
                           <Input placeholder="e.g., Ada Lovelace" {...field} />
                         </FormControl>
@@ -295,7 +295,7 @@ export default function RegisterPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Password <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input type="password" {...field} />
                     </FormControl>
@@ -308,7 +308,7 @@ export default function RegisterPage() {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
+                    <FormLabel>Confirm Password <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input type="password" {...field} />
                     </FormControl>
