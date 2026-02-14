@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -156,7 +157,6 @@ export default function SubmitPage() {
                         id="github-url"
                         type="url"
                         placeholder="https://github.com/..."
-                        required
                         value={githubUrl}
                         onChange={(e) => setGithubUrl(e.target.value)}
                     />
@@ -167,7 +167,6 @@ export default function SubmitPage() {
                         id="demo-url"
                         type="url"
                         placeholder="https://yourapp.com"
-                        required
                         value={demoUrl}
                         onChange={(e) => setDemoUrl(e.target.value)}
                     />
