@@ -38,9 +38,11 @@ const formSchema = z
   .object({
     name: z.string().min(1, 'Name is required'),
     email: z.string().email('Invalid email address'),
+    mentorName: z.string().min(1, "Mentor's name is required"),
     registrationType: z.enum(['individual', 'team'], {
       required_error: 'You need to select a registration type.',
     }),
+    leaderName: z.string().optional(),
     teamName: z.string().optional(),
     teamMembers: z.string().optional(),
     password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -52,6 +54,15 @@ const formSchema = z
   })
   .refine((data) => {
     if (data.registrationType === 'team') {
+      return !!data.leaderName && data.leaderName.length > 0;
+    }
+    return true;
+  }, {
+    message: "Team Leader's name is required for team registration.",
+    path: ['leaderName'],
+  })
+  .refine((data) => {
+    if (data.registrationType === 'team') {
       return !!data.teamName && data.teamName.length > 0;
     }
     return true;
@@ -59,6 +70,7 @@ const formSchema = z
     message: 'Team name is required when registering as a team.',
     path: ['teamName'],
   });
+
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -74,9 +86,11 @@ export default function RegisterPage() {
     defaultValues: {
       name: '',
       email: '',
+      mentorName: '',
       password: '',
       confirmPassword: '',
       registrationType: 'individual',
+      leaderName: '',
       teamName: '',
       teamMembers: '',
     },
@@ -109,6 +123,7 @@ export default function RegisterPage() {
         id: user.uid,
         email: data.email,
         name: data.name,
+        mentorName: data.mentorName,
         photoURL: user.photoURL,
         registrationDate: new Date().toISOString(),
         emailVerified: user.emailVerified,
@@ -117,6 +132,7 @@ export default function RegisterPage() {
 
       if (data.registrationType === 'team') {
         userData.teamName = data.teamName;
+        userData.leaderName = data.leaderName;
         userData.teamMembers = data.teamMembers?.split(',').map(s => s.trim()).filter(s => s);
       }
 
@@ -183,6 +199,19 @@ export default function RegisterPage() {
               />
               <FormField
                 control={form.control}
+                name="mentorName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mentor's Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. Dr. Alan Turing" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="registrationType"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
@@ -225,6 +254,19 @@ export default function RegisterPage() {
                         <FormLabel>Team Name</FormLabel>
                         <FormControl>
                           <Input placeholder="The Innovators" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="leaderName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Team Leader's Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="e.g., Ada Lovelace" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -301,5 +343,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-    
