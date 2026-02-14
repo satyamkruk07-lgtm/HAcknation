@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -35,6 +34,7 @@ export default function SubmitPage() {
   const { data: userProfile } = useDoc<UserAccount>(userDocRef);
 
   const [projectName, setProjectName] = useState('');
+  const [teamName, setTeamName] = useState('');
   const [teamMembers, setTeamMembers] = useState('');
   const [description, setDescription] = useState('');
   const [githubUrl, setGithubUrl] = useState('');
@@ -52,6 +52,9 @@ export default function SubmitPage() {
       setDescription(desc);
     }
     if (userProfile) {
+        if (userProfile.teamName) {
+            setTeamName(userProfile.teamName);
+        }
         if (userProfile.registrationType === 'team' && userProfile.teamMembers && userProfile.teamMembers.length > 0) {
             setTeamMembers(userProfile.teamMembers.join(', '));
         } else if (userProfile.name) {
@@ -88,7 +91,7 @@ export default function SubmitPage() {
       const projectsCollection = collection(firestore, 'projects');
       await addDoc(projectsCollection, {
         name: projectName,
-        teamName: userProfile?.teamName || '',
+        teamName: teamName,
         teamMembers: teamMembers.split(',').map((m) => m.trim()),
         description,
         githubUrl,
@@ -104,6 +107,7 @@ export default function SubmitPage() {
 
       // Reset form
       setProjectName('');
+      setTeamName('');
       setTeamMembers('');
       setDescription('');
       setGithubUrl('');
@@ -140,6 +144,10 @@ export default function SubmitPage() {
                 <div className="space-y-2">
                     <Label htmlFor="project-name">Project Name</Label>
                     <Input id="project-name" placeholder="e.g., EcoTrack" required value={projectName} onChange={(e) => setProjectName(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="team-name">Team Name</Label>
+                    <Input id="team-name" placeholder="The Innovators" value={teamName} onChange={(e) => setTeamName(e.target.value)} />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="team-members">Team Members</Label>
