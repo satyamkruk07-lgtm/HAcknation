@@ -65,11 +65,11 @@ service cloud.firestore {
     
     /**
      * @description Rule for the /roles_admin/{adminId} collection.
-     * Only authenticated users can read this collection to verify admin status.
+     * Only authenticated users can read their own document to verify admin status.
      * Writes should only be done from a trusted server environment.
      */
     match /roles_admin/{adminId} {
-      allow get: if isSignedIn();
+      allow get: if isOwner(adminId);
       allow list: if isAdmin(); // Admins can list other admins
       allow create, update, delete: if false; // Disallow client-side writes
     }
