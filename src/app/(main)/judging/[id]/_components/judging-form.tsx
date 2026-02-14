@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useFirestore, useUser } from '@/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import {
@@ -83,12 +83,27 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
   const firestore = useFirestore();
   const { toast } = useToast();
 
-  const [judgeName, setJudgeName] = useState(user?.displayName || '');
+  const [judgeName, setJudgeName] = useState('');
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [currentTab, setCurrentTab] = useState(judgingRounds[0].id);
   const [scores, setScores] = useState<Record<string, number>>(initialScores);
+
+  useEffect(() => {
+    const savedJudgeName = localStorage.getItem('judgeName');
+    if (savedJudgeName) {
+      setJudgeName(savedJudgeName);
+    } else if (user?.displayName) {
+      setJudgeName(user.displayName);
+    }
+  }, [user?.displayName]);
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    setJudgeName(newName);
+    localStorage.setItem('judgeName', newName);
+  };
 
   const handleScoreChange = (key: string, value: string) => {
     const numValue = parseInt(value, 10);
@@ -231,7 +246,7 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
                     id="judge-name"
                     placeholder="Please enter your full name"
                     value={judgeName}
-                    onChange={(e) => setJudgeName(e.target.value)}
+                    onChange={handleNameChange}
                     required
                 />
             </div>
