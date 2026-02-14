@@ -357,9 +357,9 @@ export const conductors: Conductor[] = [
     },
     {
         id: "3",
-        name: "Mr. Sartaj Khan",
+        name: "Dr.Vijaylakshmi Sajwan",
         role: "Head Of Department",
-        imageUrl: PlaceHolderImages.find(p => p.id === 'conductor-sartaj')?.imageUrl || `https://picsum.photos/seed/3/128/128`,
+        imageUrl: "https://image2url.com/r2/default/images/1771076182448-9dfeb3a7-af90-44ab-a70e-84ddf64e783e.jpeg",
         email: "sartaj.khan@sce.org.in",
         linkedin: "https://www.linkedin.com/in/sartaj-khan-52149724b",
         qualification: "Head of BCA Department",
@@ -456,6 +456,8 @@ export const conductors: Conductor[] = [
 
 
 
+
+    
 
     
 
