@@ -6,45 +6,59 @@ import { doc, getDoc } from 'firebase/firestore';
 
 /**
  * A hook to efficiently check if the current user has admin privileges.
- * This version uses a one-time `getDoc` call to avoid race conditions.
+ * This version uses a one-time `getDoc` call to check the 'roles_admin' collection.
  * @returns An object containing `isAdmin` (boolean) and `isAdminLoading` (boolean).
  */
 export function useAdminStatus() {
   const { user, isUserLoading } = useUser();
+  const firestore = useFirestore(); // Get the firestore instance
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAdminLoading, setIsAdminLoading] = useState(true);
 
   useEffect(() => {
-    // Set a secure default: not an admin.
+    // Secure default: not an admin.
     setIsAdmin(false);
-    // Set loading to true. It will be set to false once the check is complete.
+    // Start loading. Will be set to false when check completes.
     setIsAdminLoading(true);
 
-    // If auth state is still loading, we can't determine admin status yet.
-    if (isUserLoading) {
-      return; // Wait for user status to be resolved.
+    if (isUserLoading || !firestore) {
+      if (!isUserLoading) {
+        setIsAdminLoading(false);
+      }
+      return; // Wait for user status or firestore to resolve.
     }
 
-    // If there is no user object, or if the user is explicitly anonymous (like a judge),
-    // they are definitely not an admin. We can stop here without any database checks.
+    // No user or anonymous user cannot be an admin.
     if (!user || user.isAnonymous) {
-      setIsAdminLoading(false); // The check is complete, they are not an admin.
+      setIsAdminLoading(false);
       return;
     }
 
-    // If we reach here, we have a logged-in, non-anonymous user.
-    // Check their email against the hardcoded list of admin emails.
-    const hardcodedAdminEmails = ['kalyanikri1111@gmail.com', 'satyamkruk07@gmail.com', 'frgtpeople@gmail.com'];
-    if (user.email && hardcodedAdminEmails.includes(user.email)) {
-        setIsAdmin(true);
-    }
-    
-    // The check is now complete for all cases.
-    setIsAdminLoading(false);
+    // Valid user, check the roles_admin collection in Firestore.
+    const checkAdminStatus = async () => {
+      try {
+        const adminRoleRef = doc(firestore, 'roles_admin', user.uid);
+        const docSnap = await getDoc(adminRoleRef);
+        
+        if (docSnap.exists()) {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.error("Error checking admin status:", error);
+        // On error, default to not being an admin for security.
+        setIsAdmin(false);
+      } finally {
+        // The check is complete.
+        setIsAdminLoading(false);
+      }
+    };
 
-  }, [user, isUserLoading]);
+    checkAdminStatus();
 
-  // The overall loading state is true if either the user state is loading or the admin check is loading.
+  }, [user, isUserLoading, firestore]);
+
   return { isAdmin, isAdminLoading };
 }
