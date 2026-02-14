@@ -4,29 +4,29 @@ import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Github, Loader2 } from 'lucide-react';
 import JudgingForm from './_components/judging-form';
-import { useDoc, useFirestore, useMemoFirebase, useUser } from '@/firebase';
+import { useDoc, useFirestore, useMemoFirebase, useUser, useAuth } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import type { SubmittedProject } from '@/lib/types';
 import { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getAuth, signInAnonymously } from 'firebase/auth';
+import { signInAnonymously } from 'firebase/auth';
 
 export default function ProjectJudgingPage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
+  const auth = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    const auth = getAuth();
-    if (!isUserLoading && !user) {
+    if (!isUserLoading && !user && auth) {
       signInAnonymously(auth).catch((error) => {
         console.error("Anonymous sign-in failed:", error);
       });
     }
-  }, [user, isUserLoading]);
+  }, [user, isUserLoading, auth]);
   
   const projectRef = useMemoFirebase(() => {
     if (!firestore || !id) return null;
