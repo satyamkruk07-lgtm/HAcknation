@@ -83,6 +83,7 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
   const firestore = useFirestore();
   const { toast } = useToast();
 
+  const [judgeName, setJudgeName] = useState(user?.displayName || '');
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
@@ -116,7 +117,7 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
       await addDoc(judgmentsCollection, {
         projectId,
         judgeId: user.uid,
-        judgeName: user.displayName || 'Anonymous Judge',
+        judgeName: judgeName,
         scores,
         totalScore,
         feedback,
@@ -225,7 +226,18 @@ export default function JudgingForm({ projectId }: { projectId: string }) {
             </div>
             
             <div className="mt-8 space-y-2">
-              <Label htmlFor="feedback" className="text-lg">Final Qualitative Feedback</Label>
+                <Label htmlFor="judge-name" className="text-lg">Your Name <span className="text-destructive">*</span></Label>
+                <Input
+                    id="judge-name"
+                    placeholder="Please enter your full name"
+                    value={judgeName}
+                    onChange={(e) => setJudgeName(e.target.value)}
+                    required
+                />
+            </div>
+
+            <div className="mt-8 space-y-2">
+              <Label htmlFor="feedback" className="text-lg">Final Qualitative Feedback <span className="text-destructive">*</span></Label>
               <Textarea
                 id="feedback"
                 placeholder="Provide detailed overall comments on the project's strengths and areas for improvement."
