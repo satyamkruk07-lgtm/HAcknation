@@ -42,10 +42,10 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   college: z.string().min(1, 'College/University is required'),
-  mentorName: z.string().min(1, 'Mentor name is required'),
+  mentorName: z.string().optional(),
   department: z.string().min(1, 'Department is required'),
   skills: z.string().min(1, 'Skills are required'),
-  bio: z.string().min(1, 'A short bio is required'),
+  bio: z.string().optional(),
   phoneNumber: z.string().min(1, 'Phone number is required').refine(
     (val) => /^\d{10}$/.test(val),
     {
@@ -74,6 +74,14 @@ const profileFormSchema = z.object({
 }, {
     message: "Team Leader's name is required for team registration.",
     path: ['leaderName'],
+}).refine((data) => {
+    if (data.registrationType === 'team') {
+        return !!data.teamMembers && data.teamMembers.length > 0;
+    }
+    return true;
+}, {
+    message: 'Team members are required for team registration.',
+    path: ['teamMembers'],
 });
 
 type ProfileFormData = z.infer<typeof profileFormSchema>;
@@ -338,7 +346,7 @@ export default function ProfilePage() {
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                            <FormLabel>Full Name</FormLabel>
+                            <FormLabel>Full Name <span className="text-destructive">*</span></FormLabel>
                             <FormControl>
                                 <Input placeholder="Grace Hopper" {...field} />
                             </FormControl>
@@ -351,7 +359,7 @@ export default function ProfilePage() {
                           name="phoneNumber"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Phone Number</FormLabel>
+                              <FormLabel>Phone Number <span className="text-destructive">*</span></FormLabel>
                               <FormControl>
                                 <Input type="tel" placeholder="9876543210" {...field} />
                               </FormControl>
@@ -364,7 +372,7 @@ export default function ProfilePage() {
                         name="college"
                         render={({ field }) => (
                             <FormItem>
-                            <FormLabel>College/University</FormLabel>
+                            <FormLabel>College/University <span className="text-destructive">*</span></FormLabel>
                             <FormControl>
                                 <Input placeholder="e.g., Vassar College" {...field} />
                             </FormControl>
@@ -390,7 +398,7 @@ export default function ProfilePage() {
                           name="department"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Department</FormLabel>
+                              <FormLabel>Department <span className="text-destructive">*</span></FormLabel>
                               <FormControl>
                                 <Input placeholder="e.g., Computer Science" {...field} />
                               </FormControl>
@@ -403,7 +411,7 @@ export default function ProfilePage() {
                             name="registrationType"
                             render={({ field }) => (
                             <FormItem className="space-y-3">
-                                <FormLabel>Registration Type</FormLabel>
+                                <FormLabel>Registration Type <span className="text-destructive">*</span></FormLabel>
                                 <FormControl>
                                 <RadioGroup
                                     onValueChange={field.onChange}
@@ -440,7 +448,7 @@ export default function ProfilePage() {
                                 name="leaderName"
                                 render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Team Leader's Name</FormLabel>
+                                    <FormLabel>Team Leader's Name <span className="text-destructive">*</span></FormLabel>
                                     <FormControl>
                                     <Input placeholder="e.g., Ada Lovelace" {...field} />
                                     </FormControl>
@@ -453,7 +461,7 @@ export default function ProfilePage() {
                                 name="teamName"
                                 render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Team Name</FormLabel>
+                                    <FormLabel>Team Name <span className="text-destructive">*</span></FormLabel>
                                     <FormControl>
                                     <Input placeholder="The Innovators" {...field} />
                                     </FormControl>
@@ -466,7 +474,7 @@ export default function ProfilePage() {
                                 name="teamMembers"
                                 render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Team Members</FormLabel>
+                                    <FormLabel>Team Members <span className="text-destructive">*</span></FormLabel>
                                     <FormControl>
                                     <Input placeholder="John Doe (CS), Jane Smith (IT)..." {...field} />
                                     </FormControl>
@@ -484,7 +492,7 @@ export default function ProfilePage() {
                         name="skills"
                         render={({ field }) => (
                             <FormItem>
-                            <FormLabel>Skills</FormLabel>
+                            <FormLabel>Skills <span className="text-destructive">*</span></FormLabel>
                             <FormControl>
                                 <Input placeholder="React, Python, Figma..." {...field} />
                             </FormControl>
