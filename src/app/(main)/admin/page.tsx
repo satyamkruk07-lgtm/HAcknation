@@ -56,6 +56,8 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -67,7 +69,7 @@ function CreateAnnouncementForm() {
   const [type, setType] = useState<'Info' | 'Update'>('Info');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!user) {
@@ -80,24 +82,31 @@ function CreateAnnouncementForm() {
     }
 
     setIsSubmitting(true);
-
-    try {
-      const announcementsCollection = collection(firestore, 'announcements');
-      await addDoc(announcementsCollection, {
+    const announcementsCollection = collection(firestore, 'announcements');
+    const data = {
         title,
         content,
         type,
         timestamp: serverTimestamp(),
-      });
+    };
 
-
-      setTitle('');
-      setContent('');
-      setType('Info');
-    } catch (error: any) {
-    } finally {
-      setIsSubmitting(false);
-    }
+    addDoc(announcementsCollection, data)
+        .then(() => {
+            setTitle('');
+            setContent('');
+            setType('Info');
+        })
+        .catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+                path: 'announcements', // or announcementsCollection.path
+                operation: 'create',
+                requestResourceData: data,
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        })
+        .finally(() => {
+            setIsSubmitting(false);
+        });
   };
 
   return (
@@ -380,15 +389,20 @@ function ProjectManagementTab() {
 
   const { data: projects, isLoading, error } = useCollection<SubmittedProject>(projectsQuery);
 
-  const handleDeleteProject = async () => {
+  const handleDeleteProject = () => {
     if (!firestore || !projectToDelete) return;
 
-    try {
-      await deleteDoc(doc(firestore, 'projects', projectToDelete.id));
-    } catch (error: any) {
-    } finally {
-      setProjectToDelete(null);
-    }
+    const docRef = doc(firestore, 'projects', projectToDelete.id);
+    deleteDoc(docRef)
+        .catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+                path: docRef.path,
+                operation: 'delete',
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        });
+
+    setProjectToDelete(null);
   };
 
   const downloadCSV = (data: SubmittedProject[], filename: string) => {
@@ -645,16 +659,20 @@ function JudgmentDetailsDialog({ project, onOpenChange }: { project: SubmittedPr
     const firestore = useFirestore();
     const [judgmentToDelete, setJudgmentToDelete] = useState<Judgment | null>(null);
 
-    const handleDeleteJudgment = async () => {
+    const handleDeleteJudgment = () => {
         if (!firestore || !judgmentToDelete) return;
+        const docRef = doc(firestore, "judgments", judgmentToDelete.id);
 
-        try {
-            await deleteDoc(doc(firestore, "judgments", judgmentToDelete.id));
-        } catch (error) {
-            console.error("Failed to delete judgment: ", error);
-        } finally {
-            setJudgmentToDelete(null);
-        }
+        deleteDoc(docRef)
+            .catch(async (serverError) => {
+                const permissionError = new FirestorePermissionError({
+                    path: docRef.path,
+                    operation: 'delete',
+                });
+                errorEmitter.emit('permission-error', permissionError);
+            });
+        
+        setJudgmentToDelete(null);
     };
 
     return (
