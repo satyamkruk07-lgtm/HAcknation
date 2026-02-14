@@ -174,14 +174,14 @@ export default function SubmitPage() {
             <CardContent>
                 <div className="space-y-6">
                 <div className="space-y-2">
-                    <Label htmlFor="project-name">Project Name</Label>
+                    <Label htmlFor="project-name">Project Name <span className="text-destructive">*</span></Label>
                     <Input id="project-name" placeholder="e.g., EcoTrack" required value={projectName} onChange={(e) => setProjectName(e.target.value)} />
                 </div>
                 
                 {userProfile?.registrationType === 'team' ? (
                     <>
                         <div className="space-y-2">
-                            <Label htmlFor="team-name">Team Name</Label>
+                            <Label htmlFor="team-name">Team Name <span className="text-destructive">*</span></Label>
                             <Input 
                                 id="team-name" 
                                 placeholder="The Innovators" 
@@ -191,7 +191,7 @@ export default function SubmitPage() {
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="team-members">Team Members</Label>
+                            <Label htmlFor="team-members">Team Members <span className="text-destructive">*</span></Label>
                             <Input
                             id="team-members"
                             placeholder="John Doe, Jane Smith..."
@@ -206,7 +206,7 @@ export default function SubmitPage() {
                     </>
                 ) : (
                       <div className="space-y-2">
-                        <Label htmlFor="student-name">Your Name</Label>
+                        <Label htmlFor="student-name">Your Name <span className="text-destructive">*</span></Label>
                         <Input
                             id="student-name"
                             required
@@ -218,7 +218,7 @@ export default function SubmitPage() {
                 )}
 
                 <div className="space-y-2">
-                    <Label htmlFor="description">Project Description</Label>
+                    <Label htmlFor="description">Project Description <span className="text-destructive">*</span></Label>
                     <Textarea
                     id="description"
                     placeholder="Describe your project in a few sentences."
