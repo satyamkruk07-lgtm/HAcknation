@@ -28,7 +28,6 @@ import {
 import QRCode from 'qrcode.react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 
 function ProjectCardSkeleton() {
@@ -104,7 +103,6 @@ export default function JudgingPage() {
   const firestore = useFirestore();
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
-  const { isAdmin, isAdminLoading } = useAdminStatus();
 
   useEffect(() => {
     if (!auth) return;
@@ -127,7 +125,7 @@ export default function JudgingPage() {
 
   const { data: projects, isLoading } = useCollection<SubmittedProject>(projectsQuery);
 
-  const isContentLoading = isLoading || isUserLoading || isAdminLoading;
+  const isContentLoading = isLoading || isUserLoading;
 
   return (
     <div className="container py-12">
