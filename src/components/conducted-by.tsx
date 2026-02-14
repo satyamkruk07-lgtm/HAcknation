@@ -63,7 +63,7 @@ export function ConductedBy() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-24 gap-y-12">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-32 gap-y-12">
             {otherConductors.map((conductor) => (
               <div key={conductor.id} className="flex flex-col items-center text-center gap-2">
                 <button 
