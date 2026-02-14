@@ -55,10 +55,13 @@ function QRCodeGenerator() {
 
   useEffect(() => {
     // Ensure this runs only on the client
-    setUrl(window.location.href);
+    // Constructing a "clean" public URL without any session-specific query params.
+    const publicUrl = window.location.origin + window.location.pathname;
+    setUrl(publicUrl);
   }, []);
 
   const copyToClipboard = () => {
+    // Uses the state 'url' which is the clean public URL.
     navigator.clipboard.writeText(url).then(() => {
       toast({ title: 'URL Copied!', description: 'The judging page URL has been copied to your clipboard.' });
     }, (err) => {
@@ -105,9 +108,13 @@ export default function JudgingPage() {
   const { user, isUserLoading } = useUser();
 
   useEffect(() => {
+    // This effect ensures that any visitor to this page who is not already
+    // logged in will be seamlessly signed in as an anonymous user. This is crucial
+    // for judges who access the page via a QR code.
     if (auth && !isUserLoading && !user) {
       signInAnonymously(auth).catch((error) => {
-        console.error("Anonymous sign-in failed:", error);
+        // This is a critical error to log if it happens.
+        console.error("Critical: Anonymous sign-in failed for judging page:", error);
       });
     }
   }, [auth, isUserLoading, user]);

@@ -11,41 +11,40 @@ import { doc, getDoc } from 'firebase/firestore';
  */
 export function useAdminStatus() {
   const { user, isUserLoading } = useUser();
-  const firestore = useFirestore();
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAdminLoading, setIsAdminLoading] = useState(true);
 
   useEffect(() => {
-    const checkAdmin = async () => {
-      // If user is loading or not logged in, they can't be an admin.
-      if (isUserLoading || !user) {
-        setIsAdmin(false);
-        setIsAdminLoading(false);
-        return;
-      }
+    // Set a secure default: not an admin.
+    setIsAdmin(false);
+    // Set loading to true. It will be set to false once the check is complete.
+    setIsAdminLoading(true);
 
-      // We have a user. Now check if their email matches the hardcoded list.
-      // This is the primary and fastest check.
-      const hardcodedAdminEmails = ['kalyanikri1111@gmail.com', 'satyamkruk07@gmail.com', 'frgtpeople@gmail.com'];
-      if (user.email && hardcodedAdminEmails.includes(user.email)) {
-          setIsAdmin(true);
-          setIsAdminLoading(false);
-          return; // Found admin, no need to check Firestore.
-      }
-      
-      // If the user is anonymous, they are definitely not an admin.
-      // Also, if their email wasn't in the list, we stop here.
-      // This prevents the Firestore read for all non-admin users.
-      setIsAdmin(false);
-      setIsAdminLoading(false);
+    // If auth state is still loading, we can't determine admin status yet.
+    if (isUserLoading) {
+      return; // Wait for user status to be resolved.
+    }
 
-    };
+    // If there is no user object, or if the user is explicitly anonymous (like a judge),
+    // they are definitely not an admin. We can stop here without any database checks.
+    if (!user || user.isAnonymous) {
+      setIsAdminLoading(false); // The check is complete, they are not an admin.
+      return;
+    }
 
-    checkAdmin();
+    // If we reach here, we have a logged-in, non-anonymous user.
+    // Check their email against the hardcoded list of admin emails.
+    const hardcodedAdminEmails = ['kalyanikri1111@gmail.com', 'satyamkruk07@gmail.com', 'frgtpeople@gmail.com'];
+    if (user.email && hardcodedAdminEmails.includes(user.email)) {
+        setIsAdmin(true);
+    }
+    
+    // The check is now complete for all cases.
+    setIsAdminLoading(false);
 
-  }, [user, isUserLoading, firestore]);
+  }, [user, isUserLoading]);
 
-  // The overall loading state combines user loading and the specific admin check loading.
-  return { isAdmin, isAdminLoading: isUserLoading || isAdminLoading };
+  // The overall loading state is true if either the user state is loading or the admin check is loading.
+  return { isAdmin, isAdminLoading };
 }
