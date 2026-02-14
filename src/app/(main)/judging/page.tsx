@@ -133,12 +133,9 @@ export default function JudgingPage() {
         </p>
       </div>
 
-       {/* Conditionally render QR Code Generator for non-admins (public) */}
-       {!isAdminLoading && !isAdmin && (
-        <div className="mb-8 flex justify-center">
-            <QRCodeGenerator />
-        </div>
-       )}
+       <div className="mb-8 flex justify-center">
+           <QRCodeGenerator />
+       </div>
 
       <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {isContentLoading ? (
@@ -149,7 +146,7 @@ export default function JudgingPage() {
                 <CardHeader>
                 <CardTitle>{project.name}</CardTitle>
                 <CardDescription>
-                    by {(project.teamMembers || project.studentNames || []).join(', ')}
+                    by {(project.teamName || project.teamMembers || project.studentNames || []).join(', ')}
                 </CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
