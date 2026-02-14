@@ -18,42 +18,28 @@ export function useAdminStatus() {
 
   useEffect(() => {
     const checkAdmin = async () => {
-      // If user is loading, not logged in, or is anonymous, they are not an admin.
-      // This is the primary guard.
-      if (isUserLoading || !user || user.isAnonymous) {
+      // If user is loading or not logged in, they can't be an admin.
+      if (isUserLoading || !user) {
         setIsAdmin(false);
-        setIsAdminLoading(false); // We have a definitive answer.
+        setIsAdminLoading(false);
         return;
       }
 
-      // If we reach here, we have a signed-in, non-anonymous user.
-      // Start the loading state for the database check.
-      setIsAdminLoading(true);
-
-      // Temporary hardcoded check for immediate access
-      if (user.email === 'kalyanikri1111@gmail.com' || user.email === 'satyamkruk07@gmail.com' || user.email === 'frgtpeople@gmail.com') {
+      // We have a user. Now check if their email matches the hardcoded list.
+      // This is the primary and fastest check.
+      const hardcodedAdminEmails = ['kalyanikri1111@gmail.com', 'satyamkruk07@gmail.com', 'frgtpeople@gmail.com'];
+      if (user.email && hardcodedAdminEmails.includes(user.email)) {
           setIsAdmin(true);
           setIsAdminLoading(false);
-          return;
+          return; // Found admin, no need to check Firestore.
       }
+      
+      // If the user is anonymous, they are definitely not an admin.
+      // Also, if their email wasn't in the list, we stop here.
+      // This prevents the Firestore read for all non-admin users.
+      setIsAdmin(false);
+      setIsAdminLoading(false);
 
-      // Check Firestore for admin role if firestore instance is available.
-      if (firestore) {
-        const adminDocRef = doc(firestore, 'roles_admin', user.uid);
-        try {
-          const adminDocSnap = await getDoc(adminDocRef);
-          setIsAdmin(adminDocSnap.exists());
-        } catch (error) {
-          console.error("Error checking admin status:", error);
-          setIsAdmin(false); // Assume not admin on error.
-        } finally {
-          setIsAdminLoading(false); // DB check is complete.
-        }
-      } else {
-        // If firestore is not available for some reason, can't be admin.
-        setIsAdmin(false);
-        setIsAdminLoading(false);
-      }
     };
 
     checkAdmin();
