@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -188,12 +187,13 @@ function UserManagementTab() {
       alert('No data to download.');
       return;
     }
-    const headers = ['Name', 'Team Name', 'Team Members', 'Mentor Name', 'Email', 'College', 'Contact No.', 'Skills', 'Bio', 'Registered On'];
+    const headers = ['Name', 'Team Name', 'Leader Name', 'Team Members', 'Mentor Name', 'Email', 'College', 'Contact No.', 'Skills', 'Bio', 'Registered On'];
     const csvContent = [
       headers.join(','),
       ...data.map(item => [
         `"${item.name || ''}"`,
         `"${item.teamName || ''}"`,
+        `"${item.leaderName || ''}"`,
         `"${(item.teamMembers || []).join('; ')}"`,
         `"${item.mentorName || ''}"`,
         `"${item.email || ''}"`,
