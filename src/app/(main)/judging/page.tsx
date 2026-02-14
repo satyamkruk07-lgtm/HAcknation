@@ -54,9 +54,8 @@ function QRCodeGenerator() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Ensure this runs only on the client
-    // Constructing a "clean" public URL without any session-specific query params.
-    const publicUrl = window.location.origin + window.location.pathname;
+    // Use the public URL for the deployed Firebase application.
+    const publicUrl = 'https://studio-4104961720-80208.web.app/judging';
     setUrl(publicUrl);
   }, []);
 
