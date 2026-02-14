@@ -358,7 +358,7 @@ export const conductors: Conductor[] = [
     {
         id: "3",
         name: "Dr.Vijaylakshmi Sajwan",
-        role: "Head Of Department",
+        role: "ASSOCIATE PROFESSOR & HEAD-COMPUTER APPLICATIONS",
         imageUrl: "https://image2url.com/r2/default/images/1771076182448-9dfeb3a7-af90-44ab-a70e-84ddf64e783e.jpeg",
         email: "vijaylakshmi.sajwan@sce.org.in",
         linkedin: "https://www.linkedin.com/in/dr-vijaylakshmi-sajwan-1b450691",
