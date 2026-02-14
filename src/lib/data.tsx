@@ -360,7 +360,7 @@ export const conductors: Conductor[] = [
         name: "Dr.Vijaylakshmi Sajwan",
         role: "Head Of Department",
         imageUrl: "https://image2url.com/r2/default/images/1771076182448-9dfeb3a7-af90-44ab-a70e-84ddf64e783e.jpeg",
-        email: "sartaj.khan@sce.org.in",
+        email: "vijaylakshmi.sajwan@sce.org.in",
         linkedin: "https://www.linkedin.com/in/sartaj-khan-52149724b",
         qualification: "BCA MCA M.TECH PHD",
         skills: ["Event Management", "Public Speaking", "Canva", "Photoshop"],
