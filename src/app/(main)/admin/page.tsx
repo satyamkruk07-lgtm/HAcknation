@@ -642,46 +642,83 @@ function JudgingTab() {
 
 function JudgmentDetailsDialog({ project, onOpenChange }: { project: SubmittedProject, onOpenChange: (open: boolean) => void }) {
     const { judgments, isLoading } = useProjectJudgments(project.id);
+    const firestore = useFirestore();
+    const [judgmentToDelete, setJudgmentToDelete] = useState<Judgment | null>(null);
+
+    const handleDeleteJudgment = async () => {
+        if (!firestore || !judgmentToDelete) return;
+
+        try {
+            await deleteDoc(doc(firestore, "judgments", judgmentToDelete.id));
+        } catch (error) {
+            console.error("Failed to delete judgment: ", error);
+        } finally {
+            setJudgmentToDelete(null);
+        }
+    };
 
     return (
-        <Dialog open={!!project} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                    <DialogTitle className="text-2xl font-headline">{project.name}</DialogTitle>
-                    <DialogDescription>
-                        Detailed scores and feedback from all judges.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="py-4 max-h-[60vh] overflow-y-auto">
-                    {isLoading ? (
-                        <div className="flex justify-center items-center h-40">
-                            <Loader2 className="h-8 w-8 animate-spin" />
-                        </div>
-                    ) : judgments && judgments.length > 0 ? (
-                        <div className="space-y-6">
-                            {judgments.map((judgment) => (
-                                <Card key={judgment.id}>
-                                    <CardHeader>
-                                        <CardTitle className="text-lg flex justify-between items-center">
-                                            <span>Judge: {judgment.judgeName || 'Anonymous'}</span>
-                                            <Badge variant="secondary" className="flex items-center gap-1.5">
-                                                <Star className="h-4 w-4 text-amber-400" />
-                                                {judgment.totalScore} / 200
-                                            </Badge>
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-sm italic text-muted-foreground p-4 bg-muted/50 rounded-md">"{judgment.feedback}"</p>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-center text-muted-foreground">No judgments submitted for this project yet.</p>
-                    )}
-                </div>
-            </DialogContent>
-        </Dialog>
+        <>
+            <Dialog open={!!project} onOpenChange={onOpenChange}>
+                <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-headline">{project.name}</DialogTitle>
+                        <DialogDescription>
+                            Detailed scores and feedback from all judges.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4 max-h-[60vh] overflow-y-auto">
+                        {isLoading ? (
+                            <div className="flex justify-center items-center h-40">
+                                <Loader2 className="h-8 w-8 animate-spin" />
+                            </div>
+                        ) : judgments && judgments.length > 0 ? (
+                            <div className="space-y-6">
+                                {judgments.map((judgment) => (
+                                    <Card key={judgment.id}>
+                                        <CardHeader>
+                                            <CardTitle className="text-lg flex justify-between items-center">
+                                                <div className="flex items-center gap-2">
+                                                    <span>Judge: {judgment.judgeName || 'Anonymous'}</span>
+                                                    <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive/70 hover:bg-destructive/10 hover:text-destructive" onClick={() => setJudgmentToDelete(judgment)}>
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                                <Badge variant="secondary" className="flex items-center gap-1.5">
+                                                    <Star className="h-4 w-4 text-amber-400" />
+                                                    {judgment.totalScore} / 200
+                                                </Badge>
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-sm italic text-muted-foreground p-4 bg-muted/50 rounded-md">"{judgment.feedback}"</p>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-center text-muted-foreground">No judgments submitted for this project yet.</p>
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
+            <AlertDialog open={!!judgmentToDelete} onOpenChange={(open) => !open && setJudgmentToDelete(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently delete the judgment for this project submitted by <strong>{judgmentToDelete?.judgeName || 'Anonymous'}</strong>.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteJudgment} className="bg-destructive hover:bg-destructive/90">
+                            Delete
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
     );
 }
 

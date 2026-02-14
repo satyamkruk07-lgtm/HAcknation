@@ -104,10 +104,12 @@ service cloud.firestore {
     /**
      * @description Rule for the /judgments/{judgmentId} collection.
      * Any signed-in user (including anonymous judges) can submit judgments.
+     * Only admins can delete judgments.
      */
     match /judgments/{judgmentId} {
       allow get, list: if isSignedIn();
-      allow create, update, delete: if isSignedIn();
+      allow create, update: if isSignedIn();
+      allow delete: if isAdmin();
     }
 
     /**
