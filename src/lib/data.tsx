@@ -358,7 +358,7 @@ export const conductors: Conductor[] = [
     {
         id: "3",
         name: "Dr.Vijaylakshmi Sajwan",
-        role: "ASSOCIATE PROFESSOR & HEAD-COMPUTER APPLICATIONS",
+        role: "Associate Professor &\nHead-Computer Applications",
         imageUrl: "https://image2url.com/r2/default/images/1771076182448-9dfeb3a7-af90-44ab-a70e-84ddf64e783e.jpeg",
         email: "vijaylakshmi.sajwan@sce.org.in",
         linkedin: "https://www.linkedin.com/in/dr-vijaylakshmi-sajwan-1b450691",
@@ -378,7 +378,7 @@ export const conductors: Conductor[] = [
     {
         id: "5",
         name: "Mr. Ajay Kumar Verma",
-        role: "Associate Dean-CBII & CEO, iHub Shivalik",
+        role: "Associate Dean-CBII &\nCEO, iHub Shivalik",
         imageUrl: "https://images.unsplash.com/photo-1765528447514-b85fbdd0e43d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         email: "ajayverma84114@gmail.com",
         linkedin: "https://www.linkedin.com/in/ajay-verma-5b825668",

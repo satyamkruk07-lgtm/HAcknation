@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +14,15 @@ import { Badge } from '@/components/ui/badge';
 import { Mail, Linkedin, BookOpen } from 'lucide-react';
 import { conductors } from '@/lib/data';
 import type { Conductor } from '@/lib/types';
+
+const renderRole = (role: string) => {
+  return role.split('\n').map((line, index, arr) => (
+    <React.Fragment key={index}>
+      {line}
+      {index < arr.length - 1 && <br />}
+    </React.Fragment>
+  ));
+};
 
 export function ConductedBy() {
   const [selectedConductor, setSelectedConductor] = useState<Conductor | null>(null);
@@ -48,7 +57,7 @@ export function ConductedBy() {
                 </button>
                 <div className="mt-2">
                   <h3 className="font-semibold text-lg">{mainConductor.name}</h3>
-                  <p className="text-base text-muted-foreground">{mainConductor.role}</p>
+                  <p className="text-base text-muted-foreground">{renderRole(mainConductor.role)}</p>
                 </div>
               </div>
             </div>
@@ -72,7 +81,7 @@ export function ConductedBy() {
                 </button>
                 <div className="mt-2">
                   <h3 className="font-semibold text-base">{conductor.name}</h3>
-                  <p className="text-sm text-muted-foreground">{conductor.role}</p>
+                  <p className="text-sm text-muted-foreground">{renderRole(conductor.role)}</p>
                 </div>
               </div>
             ))}
@@ -94,7 +103,7 @@ export function ConductedBy() {
                   />
               <div className='pt-2'>
                 <DialogTitle className="text-2xl font-headline">{selectedConductor.name}</DialogTitle>
-                <DialogDescription>{selectedConductor.role}</DialogDescription>
+                <DialogDescription>{renderRole(selectedConductor.role)}</DialogDescription>
               </div>
             </DialogHeader>
             <div className="py-4 grid gap-6">
