@@ -188,7 +188,7 @@ function UserManagementTab() {
       alert('No data to download.');
       return;
     }
-    const headers = ['Name', 'Email', 'College', 'Contact No.', 'Registration Date', 'Skills', 'Bio'];
+    const headers = ['Name', 'Email', 'College', 'Contact No.', 'Registration Date', 'Skills', 'Bio', 'Mentor Name', 'Team Name', 'Team Leader Name', 'Team Members'];
     const csvContent = [
       headers.join(','),
       ...data.map(item => [
@@ -199,6 +199,10 @@ function UserManagementTab() {
         `"${item.registrationDate ? format(new Date(item.registrationDate), 'PPp') : ''}"`,
         `"${(item.skills || []).join('; ')}"`,
         `"${(item.bio || '').replace(/"/g, '""')}"`,
+        `"${item.mentorName || ''}"`,
+        `"${item.teamName || ''}"`,
+        `"${item.leaderName || ''}"`,
+        `"${(item.teamMembers || []).join('; ')}"`,
       ].join(','))
     ].join('\n');
 
