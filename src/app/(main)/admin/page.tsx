@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef, useMemo } from 'react';
@@ -392,12 +393,12 @@ function ProjectManagementTab() {
       alert('No data to download.');
       return;
     }
-    const headers = ['Project Name', 'Team Members', 'Description', 'GitHub URL', 'Demo URL', 'Submission Date'];
+    const headers = ['Project Name', 'Team', 'Description', 'GitHub URL', 'Demo URL', 'Submission Date'];
     const csvContent = [
       headers.join(','),
       ...data.map(item => [
         `"${item.name || ''}"`,
-        `"${(item.teamMembers || item.studentNames || []).join('; ')}"`,
+        `"${item.teamName || (item.teamMembers || item.studentNames || []).join('; ')}"`,
         `"${(item.description || '').replace(/"/g, '""')}"`,
         `"${item.githubUrl || ''}"`,
         `"${item.demoUrl || ''}"`,
@@ -456,7 +457,7 @@ function ProjectManagementTab() {
                 projects.map((project) => (
                   <TableRow key={project.id}>
                     <TableCell className="font-medium">{project.name}</TableCell>
-                    <TableCell>{(project.studentNames || project.teamMembers || []).join(', ')}</TableCell>
+                    <TableCell>{project.teamName || (project.studentNames || project.teamMembers || []).join(', ')}</TableCell>
                     <TableCell>
                       {project.submissionDate
                         ? format(new Date(project.submissionDate.seconds * 1000), 'PPp')

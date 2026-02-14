@@ -1,9 +1,9 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useFirestore, useUser } from '@/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useState, useEffect, useMemo } from 'react';
+import { useFirestore, useUser, useDoc, useMemoFirebase } from '@/firebase';
+import { collection, addDoc, serverTimestamp, doc } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import type { UserAccount } from '@/lib/types';
 
 export default function SubmitPage() {
   const firestore = useFirestore();
@@ -26,6 +27,12 @@ export default function SubmitPage() {
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const userDocRef = useMemoFirebase(() => {
+    if (!firestore || !user?.uid) return null;
+    return doc(firestore, 'users', user.uid);
+  }, [firestore, user?.uid]);
+  const { data: userProfile } = useDoc<UserAccount>(userDocRef);
 
   const [projectName, setProjectName] = useState('');
   const [teamMembers, setTeamMembers] = useState('');
@@ -44,7 +51,14 @@ export default function SubmitPage() {
     if (desc) {
       setDescription(desc);
     }
-  }, [searchParams]);
+    if (userProfile) {
+        if (userProfile.registrationType === 'team' && userProfile.teamMembers && userProfile.teamMembers.length > 0) {
+            setTeamMembers(userProfile.teamMembers.join(', '));
+        } else if (userProfile.name) {
+            setTeamMembers(userProfile.name);
+        }
+    }
+  }, [searchParams, userProfile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +88,7 @@ export default function SubmitPage() {
       const projectsCollection = collection(firestore, 'projects');
       await addDoc(projectsCollection, {
         name: projectName,
+        teamName: userProfile?.teamName || '',
         teamMembers: teamMembers.split(',').map((m) => m.trim()),
         description,
         githubUrl,

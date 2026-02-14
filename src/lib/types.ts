@@ -39,6 +39,7 @@ export type Project = {
 export type SubmittedProject = {
   id: string;
   name:string;
+  teamName?: string;
   studentNames?: string[];
   teamMembers?: string[]; // Add optional teamMembers
   description: string;
