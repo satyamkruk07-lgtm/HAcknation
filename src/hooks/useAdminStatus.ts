@@ -31,6 +31,13 @@ export function useAdminStatus() {
       return;
     }
 
+    // Anonymous users cannot be admins.
+    if (user.isAnonymous) {
+      setIsAdmin(false);
+      setIsAdminLoading(false);
+      return;
+    }
+
     // Temporary hardcoded check for immediate access
     if (user.email === 'kalyanikri1111@gmail.com' || user.email === 'satyamkruk07@gmail.com' || user.email === 'frgtpeople@gmail.com') {
         setIsAdmin(true);
