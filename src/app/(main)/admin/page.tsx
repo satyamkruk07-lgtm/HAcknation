@@ -188,21 +188,20 @@ function UserManagementTab() {
       alert('No data to download.');
       return;
     }
-    const headers = ['Name', 'Email', 'College', 'Contact No.', 'Registration Date', 'Skills', 'Bio', 'Mentor Name', 'Team Name', 'Team Leader Name', 'Team Members'];
+    const headers = ['Name', 'Team Name', 'Team Members', 'Mentor Name', 'Email', 'College', 'Contact No.', 'Skills', 'Bio', 'Registered On'];
     const csvContent = [
       headers.join(','),
       ...data.map(item => [
         `"${item.name || ''}"`,
+        `"${item.teamName || ''}"`,
+        `"${(item.teamMembers || []).join('; ')}"`,
+        `"${item.mentorName || ''}"`,
         `"${item.email || ''}"`,
         `"${item.college || ''}"`,
         `"${item.phoneNumber || ''}"`,
-        `"${item.registrationDate ? format(new Date(item.registrationDate), 'PPp') : ''}"`,
         `"${(item.skills || []).join('; ')}"`,
         `"${(item.bio || '').replace(/"/g, '""')}"`,
-        `"${item.mentorName || ''}"`,
-        `"${item.teamName || ''}"`,
-        `"${item.leaderName || ''}"`,
-        `"${(item.teamMembers || []).join('; ')}"`,
+        `"${item.registrationDate ? format(new Date(item.registrationDate), 'PPp') : ''}"`,
       ].join(','))
     ].join('\n');
 
