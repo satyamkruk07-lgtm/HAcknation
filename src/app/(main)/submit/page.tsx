@@ -19,10 +19,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { UserAccount } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function SubmitPage() {
   const firestore = useFirestore();
-  const { user } = useUser();
+  const { user, isUserLoading } = useUser();
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,7 +32,7 @@ export default function SubmitPage() {
     if (!firestore || !user?.uid) return null;
     return doc(firestore, 'users', user.uid);
   }, [firestore, user?.uid]);
-  const { data: userProfile } = useDoc<UserAccount>(userDocRef);
+  const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserAccount>(userDocRef);
 
   const [projectName, setProjectName] = useState('');
   const [teamName, setTeamName] = useState('');
@@ -51,17 +52,22 @@ export default function SubmitPage() {
     if (desc) {
       setDescription(desc);
     }
+
     if (userProfile) {
-        if (userProfile.teamName) {
-            setTeamName(userProfile.teamName);
-        }
-        if (userProfile.registrationType === 'team' && userProfile.teamMembers && userProfile.teamMembers.length > 0) {
-            setTeamMembers(userProfile.teamMembers.join(', '));
-        } else if (userProfile.name) {
-            setTeamMembers(userProfile.name);
-        }
+      if (userProfile.registrationType === 'team') {
+        setTeamName(userProfile.teamName || '');
+        setTeamMembers(userProfile.teamMembers?.join(', ') || '');
+      } else {
+        // Individual user
+        setTeamName(''); // Individual submission has no team name
+        setTeamMembers(userProfile.name || '');
+      }
+    } else if (user && !isProfileLoading) {
+        // Fallback for individual user if profile isn't filled out
+        setTeamName('');
+        setTeamMembers(user.displayName || '');
     }
-  }, [searchParams, userProfile]);
+  }, [searchParams, userProfile, user, isProfileLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,6 +131,32 @@ export default function SubmitPage() {
       setIsSubmitting(false);
     }
   };
+  
+  const isLoading = isUserLoading || isProfileLoading;
+
+  if (isLoading) {
+    return (
+        <div className="container py-12">
+            <Card className="w-full max-w-2xl mx-auto">
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2" />
+                    <Skeleton className="h-4 w-3/4" />
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                    <Skeleton className="h-10 w-full" />
+                </CardContent>
+                <CardFooter>
+                    <Skeleton className="h-10 w-36" />
+                </CardFooter>
+            </Card>
+        </div>
+    );
+  }
+
 
   return (
     <div className="container py-12">
@@ -145,23 +177,46 @@ export default function SubmitPage() {
                     <Label htmlFor="project-name">Project Name</Label>
                     <Input id="project-name" placeholder="e.g., EcoTrack" required value={projectName} onChange={(e) => setProjectName(e.target.value)} />
                 </div>
-                <div className="space-y-2">
-                    <Label htmlFor="team-name">Team Name</Label>
-                    <Input id="team-name" placeholder="The Innovators" value={teamName} onChange={(e) => setTeamName(e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="team-members">Team Members</Label>
-                    <Input
-                    id="team-members"
-                    placeholder="John Doe, Jane Smith..."
-                    required
-                    value={teamMembers}
-                    onChange={(e) => setTeamMembers(e.target.value)}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                    Please enter full names, separated by commas.
-                    </p>
-                </div>
+                
+                {userProfile?.registrationType === 'team' ? (
+                    <>
+                        <div className="space-y-2">
+                            <Label htmlFor="team-name">Team Name</Label>
+                            <Input 
+                                id="team-name" 
+                                placeholder="The Innovators" 
+                                value={teamName} 
+                                onChange={(e) => setTeamName(e.target.value)}
+                                required 
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="team-members">Team Members</Label>
+                            <Input
+                            id="team-members"
+                            placeholder="John Doe, Jane Smith..."
+                            required
+                            value={teamMembers}
+                            onChange={(e) => setTeamMembers(e.target.value)}
+                            />
+                            <p className="text-xs text-muted-foreground">
+                            Please enter full names, separated by commas.
+                            </p>
+                        </div>
+                    </>
+                ) : (
+                      <div className="space-y-2">
+                        <Label htmlFor="student-name">Your Name</Label>
+                        <Input
+                            id="student-name"
+                            required
+                            value={teamMembers}
+                            readOnly
+                            className="bg-muted/50"
+                        />
+                    </div>
+                )}
+
                 <div className="space-y-2">
                     <Label htmlFor="description">Project Description</Label>
                     <Textarea
