@@ -28,6 +28,7 @@ import {
 import QRCode from 'qrcode.react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 
 function ProjectCardSkeleton() {
@@ -103,6 +104,7 @@ export default function JudgingPage() {
   const firestore = useFirestore();
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
+  const { isAdmin, isAdminLoading } = useAdminStatus();
 
   useEffect(() => {
     // If not loading and no user is signed in, sign them in anonymously.
@@ -120,7 +122,7 @@ export default function JudgingPage() {
 
   const { data: projects, isLoading } = useCollection<SubmittedProject>(projectsQuery);
 
-  const isContentLoading = isLoading || isUserLoading;
+  const isContentLoading = isLoading || isUserLoading || isAdminLoading;
 
   return (
     <div className="container py-12">
@@ -131,9 +133,12 @@ export default function JudgingPage() {
         </p>
       </div>
 
-       <div className="mb-8 flex justify-center">
-        <QRCodeGenerator />
-      </div>
+       {/* Conditionally render QR Code Generator for non-admins (public) */}
+       {!isAdminLoading && !isAdmin && (
+        <div className="mb-8 flex justify-center">
+            <QRCodeGenerator />
+        </div>
+       )}
 
       <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {isContentLoading ? (
