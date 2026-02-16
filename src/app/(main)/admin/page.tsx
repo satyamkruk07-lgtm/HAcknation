@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { useFirestore, useUser, useCollection, useMemoFirebase } from '@/firebase';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
-import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc, where } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc, where, getDocs, limit, startAfter, type QueryDocumentSnapshot } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ExternalLink, Github, Loader2, Trash2, Download, Trophy, Eye, Star } from 'lucide-react';
+import { ExternalLink, Github, Loader2, Trash2, Download, Trophy, Eye, Star, UserPlus, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -58,6 +58,9 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { makeAdminAction, removeAdminAction } from '@/lib/actions';
+import { useToast } from '@/hooks/use-toast';
+
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -179,17 +182,55 @@ function CreateAnnouncementForm() {
 
 function UserManagementTab() {
   const firestore = useFirestore();
-  const { user, isUserLoading } = useUser();
+  const { user: authUser, isUserLoading } = useUser();
   const { isAdmin, isAdminLoading } = useAdminStatus();
   const [selectedUser, setSelectedUser] = useState<UserAccount | null>(null);
+  
+  // Pagination State
+  const [users, setUsers] = useState<UserAccount[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
+  const [lastVisibleUser, setLastVisibleUser] = useState<QueryDocumentSnapshot | null>(null);
+  const [hasMoreUsers, setHasMoreUsers] = useState(true);
 
-  const usersQuery = useMemoFirebase(() => {
-    if (!firestore || !isAdmin) return null; // Only create query if user is an admin
-    return query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'));
-  }, [firestore, isAdmin]);
+  const loadMoreUsers = useCallback(async () => {
+    if (!firestore || !hasMoreUsers) return;
+    setIsLoadingUsers(true);
 
-  const { data: users, isLoading: isUsersLoading } = useCollection<UserAccount>(usersQuery);
-  const isLoading = isUserLoading || isAdminLoading || isUsersLoading;
+    let q = query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'), limit(10));
+    if (lastVisibleUser) {
+      q = query(q, startAfter(lastVisibleUser));
+    }
+
+    try {
+      const querySnapshot = await getDocs(q);
+      const newUsers = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as UserAccount));
+      
+      setUsers(prev => lastVisibleUser ? [...prev, ...newUsers] : newUsers);
+      
+      if (querySnapshot.docs.length < 10) {
+        setHasMoreUsers(false);
+      } else {
+        setLastVisibleUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      }
+    } catch(err) {
+      console.error(err);
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  }, [firestore, hasMoreUsers, lastVisibleUser]);
+  
+  useEffect(() => {
+    if (isAdmin) {
+      // Initial load or re-load if admin status is gained
+      setUsers([]);
+      setLastVisibleUser(null);
+      setHasMoreUsers(true);
+      loadMoreUsers();
+    } else if (!isAdminLoading) {
+      setUsers([]);
+      setIsLoadingUsers(false);
+    }
+  }, [isAdmin, isAdminLoading]);
 
   const downloadCSV = (data: UserAccount[], filename: string) => {
     if (!data || data.length === 0) {
@@ -225,6 +266,7 @@ function UserManagementTab() {
     document.body.removeChild(link);
   };
   
+  const showSkeletons = isLoadingUsers && users.length === 0;
 
   return (
     <>
@@ -250,7 +292,7 @@ function UserManagementTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading ? (
+              {showSkeletons ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
                     <TableCell><Skeleton className="h-5 w-32" /></TableCell>
@@ -259,7 +301,7 @@ function UserManagementTab() {
                     <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
                   </TableRow>
                 ))
-              ) : users && users.length > 0 ? (
+              ) : users.length > 0 ? (
                 users.map((user) => {
                   return (
                     <TableRow key={user.id}>
@@ -287,6 +329,14 @@ function UserManagementTab() {
               )}
             </TableBody>
           </Table>
+          {hasMoreUsers && (
+            <div className="mt-6 flex justify-center">
+              <Button onClick={loadMoreUsers} disabled={isLoadingUsers}>
+                {isLoadingUsers && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Load More
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
       {selectedUser && (
@@ -382,18 +432,51 @@ function ProjectManagementTab() {
   const firestore = useFirestore();
   const [projectToDelete, setProjectToDelete] = useState<SubmittedProject | null>(null);
 
-  const projectsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'projects'), orderBy('submissionDate', 'desc'));
-  }, [firestore]);
+  // Pagination state
+  const [projects, setProjects] = useState<SubmittedProject[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [lastVisibleProject, setLastVisibleProject] = useState<QueryDocumentSnapshot | null>(null);
+  const [hasMoreProjects, setHasMoreProjects] = useState(true);
 
-  const { data: projects, isLoading, error } = useCollection<SubmittedProject>(projectsQuery);
+  const loadMoreProjects = useCallback(async () => {
+    if (!firestore || !hasMoreProjects) return;
+    setIsLoading(true);
+
+    let q = query(collection(firestore, 'projects'), orderBy('submissionDate', 'desc'), limit(10));
+    if (lastVisibleProject) {
+      q = query(q, startAfter(lastVisibleProject));
+    }
+
+    try {
+      const querySnapshot = await getDocs(q);
+      const newProjects = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as SubmittedProject));
+      
+      setProjects(prev => lastVisibleProject ? [...prev, ...newProjects] : newProjects);
+      
+      if (querySnapshot.docs.length < 10) {
+        setHasMoreProjects(false);
+      } else {
+        setLastVisibleProject(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      }
+    } catch(err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [firestore, hasMoreProjects, lastVisibleProject]);
+
+  useEffect(() => {
+    loadMoreProjects();
+  }, []);
 
   const handleDeleteProject = () => {
     if (!firestore || !projectToDelete) return;
 
     const docRef = doc(firestore, 'projects', projectToDelete.id);
     deleteDoc(docRef)
+        .then(() => {
+          setProjects(prev => prev.filter(p => p.id !== projectToDelete.id));
+        })
         .catch(async (serverError) => {
             const permissionError = new FirestorePermissionError({
                 path: docRef.path,
@@ -433,7 +516,8 @@ function ProjectManagementTab() {
     link.click();
     document.body.removeChild(link);
   };
-
+  
+  const showSkeletons = isLoading && projects.length === 0;
 
   return (
     <>
@@ -460,7 +544,7 @@ function ProjectManagementTab() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {isLoading ? (
+              {showSkeletons ? (
                 Array.from({ length: 3 }).map((_, i) => (
                   <TableRow key={i}>
                     <TableCell><Skeleton className="h-5 w-40" /></TableCell>
@@ -504,6 +588,14 @@ function ProjectManagementTab() {
               )}
             </TableBody>
           </Table>
+           {hasMoreProjects && (
+            <div className="mt-6 flex justify-center">
+              <Button onClick={loadMoreProjects} disabled={isLoading}>
+                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Load More
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
       <AlertDialog open={!!projectToDelete} onOpenChange={(open) => !open && setProjectToDelete(null)}>
@@ -533,36 +625,80 @@ interface ProjectJudgments {
   count: number;
 }
 
-function useProjectJudgments(projectId: string): { judgments: Judgment[] | null; isLoading: boolean } {
+function useProjectJudgments(projectId: string): { judgments: Judgment[] | null; isLoading: boolean, mutate: () => void } {
   const firestore = useFirestore();
   const judgmentsQuery = useMemoFirebase(() => {
     if (!firestore) return null;
     return query(collection(firestore, 'judgments'), where('projectId', '==', projectId));
   }, [firestore, projectId]);
 
-  const { data: judgments, isLoading } = useCollection<Judgment>(judgmentsQuery);
+  const [judgments, setJudgments] = useState<Judgment[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  return { judgments, isLoading };
+  const fetchJudgments = useCallback(async () => {
+    if(!judgmentsQuery) return;
+    setIsLoading(true);
+    try {
+      const snapshot = await getDocs(judgmentsQuery);
+      const data = snapshot.docs.map(doc => ({...doc.data() as Judgment, id: doc.id}));
+      setJudgments(data);
+    } catch(err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [judgmentsQuery]);
+
+  useEffect(() => {
+    fetchJudgments();
+  }, [fetchJudgments]);
+
+  return { judgments, isLoading, mutate: fetchJudgments };
 }
 
 
 function JudgingTab() {
     const firestore = useFirestore();
-    const projectsQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
-        return query(collection(firestore, 'projects'), orderBy('submissionDate', 'desc'));
-    }, [firestore]);
 
-    const { data: projects, isLoading: isLoadingProjects } = useCollection<SubmittedProject>(projectsQuery);
+    const [projects, setProjects] = useState<SubmittedProject[]>([]);
+    const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+    const [lastVisibleProject, setLastVisibleProject] = useState<QueryDocumentSnapshot | null>(null);
+    const [hasMoreProjects, setHasMoreProjects] = useState(true);
 
-    const judgmentsQuery = useMemoFirebase(() => {
-        if (!firestore) return null;
-        return collection(firestore, 'judgments');
-    }, [firestore]);
+    const [allJudgments, setAllJudgments] = useState<Judgment[] | null>(null);
+    const [isLoadingJudgments, setIsLoadingJudgments] = useState(true);
 
-    const { data: allJudgments, isLoading: isLoadingJudgments } = useCollection<Judgment>(judgmentsQuery);
-    
     const [selectedProject, setSelectedProject] = useState<SubmittedProject | null>(null);
+
+    const loadMoreProjects = useCallback(async () => {
+      if (!firestore) return;
+      setIsLoadingProjects(true);
+
+      let q = query(collection(firestore, 'projects'), orderBy('submissionDate', 'desc'));
+      
+      try {
+        const querySnapshot = await getDocs(q);
+        const newProjects = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as SubmittedProject));
+        setProjects(newProjects);
+      } catch(err) { console.error(err); } 
+      finally { setIsLoadingProjects(false); }
+    }, [firestore]);
+
+    const fetchAllJudgments = useCallback(async () => {
+      if (!firestore) return;
+      setIsLoadingJudgments(true);
+      try {
+        const querySnapshot = await getDocs(collection(firestore, 'judgments'));
+        const judgmentsData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Judgment));
+        setAllJudgments(judgmentsData);
+      } catch(err) { console.error(err); }
+      finally { setIsLoadingJudgments(false); }
+    }, [firestore]);
+
+    useEffect(() => {
+      loadMoreProjects();
+      fetchAllJudgments();
+    }, [loadMoreProjects, fetchAllJudgments]);
 
     const projectJudgments = useMemo(() => {
         if (!allJudgments) return new Map<string, ProjectJudgments>();
@@ -588,6 +724,11 @@ function JudgingTab() {
     }, [allJudgments]);
     
     const isLoading = isLoadingProjects || isLoadingJudgments;
+
+    const onJudgmentDeleted = () => {
+      // Re-fetch judgments to update the UI
+      fetchAllJudgments();
+    };
 
     return (
         <>
@@ -648,14 +789,15 @@ function JudgingTab() {
                 <JudgmentDetailsDialog
                     project={selectedProject}
                     onOpenChange={() => setSelectedProject(null)}
+                    onJudgmentDeleted={onJudgmentDeleted}
                 />
             )}
         </>
     );
 }
 
-function JudgmentDetailsDialog({ project, onOpenChange }: { project: SubmittedProject, onOpenChange: (open: boolean) => void }) {
-    const { judgments, isLoading } = useProjectJudgments(project.id);
+function JudgmentDetailsDialog({ project, onOpenChange, onJudgmentDeleted }: { project: SubmittedProject, onOpenChange: (open: boolean) => void, onJudgmentDeleted: () => void }) {
+    const { judgments, isLoading, mutate } = useProjectJudgments(project.id);
     const firestore = useFirestore();
     const [judgmentToDelete, setJudgmentToDelete] = useState<Judgment | null>(null);
 
@@ -664,6 +806,10 @@ function JudgmentDetailsDialog({ project, onOpenChange }: { project: SubmittedPr
         const docRef = doc(firestore, "judgments", judgmentToDelete.id);
 
         deleteDoc(docRef)
+            .then(() => {
+                mutate(); // Re-fetch judgments for this project
+                onJudgmentDeleted(); // Re-fetch all judgments in the parent
+            })
             .catch(async (serverError) => {
                 const permissionError = new FirestorePermissionError({
                     path: docRef.path,
@@ -740,6 +886,109 @@ function JudgmentDetailsDialog({ project, onOpenChange }: { project: SubmittedPr
     );
 }
 
+function AdminManagementTab() {
+  const { toast } = useToast();
+  const firestore = useFirestore();
+  const [newAdminEmail, setNewAdminEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const adminsQuery = useMemoFirebase(() => {
+    if (!firestore) return null;
+    return query(collection(firestore, 'roles_admin'));
+  }, [firestore]);
+  
+  // Note: Using a direct getDocs here instead of useCollection because admin roles change infrequently.
+  const [admins, setAdmins] = useState<{id: string, email: string}[]>([]);
+  const [isLoadingAdmins, setIsLoadingAdmins] = useState(true);
+
+  const fetchAdmins = useCallback(async () => {
+    if(!firestore) return;
+    setIsLoadingAdmins(true);
+    try {
+      const snapshot = await getDocs(collection(firestore, 'roles_admin'));
+      const adminData = snapshot.docs.map(doc => ({ id: doc.id, email: doc.data().email }));
+      setAdmins(adminData);
+    } catch (e) {
+      console.error("Failed to fetch admins", e);
+    } finally {
+      setIsLoadingAdmins(false);
+    }
+  }, [firestore]);
+
+  useEffect(() => {
+    fetchAdmins();
+  }, [fetchAdmins]);
+
+  const handleAddAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdminEmail) return;
+
+    setIsSubmitting(true);
+    const result = await makeAdminAction(newAdminEmail);
+
+    if (result.success) {
+      toast({ title: 'Success', description: result.message });
+      setNewAdminEmail('');
+      fetchAdmins(); // Re-fetch the admin list
+    } else {
+      toast({ variant: 'destructive', title: 'Error', description: result.message });
+    }
+    setIsSubmitting(false);
+  };
+
+  const handleRemoveAdmin = async (uid: string) => {
+    const result = await removeAdminAction(uid);
+     if (result.success) {
+      toast({ title: 'Success', description: result.message });
+      fetchAdmins(); // Re-fetch the admin list
+    } else {
+      toast({ variant: 'destructive', title: 'Error', description: result.message });
+    }
+  }
+
+  return (
+    <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+      <CardHeader>
+        <CardTitle>Admin Management</CardTitle>
+        <CardDescription>Add or remove administrators for HackNation.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleAddAdmin} className="flex items-center gap-2 mb-6">
+          <Input 
+            type="email"
+            placeholder="Enter user's email to make admin"
+            value={newAdminEmail}
+            onChange={(e) => setNewAdminEmail(e.target.value)}
+            required
+            className="flex-grow"
+          />
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
+            Add Admin
+          </Button>
+        </form>
+
+        <h3 className="mb-4 font-semibold">Current Admins</h3>
+        <div className="space-y-2">
+          {isLoadingAdmins ? (
+            Array.from({length: 2}).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)
+          ) : admins.length > 0 ? (
+            admins.map(admin => (
+              <div key={admin.id} className="flex items-center justify-between rounded-md border p-2 px-4">
+                <span className="text-sm">{admin.email}</span>
+                <Button variant="ghost" size="icon" onClick={() => handleRemoveAdmin(admin.id)}>
+                    <X className="h-4 w-4 text-destructive" />
+                </Button>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-4">No admins found.</p>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
 
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
@@ -749,21 +998,15 @@ export default function AdminPage() {
   const isLoading = isUserLoading || isAdminLoading;
 
   useEffect(() => {
-    // This effect runs whenever the loading or admin status changes.
-    // We wait until all loading is complete before making a decision.
     if (!isLoading) {
       if (!user) {
-        // If there's no user, they can't be an admin. Redirect to login.
         router.push('/login');
       } else if (!isAdmin) {
-        // If there is a user but they are not an admin, redirect to dashboard.
         router.push('/dashboard');
       }
-      // If user exists and is admin, do nothing and let the page render.
     }
   }, [user, isAdmin, isLoading, router]);
   
-  // While loading user or admin status, show a loader.
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -772,8 +1015,6 @@ export default function AdminPage() {
     );
   }
 
-  // After loading, if the user is confirmed to be an admin, render the page.
-  // The useEffect above handles redirection for non-admins, but this is an extra safeguard.
   if (user && isAdmin) {
     return (
       <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
@@ -786,11 +1027,12 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="announcements" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-background/50 border shadow-inner">
+            <TabsList className="grid w-full grid-cols-5 bg-background/50 border shadow-inner">
               <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
               <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
               <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
               <TabsTrigger value="judging" className="data-[state=active]:shadow-inner">Judging</TabsTrigger>
+              <TabsTrigger value="admins" className="data-[state=active]:shadow-inner">Admins</TabsTrigger>
             </TabsList>
             <TabsContent value="announcements" className="mt-6">
               <CreateAnnouncementForm />
@@ -804,13 +1046,14 @@ export default function AdminPage() {
             <TabsContent value="judging" className="mt-6">
                 <JudgingTab />
             </TabsContent>
+             <TabsContent value="admins" className="mt-6">
+                <AdminManagementTab />
+            </TabsContent>
           </Tabs>
         </div>
       </div>
     );
   }
 
-  // If the user is not an admin, or there is no user, render nothing.
-  // The redirection is handled by the useEffect.
   return null;
 }

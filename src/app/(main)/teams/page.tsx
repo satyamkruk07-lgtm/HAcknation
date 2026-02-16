@@ -12,12 +12,12 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Phone, Users } from 'lucide-react';
+import { Mail, Phone, Users, Loader2 } from 'lucide-react';
 import type { UserAccount } from '@/lib/types';
-import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
-import { collection, query, orderBy } from 'firebase/firestore';
+import { useFirestore, useUser } from '@/firebase';
+import { collection, query, orderBy, getDocs, limit, startAfter, type QueryDocumentSnapshot } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 function ProfileCardSkeleton() {
@@ -49,35 +49,63 @@ export default function TeamsPage() {
   const { user, isUserLoading } = useUser();
   const router = useRouter();
 
+  // Pagination State
+  const [teamProfiles, setTeamProfiles] = useState<UserAccount[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [lastVisibleProfile, setLastVisibleProfile] = useState<QueryDocumentSnapshot | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+
   useEffect(() => {
     if (!isUserLoading && !user) {
       router.push('/login');
     }
   }, [user, isUserLoading, router]);
-  
-  const usersCollectionQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return query(
-      collection(firestore, 'users'),
-      orderBy('registrationDate', 'desc')
-    );
-  }, [firestore, user]);
 
-  const { data: teamProfiles, isLoading } = useCollection<UserAccount>(usersCollectionQuery);
+  const loadMoreProfiles = useCallback(async () => {
+    if (!firestore || !hasMore) return;
+    setIsLoading(true);
+
+    let q = query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'), limit(9));
+    if (lastVisibleProfile) {
+        q = query(q, startAfter(lastVisibleProfile));
+    }
+
+    try {
+        const querySnapshot = await getDocs(q);
+        const newProfiles = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as UserAccount));
+        
+        setTeamProfiles(prev => lastVisibleProfile ? [...prev, ...newProfiles] : newProfiles);
+        
+        if (querySnapshot.docs.length < 9) {
+            setHasMore(false);
+        } else {
+            setLastVisibleProfile(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        }
+    } catch(err) {
+        console.error(err);
+    } finally {
+        setIsLoading(false);
+    }
+  }, [firestore, hasMore, lastVisibleProfile]);
   
-  if (isUserLoading || isLoading || !user) {
-    return (
+  useEffect(() => {
+    // Initial fetch if user is logged in
+    if(user) {
+      loadMoreProfiles();
+    }
+  }, [user]);
+
+  const showSkeletons = isLoading && teamProfiles.length === 0;
+
+  if (isUserLoading || !user) {
+     return (
         <div className="container py-12">
             <div className="text-center">
-                <h1 className="font-headline text-4xl font-bold">Find Your Team</h1>
-                <p className="mt-2 text-lg text-muted-foreground">
-                Connect with other hackers and build your dream team.
-                </p>
+                <Skeleton className="h-10 w-1/2 mx-auto" />
+                <Skeleton className="h-6 w-3/4 mx-auto mt-4" />
             </div>
             <div className="mt-12">
-                <h2 className="mb-6 font-headline text-2xl font-bold">
-                Looking for a Team
-                </h2>
+                <Skeleton className="h-8 w-1/4 mb-6" />
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {Array.from({length: 6}).map((_, i) => <ProfileCardSkeleton key={i} />)}
                 </div>
@@ -100,7 +128,9 @@ export default function TeamsPage() {
           Available Hackers
         </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {teamProfiles && teamProfiles.length > 0 ? (
+          {showSkeletons ? (
+             Array.from({length: 6}).map((_, i) => <ProfileCardSkeleton key={i} />)
+          ) : teamProfiles.length > 0 ? (
             teamProfiles.map((profile) => {
               const imageUrl = profile.photoURL || `https://picsum.photos/seed/${profile.id}/200/200`;
 
@@ -168,6 +198,16 @@ export default function TeamsPage() {
             </div>
           )}
         </div>
+
+        {hasMore && (
+            <div className="mt-8 flex justify-center">
+                <Button onClick={loadMoreProfiles} disabled={isLoading}>
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Load More
+                </Button>
+            </div>
+        )}
+
       </div>
     </div>
   );
