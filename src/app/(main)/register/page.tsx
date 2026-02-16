@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
 import { useAuth } from '@/firebase';
 
 import {
@@ -106,17 +106,13 @@ export default function RegisterPage() {
       );
       const user = userCredential.user;
       
-      // Set the user's display name in Firebase Auth
       await updateProfile(user, { displayName: data.name });
 
-      // Send the verification email
       await sendEmailVerification(user);
-      
-      // Sign the user out immediately to force them to log in after verifying
-      await signOut(auth);
 
-      // Force a full page reload to the login page to clear all state and show success message.
-      window.location.href = '/login?registered=true';
+      // Redirect to login page with a success message, but keep the user logged in temporarily
+      // The login page's logic will handle verified/unverified users.
+      router.push('/login?registered=true');
 
     } catch (error: any) {
       let errorMessage = 'An unknown error occurred. Please try again.';

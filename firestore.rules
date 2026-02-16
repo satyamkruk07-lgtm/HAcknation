@@ -62,11 +62,12 @@ service cloud.firestore {
 
     /**
      * @description Rule for the /users/{userId} collection.
-     * Any VERIFIED user can read all users to find teammates.
+     * A user can read their own profile, even if unverified, to populate their profile page.
      * A user can only create, update, or delete their own profile, and only if they are VERIFIED.
      */
     match /users/{userId} {
-      allow read: if isVerified();
+      allow read: if isOwner(userId); // Allow user to read their own data
+      allow list: if isVerified(); // Allow verified users to see list of other users
       allow create: if isOwner(userId) && isVerified();
       allow update, delete: if isExistingOwner(userId) && isVerified();
     }
