@@ -19,6 +19,14 @@ service cloud.firestore {
     }
 
     /**
+     * @description Checks if the user's email is verified.
+     * @return {boolean} True if the user is signed in and their email is verified.
+     */
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    /**
      * @description Checks if the user is the owner of the resource, meaning that the userId from the resource matches the user's UID.
      * @param {string} userId The user ID to check against.
      * @return {boolean} True if the user is the owner, false otherwise.
@@ -49,16 +57,16 @@ service cloud.firestore {
      */
     match /events/{eventId} {
       allow get, list: if true;
-      allow create, update, delete: if false;
+      allow create, update, delete: if isAdmin();
     }
 
     /**
      * @description Rule for the /users/{userId} collection.
-     * Any user can read all users to find teammates.
+     * Any VERIFIED user can read all users to find teammates.
      * A user can only create, update, or delete their own profile.
      */
     match /users/{userId} {
-      allow read: if true;
+      allow read: if isVerified();
       allow create: if isOwner(userId);
       allow update, delete: if isExistingOwner(userId);
     }
@@ -78,19 +86,19 @@ service cloud.firestore {
      * @description Rule for the /teams/{teamId} collection.
      */
     match /teams/{teamId} {
-      allow get, list: if true;
-      allow create: if isSignedIn();
-      allow update: if request.auth.uid in resource.data.memberIds;
-      allow delete: if request.auth.uid in resource.data.memberIds && resource != null;
+      allow get, list: if isVerified();
+      allow create: if isVerified();
+      allow update: if isVerified() && request.auth.uid in resource.data.memberIds;
+      allow delete: if isVerified() && request.auth.uid in resource.data.memberIds && resource != null;
     }
 
     /**
      * @description Rule for the /projects/{projectId} collection.
      */
     match /projects/{projectId} {
-      allow get, list: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && resource != null;
+      allow get, list: if isVerified();
+      allow create: if isVerified();
+      allow update, delete: if isVerified() && resource != null;
     }
 
     /**
@@ -116,8 +124,8 @@ service cloud.firestore {
      * @description Rule for the /announcements/{announcementId} collection.
      */
     match /announcements/{announcementId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
+      allow get, list: if isVerified();
+      allow create, update, delete: if isAdmin();
     }
   }
 }

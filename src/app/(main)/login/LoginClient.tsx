@@ -73,15 +73,20 @@ export default function LoginClient() {
     setSuccess(null);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
-      const user = userCredential.user;
       
-      if (user.emailVerified) {
+      // Force a reload of the user's profile to get the latest `emailVerified` status
+      await userCredential.user.reload();
+      const freshUser = auth.currentUser; // Get the most up-to-date user object
+      
+      if (freshUser && freshUser.emailVerified) {
         // SUCCESS: Email is verified, proceed to dashboard.
         router.push('/dashboard');
       } else {
         // FAIL: Email is not verified.
         setError('Please verify your email address before logging in. A new verification link has been sent to your email.');
-        await sendEmailVerification(user);
+        if (freshUser) {
+          await sendEmailVerification(freshUser);
+        }
         await signOut(auth);
         // Force a page refresh to ensure UI reflects the signed-out state.
         router.refresh();
