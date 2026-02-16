@@ -141,7 +141,8 @@ export default function RegisterPage() {
       // Sign the user out immediately after registration.
       await signOut(auth);
 
-      router.push('/login?registered=true');
+      // Force a full page reload to the login page to clear all state.
+      window.location.href = '/login?registered=true';
 
     } catch (error: any) {
       setError(error.message);
