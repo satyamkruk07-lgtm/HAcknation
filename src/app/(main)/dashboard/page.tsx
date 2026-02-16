@@ -257,8 +257,8 @@ export default function DashboardPage() {
                               <Image
                                   src="https://image2url.com/r2/default/images/1771236095184-93d2c5d5-1a06-4393-8575-37d925995ef3.png"
                                   alt="NAAC A+ Grade"
-                                  width={100}
-                                  height={100}
+                                  width={120}
+                                  height={120}
                               />
                               <Image
                                   src="https://image2url.com/r2/default/images/1770980427628-5a0a7bba-af9b-4dee-98cc-c1b29fddac2b.png"
