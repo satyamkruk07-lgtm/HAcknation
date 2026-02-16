@@ -40,7 +40,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function LoginPage() {
   const auth = useAuth();
-  const { user: currentUser } = useUser();
+  // const { user: currentUser } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
@@ -53,12 +53,12 @@ export default function LoginPage() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    // If a verified user somehow lands on the login page, redirect them.
-    if (currentUser?.emailVerified) {
-      router.push('/dashboard');
-    }
-  }, [currentUser, router]);
+  // useEffect(() => {
+  //   // If a verified user somehow lands on the login page, redirect them.
+  //   if (currentUser?.emailVerified) {
+  //     router.push('/dashboard');
+  //   }
+  // }, [currentUser, router]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
