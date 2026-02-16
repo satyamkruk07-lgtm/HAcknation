@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from 'firebase/auth';
-import { useAuth, useFirestore } from '@/firebase';
+import { useAuth } from '@/firebase';
 
 import {
   Card,
@@ -74,7 +74,6 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function RegisterPage() {
   const auth = useAuth();
-  const firestore = useFirestore();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,11 +98,6 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setError(null);
-    if (!firestore) {
-        setError("Firestore is not initialized");
-        setIsSubmitting(false);
-        return;
-    }
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -125,7 +119,22 @@ export default function RegisterPage() {
       window.location.href = '/login?registered=true';
 
     } catch (error: any) {
-      setError(error.message);
+      let errorMessage = 'An unknown error occurred. Please try again.';
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'This email address is already registered. Please try logging in.';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'The password is too weak. Please use at least 6 characters.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'The email address is not valid.';
+          break;
+        default:
+          errorMessage = error.message;
+          break;
+      }
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
