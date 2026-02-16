@@ -7,7 +7,7 @@ export function Footer() {
       <div className="container py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         <Logo />
         <p className="text-sm text-muted-foreground">
-          © {new Date().getFullYear()} HackNation. All rights reserved.
+          © {new Date().getFullYear()} HackNation. Designed and Developed by ACM Student Chapter
         </p>
         <div className="flex items-center gap-4">
           <a
