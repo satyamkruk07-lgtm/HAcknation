@@ -62,13 +62,13 @@ service cloud.firestore {
 
     /**
      * @description Rule for the /users/{userId} collection.
-     * A user can read their own profile, even if unverified, to populate their profile page.
-     * A user can only create, update, or delete their own profile, and only if they are VERIFIED.
+     * A user can create their own profile document upon registration (unverified).
+     * They can only update or delete it once their email is verified.
+     * Any signed-in user can read another user's profile to facilitate team building.
      */
     match /users/{userId} {
-      allow read: if isOwner(userId); // Allow user to read their own data
-      allow list: if isVerified(); // Allow verified users to see list of other users
-      allow create: if isOwner(userId) && isVerified();
+      allow read, list: if isSignedIn(); 
+      allow create: if isOwner(userId);
       allow update, delete: if isExistingOwner(userId) && isVerified();
     }
     
@@ -95,11 +95,13 @@ service cloud.firestore {
 
     /**
      * @description Rule for the /projects/{projectId} collection.
+     * Any verified user can view and create projects.
+     * An admin can modify any project. A project owner can update/delete their own project.
      */
     match /projects/{projectId} {
       allow get, list: if isVerified();
       allow create: if isVerified();
-      allow update, delete: if isVerified() && resource != null;
+      allow update, delete: if isVerified() && (isAdmin() || request.auth.uid == resource.data.submittedBy);
     }
 
     /**

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useFirestore, useUser, useMemoFirebase } from '@/firebase';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
-import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc, where, getDocs, limit, startAfter, type QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, doc, deleteDoc, where, getDocs, limit, startAfter, type QueryDocumentSnapshot, updateDoc } from 'firebase/firestore';
 import {
   Card,
   CardContent,
@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ExternalLink, Github, Loader2, Trash2, Download, Trophy, Eye, Star } from 'lucide-react';
+import { ExternalLink, Github, Loader2, Trash2, Download, Trophy, Eye, Star, UserX } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -58,6 +58,7 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
+import { useToast } from '@/hooks/use-toast';
 
 
 function CreateAnnouncementForm() {
@@ -180,9 +181,11 @@ function CreateAnnouncementForm() {
 
 function UserManagementTab() {
   const firestore = useFirestore();
+  const { toast } = useToast();
   const { user: authUser, isUserLoading } = useUser();
   const { isAdmin, isAdminLoading } = useAdminStatus();
   const [selectedUser, setSelectedUser] = useState<UserAccount | null>(null);
+  const [userToDelete, setUserToDelete] = useState<UserAccount | null>(null);
   
   // Pagination State
   const [users, setUsers] = useState<UserAccount[]>([]);
@@ -228,7 +231,24 @@ function UserManagementTab() {
       setUsers([]);
       setIsLoadingUsers(false);
     }
-  }, [isAdmin, isAdminLoading]);
+  }, [isAdmin, isAdminLoading, loadMoreUsers]);
+
+  const handleDeleteUser = async () => {
+    if (!firestore || !userToDelete) return;
+
+    try {
+        const userDocRef = doc(firestore, 'users', userToDelete.id);
+        await deleteDoc(userDocRef);
+
+        setUsers(prevUsers => prevUsers.filter(u => u.id !== userToDelete.id));
+        toast({ title: "User Deleted", description: "The user account has been removed from Firestore." });
+    } catch (error: any) {
+        toast({ variant: 'destructive', title: "Deletion Failed", description: error.message });
+        console.error(error);
+    } finally {
+        setUserToDelete(null);
+    }
+  };
 
   const downloadCSV = (data: UserAccount[], filename: string) => {
     if (!data || data.length === 0) {
@@ -296,7 +316,10 @@ function UserManagementTab() {
                     <TableCell><Skeleton className="h-5 w-32" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-48" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-                    <TableCell className="text-right"><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
+                    <TableCell className="text-right space-x-2">
+                        <Skeleton className="h-8 w-20 ml-auto inline-block" />
+                        <Skeleton className="h-8 w-8 ml-auto inline-block" />
+                    </TableCell>
                   </TableRow>
                 ))
               ) : users.length > 0 ? (
@@ -310,9 +333,12 @@ function UserManagementTab() {
                           ? format(new Date(user.registrationDate), 'PP')
                           : 'N/A'}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right space-x-2">
                         <Button variant="outline" size="sm" onClick={() => setSelectedUser(user)}>
                           View Details
+                        </Button>
+                        <Button variant="destructive" size="icon" onClick={() => setUserToDelete(user)}>
+                            <UserX className="h-4 w-4" />
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -422,6 +448,23 @@ function UserManagementTab() {
           </DialogContent>
         </Dialog>
       )}
+
+      <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the user <strong className='text-foreground'>{userToDelete?.name}</strong> from Firestore. It will NOT delete their authentication record. They will need to be deleted from the Firebase Authentication console separately.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteUser} className="bg-destructive hover:bg-destructive/90">
+              Delete from Firestore
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
@@ -465,7 +508,7 @@ function ProjectManagementTab() {
 
   useEffect(() => {
     loadMoreProjects();
-  }, []);
+  }, [loadMoreProjects]);
 
   const handleDeleteProject = () => {
     if (!firestore || !projectToDelete) return;

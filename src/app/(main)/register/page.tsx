@@ -5,8 +5,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth';
-import { useAuth } from '@/firebase';
+import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from 'firebase/auth';
+import { useAuth, useFirestore } from '@/firebase';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+
 
 import {
   Card,
@@ -31,6 +33,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z
   .object({
@@ -74,7 +77,9 @@ type FormData = z.infer<typeof formSchema>;
 
 export default function RegisterPage() {
   const auth = useAuth();
+  const firestore = useFirestore();
   const router = useRouter();
+  const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -98,7 +103,14 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setError(null);
+    if (!firestore) {
+        setError("Database not available. Please try again later.");
+        setIsSubmitting(false);
+        return;
+    }
+
     try {
+      // Step 1: Create user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         data.email,
@@ -106,13 +118,35 @@ export default function RegisterPage() {
       );
       const user = userCredential.user;
       
+      // Step 2: Update their Auth profile with their name
       await updateProfile(user, { displayName: data.name });
+      
+      // Step 3: Create a corresponding user document in Firestore
+      const userDocRef = doc(firestore, 'users', user.uid);
+      await setDoc(userDocRef, {
+          name: data.name,
+          email: data.email,
+          mentorName: data.mentorName || '',
+          registrationType: data.registrationType,
+          leaderName: data.leaderName || '',
+          teamName: data.teamName || '',
+          teamMembers: data.teamMembers ? data.teamMembers.split(',').map(s => s.trim()) : [],
+          registrationDate: new Date().toISOString(),
+          emailVerified: false, // Explicitly set to false initially
+      });
 
+      // Step 4: Send the verification email
       await sendEmailVerification(user);
 
-      // Redirect to login page with a success message, but keep the user logged in temporarily
-      // The login page's logic will handle verified/unverified users.
-      router.push('/login?registered=true');
+      // Step 5: Sign the user out to force them to log in after verifying
+      await signOut(auth);
+
+      // Step 6: Redirect to login page with a success message
+      toast({
+        title: "Registration Successful!",
+        description: "Please check your email to verify your account before logging in.",
+      });
+      router.push('/login');
 
     } catch (error: any) {
       let errorMessage = 'An unknown error occurred. Please try again.';
