@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -7,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
 import { useAuth, useFirestore } from '@/firebase';
 
 import {
@@ -114,34 +112,16 @@ export default function RegisterPage() {
       );
       const user = userCredential.user;
       
+      // Set the user's display name in Firebase Auth
       await updateProfile(user, { displayName: data.name });
+
+      // Send the verification email
       await sendEmailVerification(user);
-
-      const userDocRef = doc(firestore, 'users', user.uid);
       
-      const userData: any = {
-        id: user.uid,
-        email: data.email,
-        name: data.name,
-        mentorName: data.mentorName,
-        photoURL: user.photoURL,
-        registrationDate: new Date().toISOString(),
-        emailVerified: user.emailVerified,
-        registrationType: data.registrationType,
-      };
-
-      if (data.registrationType === 'team') {
-        userData.teamName = data.teamName;
-        userData.leaderName = data.leaderName;
-        userData.teamMembers = data.teamMembers?.split(',').map(s => s.trim()).filter(s => s);
-      }
-
-      await setDoc(userDocRef, userData);
-      
-      // Sign the user out immediately after registration.
+      // Sign the user out immediately to force them to log in after verifying
       await signOut(auth);
 
-      // Force a full page reload to the login page to clear all state.
+      // Force a full page reload to the login page to clear all state and show success message.
       window.location.href = '/login?registered=true';
 
     } catch (error: any) {
