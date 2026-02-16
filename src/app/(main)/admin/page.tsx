@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ExternalLink, Github, Loader2, Trash2, Download, Trophy, Eye, Star, UserPlus, X } from 'lucide-react';
+import { ExternalLink, Github, Loader2, Trash2, Download, Trophy, Eye, Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -58,8 +58,6 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
-import { makeAdminAction, removeAdminAction } from '@/lib/actions';
-import { useToast } from '@/hooks/use-toast';
 
 
 function CreateAnnouncementForm() {
@@ -886,110 +884,6 @@ function JudgmentDetailsDialog({ project, onOpenChange, onJudgmentDeleted }: { p
     );
 }
 
-function AdminManagementTab() {
-  const { toast } = useToast();
-  const firestore = useFirestore();
-  const [newAdminEmail, setNewAdminEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const adminsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
-    return query(collection(firestore, 'roles_admin'));
-  }, [firestore]);
-  
-  // Note: Using a direct getDocs here instead of useCollection because admin roles change infrequently.
-  const [admins, setAdmins] = useState<{id: string, email: string}[]>([]);
-  const [isLoadingAdmins, setIsLoadingAdmins] = useState(true);
-
-  const fetchAdmins = useCallback(async () => {
-    if(!firestore) return;
-    setIsLoadingAdmins(true);
-    try {
-      const snapshot = await getDocs(collection(firestore, 'roles_admin'));
-      const adminData = snapshot.docs.map(doc => ({ id: doc.id, email: doc.data().email }));
-      setAdmins(adminData);
-    } catch (e) {
-      console.error("Failed to fetch admins", e);
-    } finally {
-      setIsLoadingAdmins(false);
-    }
-  }, [firestore]);
-
-  useEffect(() => {
-    fetchAdmins();
-  }, [fetchAdmins]);
-
-  const handleAddAdmin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newAdminEmail) return;
-
-    setIsSubmitting(true);
-    const result = await makeAdminAction(newAdminEmail);
-
-    if (result.success) {
-      toast({ title: 'Success', description: result.message });
-      setNewAdminEmail('');
-      fetchAdmins(); // Re-fetch the admin list
-    } else {
-      toast({ variant: 'destructive', title: 'Error', description: result.message });
-    }
-    setIsSubmitting(false);
-  };
-
-  const handleRemoveAdmin = async (uid: string) => {
-    const result = await removeAdminAction(uid);
-     if (result.success) {
-      toast({ title: 'Success', description: result.message });
-      fetchAdmins(); // Re-fetch the admin list
-    } else {
-      toast({ variant: 'destructive', title: 'Error', description: result.message });
-    }
-  }
-
-  return (
-    <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
-      <CardHeader>
-        <CardTitle>Admin Management</CardTitle>
-        <CardDescription>Add or remove administrators for HackNation.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleAddAdmin} className="flex items-center gap-2 mb-6">
-          <Input 
-            type="email"
-            placeholder="Enter user's email to make admin"
-            value={newAdminEmail}
-            onChange={(e) => setNewAdminEmail(e.target.value)}
-            required
-            className="flex-grow"
-          />
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UserPlus className="mr-2 h-4 w-4" />}
-            Add Admin
-          </Button>
-        </form>
-
-        <h3 className="mb-4 font-semibold">Current Admins</h3>
-        <div className="space-y-2">
-          {isLoadingAdmins ? (
-            Array.from({length: 2}).map((_, i) => <Skeleton key={i} className="h-10 w-full" />)
-          ) : admins.length > 0 ? (
-            admins.map(admin => (
-              <div key={admin.id} className="flex items-center justify-between rounded-md border p-2 px-4">
-                <span className="text-sm">{admin.email}</span>
-                <Button variant="ghost" size="icon" onClick={() => handleRemoveAdmin(admin.id)}>
-                    <X className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-            ))
-          ) : (
-            <p className="text-sm text-muted-foreground text-center py-4">No admins found.</p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
 export default function AdminPage() {
   const { user, isUserLoading } = useUser();
   const { isAdmin, isAdminLoading } = useAdminStatus();
@@ -1027,12 +921,11 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="announcements" className="w-full">
-            <TabsList className="grid w-full grid-cols-5 bg-background/50 border shadow-inner">
+            <TabsList className="grid w-full grid-cols-4 bg-background/50 border shadow-inner">
               <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
               <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
               <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
               <TabsTrigger value="judging" className="data-[state=active]:shadow-inner">Judging</TabsTrigger>
-              <TabsTrigger value="admins" className="data-[state=active]:shadow-inner">Admins</TabsTrigger>
             </TabsList>
             <TabsContent value="announcements" className="mt-6">
               <CreateAnnouncementForm />
@@ -1045,9 +938,6 @@ export default function AdminPage() {
             </TabsContent>
             <TabsContent value="judging" className="mt-6">
                 <JudgingTab />
-            </TabsContent>
-             <TabsContent value="admins" className="mt-6">
-                <AdminManagementTab />
             </TabsContent>
           </Tabs>
         </div>
