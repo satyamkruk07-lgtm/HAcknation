@@ -61,9 +61,9 @@ export default function AiDiscussionPage() {
 
   // Fetch all submitted projects to check for taken ideas
   const projectsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !user?.emailVerified) return null;
     return query(collection(firestore, 'projects'));
-  }, [firestore]);
+  }, [firestore, user?.emailVerified]);
 
   const { data: submittedProjects, isLoading } = useCollection<SubmittedProject>(projectsQuery);
 

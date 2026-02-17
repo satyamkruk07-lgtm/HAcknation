@@ -96,11 +96,14 @@ export default function TeamsPage() {
   }, [firestore, hasMore, lastVisibleProfile]);
   
   useEffect(() => {
-    // Initial fetch if user is logged in
+    // Initial fetch if user is logged in and verified
     if(user && user.emailVerified) {
       loadMoreProfiles();
+    } else if (!isUserLoading) {
+      // If user is not verified or not logged in, don't load anything.
+      setIsLoading(false);
     }
-  }, [user, loadMoreProfiles]);
+  }, [user, isUserLoading, loadMoreProfiles]);
 
   const showSkeletons = isLoading && teamProfiles.length === 0;
 

@@ -147,7 +147,7 @@ export default function SubmitClient() {
   
   const isLoading = isUserLoading || isProfileLoading;
 
-  if (isLoading) {
+  if (isLoading || !user) {
     return (
         <div className="container py-12">
             <Card className="w-full max-w-2xl mx-auto">
