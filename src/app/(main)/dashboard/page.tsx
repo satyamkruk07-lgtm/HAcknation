@@ -246,53 +246,53 @@ export default function DashboardPage() {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/50" />
-           <div className="relative flex justify-between items-center p-8">
-              <div className="flex items-center gap-6">
+           <div className="relative flex flex-col md:flex-row justify-between items-start md:items-center p-4 sm:p-6 md:p-8 gap-6">
+              {/* Left side */}
+              <div className="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4">
                   <Image
                       src="https://shivalikcollege.edu.in/naac/assets/img/shivalik_college_of_eng_logo.jpg"
                       alt="Shivalik College Logo"
-                      width={100}
-                      height={100}
-                      className="rounded-full"
+                      width={96}
+                      height={96}
+                      className="rounded-full w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0"
                   />
-                  <div className="text-left mt-4">
-                      <div className="flex items-center gap-4">
-                          <h1 className="font-headline text-3xl font-bold text-white">
-                              Shivalik <br /> College of Engineering
-                          </h1>
-                          <div className="flex flex-row items-center gap-4">
-                              <Image
-                                  src="https://image2url.com/r2/default/images/1771236095184-93d2c5d5-1a06-4393-8575-37d925995ef3.png"
-                                  alt="NAAC A+ Grade"
-                                  width={120}
-                                  height={120}
-                              />
-                              <Image
-                                  src="https://image2url.com/r2/default/images/1770980427628-5a0a7bba-af9b-4dee-98cc-c1b29fddac2b.png"
-                                  alt="Ranked among Top 10 Engineering Colleges in North India"
-                                  width={100}
-                                  height={100}
-                              />
-                          </div>
+                  <div className="flex flex-col gap-2">
+                      <h1 className="font-headline text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                          Shivalik College of Engineering
+                      </h1>
+                      <div className="flex flex-row items-center justify-center sm:justify-start gap-4">
+                          <Image
+                              src="https://image2url.com/r2/default/images/1771236095184-93d2c5d5-1a06-4393-8575-37d925995ef3.png"
+                              alt="NAAC A+ Grade"
+                              width={90}
+                              height={90}
+                              className="w-20 h-20 object-contain"
+                          />
+                          <Image
+                              src="https://image2url.com/r2/default/images/1770980427628-5a0a7bba-af9b-4dee-98cc-c1b29fddac2b.png"
+                              alt="Ranked among Top 10 Engineering Colleges in North India"
+                              width={90}
+                              height={90}
+                              className="w-20 h-20 object-contain"
+                          />
                       </div>
                   </div>
               </div>
-              <div className="flex flex-col items-center gap-2">
-                <div className="flex items-center gap-4">
-                  <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
-                      <a href="tel:+919997155111">
-                          <Phone className="h-5 w-5" />
-                      </a>
-                  </Button>
-                  <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
-                      <a href="mailto:info@shivalikcollege.edu.in">
-                          <Mail className="h-5 w-5" />
-                      </a>
-                  </Button>
-                </div>
-                <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white">
-                    <a href="https://shivalikcollege.edu.in/" target="_blank" rel="noopener noreferrer">
-                        <Globe className="h-5 w-5" />
+              {/* Right Side */}
+              <div className="flex flex-row self-center sm:self-end md:self-center items-center justify-center gap-2 md:flex-col md:gap-2">
+                <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white h-9 w-9">
+                    <a href="tel:+919997155111" aria-label="Call">
+                        <Phone className="h-4 w-4" />
+                    </a>
+                </Button>
+                <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white h-9 w-9">
+                    <a href="mailto:info@shivalikcollege.edu.in" aria-label="Email">
+                        <Mail className="h-4 w-4" />
+                    </a>
+                </Button>
+                <Button asChild size="icon" variant="outline" className="bg-transparent text-white border-white/50 hover:bg-white/10 hover:text-white h-9 w-9">
+                    <a href="https://shivalikcollege.edu.in/" target="_blank" rel="noopener noreferrer" aria-label="Website">
+                        <Globe className="h-4 w-4" />
                     </a>
                 </Button>
               </div>
