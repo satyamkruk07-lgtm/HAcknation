@@ -54,9 +54,10 @@ function QRCodeGenerator() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Use the public URL for the deployed Firebase application.
-    const publicUrl = 'https://9000-firebase-studio-1762000194238.cluster-xpmcxs2fjnhg6xvn446ubtgpio.cloudworkstations.dev/judging';
-    setUrl(publicUrl);
+    if (typeof window !== 'undefined') {
+      const publicUrl = `${window.location.origin}/judging`;
+      setUrl(publicUrl);
+    }
   }, []);
 
   const copyToClipboard = () => {
