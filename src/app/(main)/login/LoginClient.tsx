@@ -52,7 +52,7 @@ export default function LoginClient() {
 
   useEffect(() => {
     if (searchParams.get('registered') === 'true') {
-      setSuccess('Account created! Please check your email to verify your account before logging in.');
+      setSuccess('Please verify your email to continue(Check your inbox and spam section for verification link)');
     }
     if (searchParams.get('reason') === 'unverified') {
       setSuccess('Please verify your email to continue(Check your inbox and spam section for verification link)');
