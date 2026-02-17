@@ -169,6 +169,15 @@ export default function ProfilePage() {
     const file = event.target.files?.[0];
     if (!file || !user || !userDocRef) return;
 
+    if (!user.emailVerified) {
+      toast({
+        variant: 'destructive',
+        title: 'Verification Required',
+        description: 'Firstly verify your email id',
+      });
+      return;
+    }
+
     if (file.size > 2 * 1024 * 1024) { // 2MB limit
       toast({
         variant: 'destructive',
@@ -213,6 +222,15 @@ export default function ProfilePage() {
         variant: 'destructive',
         title: 'Error',
         description: 'You must be logged in to update your profile.',
+      });
+      return;
+    }
+
+    if (!user.emailVerified) {
+      toast({
+        variant: 'destructive',
+        title: 'Verification Required',
+        description: 'Firstly verify your email id',
       });
       return;
     }
