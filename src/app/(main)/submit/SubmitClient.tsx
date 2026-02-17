@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useFirestore, useUser, useDoc, useMemoFirebase } from '@/firebase';
+import { useFirestore, useUser, useDoc, useMemoFirebase, useAuth } from '@/firebase';
 import { collection, addDoc, serverTimestamp, doc } from 'firebase/firestore';
 import {
   Card,
@@ -20,10 +20,12 @@ import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { UserAccount } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { signOut } from 'firebase/auth';
 
 export default function SubmitClient() {
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
+  const auth = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -41,6 +43,17 @@ export default function SubmitClient() {
   const [githubUrl, setGithubUrl] = useState('');
   const [demoUrl, setDemoUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isUserLoading) return;
+    if (!user) {
+      router.push('/login');
+    } else if (!user.emailVerified) {
+      signOut(auth).then(() => {
+        router.push('/login?reason=unverified');
+      });
+    }
+  }, [user, isUserLoading, router, auth]);
 
   useEffect(() => {
     // Pre-fill form from URL query parameters

@@ -32,18 +32,32 @@ import { Badge } from '@/components/ui/badge';
 import { projectIdeas } from '@/lib/data';
 import type { ProjectIdea, SubmittedProject } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser, useAuth } from '@/firebase';
 import { collection, query } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
+import { signOut } from 'firebase/auth';
 
 export default function AiDiscussionPage() {
   const ideas: ProjectIdea[] = projectIdeas;
   const router = useRouter();
   const firestore = useFirestore();
+  const { user, isUserLoading } = useUser();
+  const auth = useAuth();
 
   const [selectedIdea, setSelectedIdea] = useState<ProjectIdea | null>(null);
   const [takenIdeas, setTakenIdeas] = useState<Set<string>>(new Set());
   const [showTakenAlert, setShowTakenAlert] = useState(false);
+
+  useEffect(() => {
+    if (isUserLoading) return;
+    if (!user) {
+      router.push('/login');
+    } else if (!user.emailVerified) {
+      signOut(auth).then(() => {
+        router.push('/login?reason=unverified');
+      });
+    }
+  }, [user, isUserLoading, router, auth]);
 
   // Fetch all submitted projects to check for taken ideas
   const projectsQuery = useMemoFirebase(() => {
@@ -90,6 +104,8 @@ export default function AiDiscussionPage() {
     }
   };
 
+  const pageLoading = isLoading || isUserLoading;
+
   return (
     <>
       <div className="container py-12">
@@ -107,7 +123,7 @@ export default function AiDiscussionPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {isLoading ? (
+            {pageLoading ? (
               Array.from({ length: 9 }).map((_, i) => (
                 <Card key={i}>
                     <CardHeader>

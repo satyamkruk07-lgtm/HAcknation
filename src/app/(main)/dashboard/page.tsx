@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc } from '@/firebase';
+import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc, useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -37,6 +37,7 @@ import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ConductedBy } from '@/components/conducted-by';
+import { signOut } from 'firebase/auth';
 
 const features = [
   {
@@ -179,6 +180,7 @@ function AnnouncementSkeleton() {
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
+  const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
 
@@ -197,10 +199,15 @@ export default function DashboardPage() {
   const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserAccount>(userDocRef);
 
   useEffect(() => {
-    if (!isUserLoading && !user) {
+    if (isUserLoading) return;
+    if (!user) {
       router.push('/login');
+    } else if (!user.emailVerified) {
+      signOut(auth).then(() => {
+        router.push('/login?reason=unverified');
+      });
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, auth]);
 
   const isContentLoading = isUserLoading || isProfileLoading;
 

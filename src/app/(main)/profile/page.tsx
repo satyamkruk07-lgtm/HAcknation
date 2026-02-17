@@ -4,12 +4,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useUser, useFirestore, useMemoFirebase, useStorage } from '@/firebase';
+import { useUserAndMutate, useFirestore, useMemoFirebase, useStorage, useAuth } from '@/firebase';
 import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useRouter } from 'next/navigation';
 import { useDoc } from '@/firebase/firestore/use-doc';
-import { useUserAndMutate } from '@/firebase/provider';
 
 import {
   Card,
@@ -34,7 +33,7 @@ import { Loader2, Cpu, Upload } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { UserAccount } from '@/lib/types';
-import { updateProfile } from 'firebase/auth';
+import { updateProfile, signOut } from 'firebase/auth';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -88,6 +87,7 @@ type ProfileFormData = z.infer<typeof profileFormSchema>;
 
 export default function ProfilePage() {
   const { user, isUserLoading, mutate: mutateUser } = useUserAndMutate();
+  const auth = useAuth();
   const firestore = useFirestore();
   const storage = useStorage();
   const router = useRouter();
@@ -123,10 +123,15 @@ export default function ProfilePage() {
   const registrationType = form.watch('registrationType');
 
   useEffect(() => {
-    if (!isUserLoading && !user) {
+    if (isUserLoading) return;
+    if (!user) {
       router.push('/login');
+    } else if (!user.emailVerified) {
+      signOut(auth).then(() => {
+        router.push('/login?reason=unverified');
+      });
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, auth]);
 
   useEffect(() => {
     if (userProfile) {

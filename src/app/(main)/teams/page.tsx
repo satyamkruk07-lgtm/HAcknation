@@ -14,11 +14,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Mail, Phone, Users, Loader2 } from 'lucide-react';
 import type { UserAccount } from '@/lib/types';
-import { useFirestore, useUser } from '@/firebase';
+import { useFirestore, useUser, useAuth } from '@/firebase';
 import { collection, query, orderBy, getDocs, limit, startAfter, type QueryDocumentSnapshot } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { signOut } from 'firebase/auth';
 
 function ProfileCardSkeleton() {
     return (
@@ -47,6 +48,7 @@ function ProfileCardSkeleton() {
 export default function TeamsPage() {
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
+  const auth = useAuth();
   const router = useRouter();
 
   // Pagination State
@@ -56,10 +58,15 @@ export default function TeamsPage() {
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    if (!isUserLoading && !user) {
+    if (isUserLoading) return;
+    if (!user) {
       router.push('/login');
+    } else if (!user.emailVerified) {
+      signOut(auth).then(() => {
+        router.push('/login?reason=unverified');
+      });
     }
-  }, [user, isUserLoading, router]);
+  }, [user, isUserLoading, router, auth]);
 
   const loadMoreProfiles = useCallback(async () => {
     if (!firestore || !hasMore) return;
@@ -90,10 +97,10 @@ export default function TeamsPage() {
   
   useEffect(() => {
     // Initial fetch if user is logged in
-    if(user) {
+    if(user && user.emailVerified) {
       loadMoreProfiles();
     }
-  }, [user]);
+  }, [user, loadMoreProfiles]);
 
   const showSkeletons = isLoading && teamProfiles.length === 0;
 

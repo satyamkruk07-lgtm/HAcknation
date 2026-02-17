@@ -50,6 +50,9 @@ export default function LoginClient() {
     if (searchParams.get('registered') === 'true') {
       setSuccess('Account created! Please check your email to verify your account before logging in.');
     }
+    if (searchParams.get('reason') === 'unverified') {
+      setSuccess('Please verify your email to continue. Check your inbox for the verification link.');
+    }
   }, [searchParams]);
 
   useEffect(() => {
@@ -135,7 +138,7 @@ export default function LoginClient() {
                {success && (
                 <Alert variant='default'>
                   <CheckCircle className="h-4 w-4" />
-                  <AlertTitle>Success!</AlertTitle>
+                  <AlertTitle>Action Required</AlertTitle>
                   <AlertDescription>{success}</AlertDescription>
                 </Alert>
               )}
