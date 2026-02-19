@@ -269,10 +269,10 @@ export default function DashboardPage() {
                               className="w-20 h-20 object-contain"
                           />
                           <Image
-                              src="https://image2url.com/r2/default/images/1770980427628-5a0a7bba-af9b-4dee-98cc-c1b29fddac2b.png"
-                              alt="Ranked among Top 10 Engineering Colleges in North India"
-                              width={90}
-                              height={90}
+                              src="https://image2url.com/r2/default/images/1771394043806-0d318ac1-2aae-4c91-8ca3-63e2058328b0.png"
+                              alt="ACM Logo"
+                              width={80}
+                              height={80}
                               className="w-20 h-20 object-contain"
                           />
                       </div>
