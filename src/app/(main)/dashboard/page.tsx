@@ -269,6 +269,13 @@ export default function DashboardPage() {
                               className="w-20 h-20 object-contain"
                           />
                           <Image
+                              src="https://image2url.com/r2/default/images/1771393774659-1af0cbaf-4b16-4aaa-9da0-0b097a9943cd.png"
+                              alt="NBA Accredited"
+                              width={90}
+                              height={90}
+                              className="w-[90px] h-[90px] object-contain"
+                          />
+                          <Image
                               src="https://image2url.com/r2/default/images/1771394043806-0d318ac1-2aae-4c91-8ca3-63e2058328b0.png"
                               alt="ACM Logo"
                               width={80}
