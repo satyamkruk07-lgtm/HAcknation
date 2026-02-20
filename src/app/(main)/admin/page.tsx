@@ -193,20 +193,19 @@ function UserManagementTab() {
   const [lastVisibleUser, setLastVisibleUser] = useState<QueryDocumentSnapshot | null>(null);
   const [hasMoreUsers, setHasMoreUsers] = useState(true);
 
+  // For loading more users on button click
   const loadMoreUsers = useCallback(async () => {
-    if (!firestore || !hasMoreUsers) return;
+    if (!firestore || !hasMoreUsers || isLoadingUsers || !lastVisibleUser) return;
+    
     setIsLoadingUsers(true);
 
-    let q = query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'), limit(10));
-    if (lastVisibleUser) {
-      q = query(q, startAfter(lastVisibleUser));
-    }
+    const q = query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'), limit(10), startAfter(lastVisibleUser));
 
     try {
       const querySnapshot = await getDocs(q);
       const newUsers = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as UserAccount));
       
-      setUsers(prev => lastVisibleUser ? [...prev, ...newUsers] : newUsers);
+      setUsers(prev => [...prev, ...newUsers]);
       
       if (querySnapshot.docs.length < 10) {
         setHasMoreUsers(false);
@@ -215,23 +214,45 @@ function UserManagementTab() {
       }
     } catch(err) {
       console.error(err);
+      toast({ variant: "destructive", title: "Error", description: "Could not load more users." });
     } finally {
       setIsLoadingUsers(false);
     }
-  }, [firestore, hasMoreUsers, lastVisibleUser]);
+  }, [firestore, hasMoreUsers, lastVisibleUser, isLoadingUsers, toast]);
   
+  // For the initial load of users
   useEffect(() => {
-    if (isAdmin) {
-      // Initial load or re-load if admin status is gained
-      setUsers([]);
-      setLastVisibleUser(null);
-      setHasMoreUsers(true);
-      loadMoreUsers();
+    if (isAdmin && firestore) {
+      const initialLoad = async () => {
+        setIsLoadingUsers(true);
+        const q = query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'), limit(10));
+        try {
+          const querySnapshot = await getDocs(q);
+          const newUsers = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as UserAccount));
+          
+          setUsers(newUsers);
+          
+          if (querySnapshot.docs.length < 10) {
+            setHasMoreUsers(false);
+          } else {
+            setHasMoreUsers(true);
+            setLastVisibleUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
+          }
+        } catch (err) {
+          console.error(err);
+          toast({ variant: "destructive", title: "Error loading users", description: "Could not fetch user data." });
+        } finally {
+          setIsLoadingUsers(false);
+        }
+      };
+
+      initialLoad();
     } else if (!isAdminLoading) {
+      // If not an admin, clear the list and stop loading.
       setUsers([]);
       setIsLoadingUsers(false);
     }
-  }, [isAdmin, isAdminLoading, loadMoreUsers]);
+  }, [isAdmin, isAdminLoading, firestore, toast]);
 
   const handleDeleteUser = async () => {
     if (!firestore || !userToDelete) return;
