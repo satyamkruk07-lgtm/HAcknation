@@ -41,8 +41,7 @@ function ProjectCardSkeleton() {
                 <Skeleton className="h-4 w-full mb-1" />
                 <Skeleton className="h-4 w-5/6" />
             </CardContent>
-            <CardFooter className="flex justify-between">
-                <Skeleton className="h-9 w-24" />
+            <CardFooter className="flex justify-end">
                 <Skeleton className="h-9 w-32" />
             </CardFooter>
         </Card>
@@ -156,13 +155,7 @@ export default function JudgingPage() {
                 <CardContent className="flex-1">
                 <p className="text-muted-foreground line-clamp-3">{project.description}</p>
                 </CardContent>
-                <CardFooter className="flex justify-between">
-                <Button asChild variant="ghost" size="sm">
-                    <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
-                    <Github className="mr-2 h-4 w-4" />
-                    GitHub
-                    </a>
-                </Button>
+                <CardFooter className="flex justify-end">
                 <Button asChild>
                     <Link href={`/judging/${project.id}`}>
                     Judge Project <ArrowRight className="ml-2 h-4 w-4" />
