@@ -2,7 +2,7 @@
 
 import { notFound } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Github, Loader2 } from 'lucide-react';
+import { ExternalLink, Github, Loader2, FileText } from 'lucide-react';
 import JudgingForm from './_components/judging-form';
 import { useDoc, useFirestore, useMemoFirebase, useUser, useAuth } from '@/firebase';
 import { doc } from 'firebase/firestore';
@@ -81,20 +81,10 @@ export default function ProjectJudgingPage() {
           </p>
           <p className="mt-4">{project.description}</p>
           <div className="mt-6 flex gap-4">
-            <Button asChild variant="outline">
-              <a
-                href={project.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Github className="mr-2 h-4 w-4" />
-                View on GitHub
-              </a>
-            </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" disabled={!project.demoUrl}>
               <a href={project.demoUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Live Demo
+                <FileText className="mr-2 h-4 w-4" />
+                View Presentation
               </a>
             </Button>
           </div>
