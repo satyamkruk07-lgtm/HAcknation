@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ExternalLink, Github, Loader2, Trash2, Download, Trophy, Eye, Star, UserX } from 'lucide-react';
+import { ExternalLink, Github, Loader2, Trash2, Download, Trophy, Eye, Star, UserX, FileText } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -192,20 +192,24 @@ function UserManagementTab() {
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const [lastVisibleUser, setLastVisibleUser] = useState<QueryDocumentSnapshot | null>(null);
   const [hasMoreUsers, setHasMoreUsers] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // For loading more users on button click
   const loadMoreUsers = useCallback(async () => {
-    if (!firestore || !hasMoreUsers || isLoadingUsers || !lastVisibleUser) return;
+    if (!firestore || !hasMoreUsers || isLoadingUsers) return;
     
     setIsLoadingUsers(true);
 
-    const q = query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'), limit(10), startAfter(lastVisibleUser));
+    let q = query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'), limit(10));
+    if(lastVisibleUser) {
+        q = query(q, startAfter(lastVisibleUser))
+    }
 
     try {
       const querySnapshot = await getDocs(q);
       const newUsers = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as UserAccount));
       
-      setUsers(prev => [...prev, ...newUsers]);
+      setUsers(prev => lastVisibleUser ? [...prev, ...newUsers] : newUsers);
       
       if (querySnapshot.docs.length < 10) {
         setHasMoreUsers(false);
@@ -213,62 +217,47 @@ function UserManagementTab() {
         setLastVisibleUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
       }
     } catch(err) {
-      console.error(err);
-      toast({ variant: "destructive", title: "Error", description: "Could not load more users." });
+        const permissionError = new FirestorePermissionError({
+            path: 'users',
+            operation: 'list',
+        });
+        errorEmitter.emit('permission-error', permissionError);
     } finally {
       setIsLoadingUsers(false);
     }
-  }, [firestore, hasMoreUsers, lastVisibleUser, isLoadingUsers, toast]);
+  }, [firestore, hasMoreUsers, lastVisibleUser, isLoadingUsers]);
   
   // For the initial load of users
   useEffect(() => {
     if (isAdmin && firestore) {
-      const initialLoad = async () => {
-        setIsLoadingUsers(true);
-        const q = query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'), limit(10));
-        try {
-          const querySnapshot = await getDocs(q);
-          const newUsers = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as UserAccount));
-          
-          setUsers(newUsers);
-          
-          if (querySnapshot.docs.length < 10) {
-            setHasMoreUsers(false);
-          } else {
-            setHasMoreUsers(true);
-            setLastVisibleUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
-          }
-        } catch (err) {
-          console.error(err);
-          toast({ variant: "destructive", title: "Error loading users", description: "Could not fetch user data." });
-        } finally {
-          setIsLoadingUsers(false);
-        }
-      };
-
-      initialLoad();
+      loadMoreUsers();
     } else if (!isAdminLoading) {
-      // If not an admin, clear the list and stop loading.
       setUsers([]);
       setIsLoadingUsers(false);
     }
-  }, [isAdmin, isAdminLoading, firestore, toast]);
+  }, [isAdmin, isAdminLoading, firestore, loadMoreUsers]);
 
-  const handleDeleteUser = async () => {
+  const handleDeleteUser = () => {
     if (!firestore || !userToDelete) return;
+    setIsDeleting(true);
 
-    try {
-        const userDocRef = doc(firestore, 'users', userToDelete.id);
-        await deleteDoc(userDocRef);
-
-        setUsers(prevUsers => prevUsers.filter(u => u.id !== userToDelete.id));
-        toast({ title: "User Deleted", description: "The user account has been removed from Firestore." });
-    } catch (error: any) {
-        toast({ variant: 'destructive', title: "Deletion Failed", description: error.message });
-        console.error(error);
-    } finally {
-        setUserToDelete(null);
-    }
+    const userDocRef = doc(firestore, 'users', userToDelete.id);
+    deleteDoc(userDocRef)
+        .then(() => {
+            setUsers(prevUsers => prevUsers.filter(u => u.id !== userToDelete.id));
+            toast({ title: "User Deleted", description: "The user account has been removed from Firestore." });
+        })
+        .catch(async (serverError) => {
+            const permissionError = new FirestorePermissionError({
+                path: userDocRef.path,
+                operation: 'delete',
+            });
+            errorEmitter.emit('permission-error', permissionError);
+        })
+        .finally(() => {
+            setIsDeleting(false);
+            setUserToDelete(null);
+        });
   };
 
   const downloadCSV = (data: UserAccount[], filename: string) => {
@@ -480,7 +469,8 @@ function UserManagementTab() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteUser} className="bg-destructive hover:bg-destructive/90">
+            <AlertDialogAction onClick={handleDeleteUser} disabled={isDeleting} className="bg-destructive hover:bg-destructive/90">
+              {isDeleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Delete from Firestore
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -521,7 +511,11 @@ function ProjectManagementTab() {
         setLastVisibleProject(querySnapshot.docs[querySnapshot.docs.length - 1]);
       }
     } catch(err) {
-      console.error(err);
+        const permissionError = new FirestorePermissionError({
+            path: 'projects',
+            operation: 'list',
+        });
+        errorEmitter.emit('permission-error', permissionError);
     } finally {
       setIsLoading(false);
     }
@@ -555,14 +549,13 @@ function ProjectManagementTab() {
       alert('No data to download.');
       return;
     }
-    const headers = ['Project Name', 'Team', 'Description', 'GitHub URL', 'Demo URL', 'Submission Date'];
+    const headers = ['Project Name', 'Team', 'Description', 'Demo URL', 'Submission Date'];
     const csvContent = [
       headers.join(','),
       ...data.map(item => [
         `"${item.name || ''}"`,
         `"${item.teamName || (item.teamMembers || item.studentNames || []).join('; ')}"`,
         `"${(item.description || '').replace(/"/g, '""')}"`,
-        `"${item.githubUrl || ''}"`,
         `"${item.demoUrl || ''}"`,
         `"${item.submissionDate ? format(new Date(item.submissionDate.seconds * 1000), 'PPp') : ''}"`
       ].join(','))
@@ -627,11 +620,8 @@ function ProjectManagementTab() {
                         : 'N/A'}
                     </TableCell>
                     <TableCell className="space-x-2">
-                      <Button asChild variant="outline" size="icon">
-                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer"><Github className="h-4 w-4" /></a>
-                      </Button>
-                      <Button asChild variant="outline" size="icon">
-                        <a href={project.demoUrl} target="_blank" rel="noopener noreferrer"><ExternalLink className="h-4 w-4" /></a>
+                      <Button asChild variant="outline" size="icon" disabled={!project.demoUrl}>
+                        <a href={project.demoUrl} target="_blank" rel="noopener noreferrer"><FileText className="h-4 w-4" /></a>
                       </Button>
                     </TableCell>
                     <TableCell className="text-right">
@@ -705,7 +695,11 @@ function useProjectJudgments(projectId: string): { judgments: Judgment[] | null;
       const data = snapshot.docs.map(doc => ({...doc.data() as Judgment, id: doc.id}));
       setJudgments(data);
     } catch(err) {
-      console.error(err);
+      const permissionError = new FirestorePermissionError({
+        path: 'judgments',
+        operation: 'list',
+      });
+      errorEmitter.emit('permission-error', permissionError);
     } finally {
       setIsLoading(false);
     }
@@ -742,7 +736,13 @@ function JudgingTab() {
         const querySnapshot = await getDocs(q);
         const newProjects = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as SubmittedProject));
         setProjects(newProjects);
-      } catch(err) { console.error(err); } 
+      } catch(err) {
+        const permissionError = new FirestorePermissionError({
+            path: 'projects',
+            operation: 'list',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      } 
       finally { setIsLoadingProjects(false); }
     }, [firestore]);
 
@@ -753,7 +753,13 @@ function JudgingTab() {
         const querySnapshot = await getDocs(collection(firestore, 'judgments'));
         const judgmentsData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Judgment));
         setAllJudgments(judgmentsData);
-      } catch(err) { console.error(err); }
+      } catch(err) {
+        const permissionError = new FirestorePermissionError({
+            path: 'judgments',
+            operation: 'list',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      }
       finally { setIsLoadingJudgments(false); }
     }, [firestore]);
 
