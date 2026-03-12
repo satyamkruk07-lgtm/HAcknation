@@ -32,7 +32,6 @@ export type Project = {
   name: string;
   team: string[];
   description: string;
-  githubUrl: string;
   demoUrl: string;
 };
 
@@ -43,7 +42,6 @@ export type SubmittedProject = {
   studentNames?: string[];
   teamMembers?: string[]; // Add optional teamMembers
   description: string;
-  githubUrl: string;
   demoUrl: string;
   submittedBy: string;
   submissionDate: Timestamp;
