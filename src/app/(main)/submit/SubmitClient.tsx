@@ -40,7 +40,6 @@ export default function SubmitClient() {
   const [teamName, setTeamName] = useState('');
   const [teamMembers, setTeamMembers] = useState('');
   const [description, setDescription] = useState('');
-  const [githubUrl, setGithubUrl] = useState('');
   const [demoUrl, setDemoUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -103,6 +102,26 @@ export default function SubmitClient() {
       });
       return;
     }
+    
+    if (!demoUrl) {
+        toast({
+            variant: 'destructive',
+            title: 'Link missing',
+            description: 'Please provide a link to your presentation.',
+        });
+        return;
+    }
+    
+    try {
+        new URL(demoUrl);
+    } catch (_) {
+        toast({
+            variant: 'destructive',
+            title: 'Invalid URL',
+            description: 'Please provide a valid link to your presentation.',
+        });
+        return;
+    }
 
     setIsSubmitting(true);
 
@@ -113,8 +132,7 @@ export default function SubmitClient() {
         teamName: teamName,
         teamMembers: teamMembers.split(',').map((m) => m.trim()),
         description,
-        githubUrl,
-        demoUrl,
+        demoUrl: demoUrl,
         submittedBy: user.displayName,
         submissionDate: serverTimestamp(),
       });
@@ -123,14 +141,6 @@ export default function SubmitClient() {
         title: 'Project Submitted!',
         description: 'Your project has been successfully submitted for judging. Good luck!',
       });
-
-      // Reset form
-      setProjectName('');
-      setTeamName('');
-      setTeamMembers('');
-      setDescription('');
-      setGithubUrl('');
-      setDemoUrl('');
       
       router.push('/dashboard');
 
@@ -138,10 +148,10 @@ export default function SubmitClient() {
       toast({
         variant: 'destructive',
         title: 'Submission Failed',
-        description: error.message || 'An unknown error occurred.',
+        description: error.message || 'An unknown error occurred while saving project data.',
       });
     } finally {
-      setIsSubmitting(false);
+        setIsSubmitting(false);
     }
   };
   
@@ -188,7 +198,7 @@ export default function SubmitClient() {
                 <div className="space-y-6">
                 <div className="space-y-2">
                     <Label htmlFor="project-name">Project Name <span className="text-destructive">*</span></Label>
-                    <Input id="project-name" placeholder="e.g., EcoTrack" required value={projectName} onChange={(e) => setProjectName(e.target.value)} />
+                    <Input id="project-name" placeholder="e.g., EcoTrack" required value={projectName} onChange={(e) => setProjectName(e.target.value)} disabled={isSubmitting}/>
                 </div>
                 
                 {userProfile?.registrationType === 'team' ? (
@@ -201,6 +211,7 @@ export default function SubmitClient() {
                                 value={teamName} 
                                 onChange={(e) => setTeamName(e.target.value)}
                                 required 
+                                disabled={isSubmitting}
                             />
                         </div>
                         <div className="space-y-2">
@@ -211,6 +222,7 @@ export default function SubmitClient() {
                             required
                             value={teamMembers}
                             onChange={(e) => setTeamMembers(e.target.value)}
+                            disabled={isSubmitting}
                             />
                             <p className="text-xs text-muted-foreground">
                             Please enter full names, separated by commas.
@@ -226,6 +238,7 @@ export default function SubmitClient() {
                             value={teamMembers}
                             readOnly
                             className="bg-muted/50"
+                            disabled={isSubmitting}
                         />
                     </div>
                 )}
@@ -239,29 +252,22 @@ export default function SubmitClient() {
                     required
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                    disabled={isSubmitting}
                     />
                 </div>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                    <div className="space-y-2">
-                    <Label htmlFor="github-url">GitHub Repository URL</Label>
-                    <Input
-                        id="github-url"
-                        type="url"
-                        placeholder="https://github.com/..."
-                        value={githubUrl}
-                        onChange={(e) => setGithubUrl(e.target.value)}
-                    />
-                    </div>
-                    <div className="space-y-2">
-                    <Label htmlFor="demo-url">Live Demo URL</Label>
+                <div className="space-y-2">
+                    <Label htmlFor="demo-url">Presentation Link <span className="text-destructive">*</span></Label>
                     <Input
                         id="demo-url"
-                        type="url"
-                        placeholder="https://yourapp.com"
+                        placeholder="https://docs.google.com/presentation/..."
+                        required
                         value={demoUrl}
                         onChange={(e) => setDemoUrl(e.target.value)}
+                        disabled={isSubmitting}
                     />
-                    </div>
+                    <p className="text-xs text-muted-foreground">
+                        Upload your presentation to Google Drive, OneDrive, or Dropbox and paste the shareable link here.
+                    </p>
                 </div>
                 </div>
             </CardContent>
