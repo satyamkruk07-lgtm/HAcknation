@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { useUser, useFirestore, useCollection, useMemoFirebase, useDoc, useAuth } from '@/firebase';
+import { useUser, useFirestore, useMemoFirebase, useDoc, useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,7 +32,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { sponsors } from '@/lib/data';
 import { Badge } from '@/components/ui/badge';
 import type { Announcement, Conductor, UserAccount } from '@/lib/types';
-import { collection, query, orderBy, limit, doc } from 'firebase/firestore';
+import { collection, query, orderBy, limit, doc, getDocs } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -91,7 +91,7 @@ const hackathonTips = [
 
 
 function Countdown() {
-    const deadline = new Date('2026-08-13T11:00:00');
+    const deadline = new Date('2026-04-25T11:00:00');
     const [timeLeft, setTimeLeft] = useState<{
         days: number;
         hours: number;
@@ -184,12 +184,32 @@ export default function DashboardPage() {
   const firestore = useFirestore();
   const router = useRouter();
 
-  const announcementsQuery = useMemoFirebase(() => {
-    if (!firestore || !user) return null;
-    return query(collection(firestore, 'announcements'), orderBy('timestamp', 'desc'), limit(5));
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [areAnnouncementsLoading, setAreAnnouncementsLoading] = useState(true);
+
+  const fetchAnnouncements = useCallback(async () => {
+    if (!firestore || !user) {
+        setAreAnnouncementsLoading(false);
+        return;
+    }
+    setAreAnnouncementsLoading(true);
+    try {
+        const q = query(collection(firestore, 'announcements'), orderBy('timestamp', 'desc'), limit(5));
+        const querySnapshot = await getDocs(q);
+        const announcementsData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Announcement));
+        setAnnouncements(announcementsData);
+    } catch (error) {
+        console.error("Error fetching announcements: ", error);
+    } finally {
+        setAreAnnouncementsLoading(false);
+    }
   }, [firestore, user]);
 
-  const { data: announcements, isLoading: areAnnouncementsLoading } = useCollection<Announcement>(announcementsQuery);
+  useEffect(() => {
+    if (user) {
+        fetchAnnouncements();
+    }
+  }, [user, fetchAnnouncements]);
   
   const userDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null;
@@ -264,9 +284,9 @@ export default function DashboardPage() {
                           <Image
                               src="https://image2url.com/r2/default/images/1771236095184-93d2c5d5-1a06-4393-8575-37d925995ef3.png"
                               alt="NAAC A+ Grade"
-                              width={90}
-                              height={90}
-                              className="w-20 h-20 object-contain"
+                              width={100}
+                              height={100}
+                              className="w-[100px] h-[100px] object-contain"
                           />
                           <Image
                               src="https://image2url.com/r2/default/images/1771393774659-1af0cbaf-4b16-4aaa-9da0-0b097a9943cd.png"
