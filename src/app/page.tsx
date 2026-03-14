@@ -75,7 +75,7 @@ export default function Home() {
               <p className="mt-4 text-muted-foreground text-lg">
                 HackNation is the country's most prestigious hackathon, bringing
                 together the brightest minds to solve real-world problems
-                through technology. Over 48 hours, participants will form
+                through technology. Over 36 hours, participants will form
                 teams, brainstorm ideas, and build a project from scratch with
                 the help of our mentors and workshops.
               </p>
