@@ -31,8 +31,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, CheckCircle } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -46,18 +47,24 @@ export default function LoginClient() {
   const { user } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (searchParams.get('registered') === 'true') {
-      setSuccess('Please verify your email to continue(Check your inbox and spam section for verification link)');
+    const showVerificationToast = () => {
+        toast({
+            title: 'Verification Required',
+            description: 'Please verify your email to continue(Check your spam section for verification link)',
+        });
+        // Remove the query params from URL after showing toast to prevent re-showing on refresh
+        router.replace('/login', { scroll: false });
+    };
+
+    if (searchParams.get('registered') === 'true' || searchParams.get('reason') === 'unverified') {
+        showVerificationToast();
     }
-    if (searchParams.get('reason') === 'unverified') {
-      setSuccess('Please verify your email to continue(Check your inbox and spam section for verification link)');
-    }
-  }, [searchParams]);
+  }, [searchParams, toast, router]);
 
   useEffect(() => {
     // If a verified user somehow lands on the login page, redirect them.
@@ -77,7 +84,6 @@ export default function LoginClient() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setError(null);
-    setSuccess(null);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
       
@@ -90,13 +96,12 @@ export default function LoginClient() {
         router.push('/dashboard');
       } else {
         // FAIL: Email is not verified.
-        setError('Please verify your email address before logging in. A new verification link has been sent to your email.');
         if (freshUser) {
           await sendEmailVerification(freshUser);
         }
         await signOut(auth);
-        // Force a page refresh to ensure UI reflects the signed-out state.
-        window.location.reload();
+        // Redirect to login to show the verification toast.
+        router.push('/login?reason=unverified');
       }
 
     } catch (error: any) {
@@ -132,18 +137,11 @@ export default function LoginClient() {
             Log in to your HackNation account to continue.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent>
               {error && (
                 <Alert variant="destructive">
                   <AlertTitle>Login Failed</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-               {success && (
-                <Alert variant='default'>
-                  <CheckCircle className="h-4 w-4" />
-                  <AlertTitle>Action Required</AlertTitle>
-                  <AlertDescription>{success}</AlertDescription>
                 </Alert>
               )}
         </CardContent>
