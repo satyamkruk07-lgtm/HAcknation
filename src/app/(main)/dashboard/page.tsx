@@ -91,7 +91,7 @@ const hackathonTips = [
 
 
 function Countdown() {
-    const deadline = new Date('2026-04-17T00:00:00');
+    const deadline = new Date('2026-04-18T11:00:00');
     const [timeLeft, setTimeLeft] = useState<{
         days: number;
         hours: number;
@@ -123,7 +123,7 @@ function Countdown() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, []);
+    }, [deadline]);
 
     const renderTimeValue = (value: number | undefined) => {
         if (value === undefined || timeLeft === null) {
@@ -206,6 +206,17 @@ export default function DashboardPage() {
   }, [firestore, user]);
 
   useEffect(() => {
+    if (isUserLoading) return;
+    if (!user) {
+      router.push('/login');
+    } else if (!user.emailVerified) {
+      signOut(auth).then(() => {
+        router.push('/login?reason=unverified');
+      });
+    }
+  }, [user, isUserLoading, router, auth]);
+
+  useEffect(() => {
     if (user) {
         fetchAnnouncements();
     }
@@ -217,17 +228,6 @@ export default function DashboardPage() {
   }, [firestore, user?.uid]);
 
   const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserAccount>(userDocRef);
-
-  useEffect(() => {
-    if (isUserLoading) return;
-    if (!user) {
-      router.push('/login');
-    } else if (!user.emailVerified) {
-      signOut(auth).then(() => {
-        router.push('/login?reason=unverified');
-      });
-    }
-  }, [user, isUserLoading, router, auth]);
 
   const isContentLoading = isUserLoading || isProfileLoading;
 
@@ -390,7 +390,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Announcements */}
-            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover-translate-y-2">
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 font-headline">
                   <Megaphone className="h-6 w-6 text-accent" />
@@ -462,7 +462,7 @@ export default function DashboardPage() {
               <h2 className="mb-4 font-headline text-2xl font-bold">Hackathon Tips</h2>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 {hackathonTips.map((tip, index) => (
-                  <Card key={index} className="group transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+                  <Card key={index} className="group transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
                       <CardContent className="p-6">
                         <div className="flex items-start gap-4">
                           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10 text-accent transition-transform duration-200 group-hover:scale-105 group-active:scale-110 group-active:shadow-lg group-active:shadow-accent/50">
@@ -502,7 +502,7 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
             {/* Our Sponsors */}
-            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+            <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-3 font-headline">
                     <HeartHandshake className="h-6 w-6 text-accent" />
