@@ -196,7 +196,7 @@ function UserManagementTab() {
 
   // For loading more users on button click
   const loadMoreUsers = useCallback(async () => {
-    if (!firestore || !hasMoreUsers || isLoadingUsers) return;
+    if (!firestore || !hasMoreUsers) return;
     
     setIsLoadingUsers(true);
 
@@ -225,17 +225,17 @@ function UserManagementTab() {
     } finally {
       setIsLoadingUsers(false);
     }
-  }, [firestore, hasMoreUsers, lastVisibleUser, isLoadingUsers]);
+  }, [firestore, hasMoreUsers, lastVisibleUser]);
   
   // For the initial load of users
   useEffect(() => {
-    if (isAdmin && firestore) {
+    if (isAdmin && firestore && users.length === 0) {
       loadMoreUsers();
-    } else if (!isAdminLoading) {
+    } else if (!isAdminLoading && !isAdmin) {
       setUsers([]);
       setIsLoadingUsers(false);
     }
-  }, [isAdmin, isAdminLoading, firestore, loadMoreUsers]);
+  }, [isAdmin, isAdminLoading, firestore, loadMoreUsers, users.length]);
 
   const handleDeleteUser = () => {
     if (!firestore || !userToDelete) return;
@@ -522,8 +522,10 @@ function ProjectManagementTab() {
   }, [firestore, hasMoreProjects, lastVisibleProject]);
 
   useEffect(() => {
-    loadMoreProjects();
-  }, [loadMoreProjects]);
+    if(projects.length === 0) {
+      loadMoreProjects();
+    }
+  }, [loadMoreProjects, projects.length]);
 
   const handleDeleteProject = () => {
     if (!firestore || !projectToDelete) return;
