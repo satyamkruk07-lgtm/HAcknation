@@ -93,6 +93,15 @@ export default function SubmitClient() {
       router.push('/login');
       return;
     }
+    
+    if (!user.emailVerified) {
+      toast({
+        variant: 'destructive',
+        title: 'Verification Required',
+        description: 'Please verify your email before submitting a project.',
+      });
+      return;
+    }
 
     if (!firestore) {
       toast({
@@ -265,7 +274,7 @@ export default function SubmitClient() {
                         onChange={(e) => setDemoUrl(e.target.value)}
                         disabled={isSubmitting}
                     />
-                    <p className="text-xs text-muted-foreground">
+                     <p className="text-xs text-muted-foreground">
                         Upload your presentation to Google Drive, OneDrive, or Dropbox and paste the shareable link here.
                     </p>
                 </div>
