@@ -173,7 +173,7 @@ export default function ProfilePage() {
       toast({
         variant: 'destructive',
         title: 'Verification Required',
-        description: 'Firstly verify your email id',
+        description: 'You must verify your email before uploading an image.',
       });
       return;
     }
@@ -230,7 +230,7 @@ export default function ProfilePage() {
       toast({
         variant: 'destructive',
         title: 'Verification Required',
-        description: 'Firstly verify your email id',
+        description: 'You must verify your email before updating your profile.',
       });
       return;
     }
