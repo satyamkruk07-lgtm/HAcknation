@@ -1,4 +1,3 @@
-
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
 import type { Sponsor, Project, ProjectIdea, ScheduleEvent, Conductor } from './types';
 import { PlaceHolderImages } from './placeholder-images';
@@ -20,17 +19,17 @@ export const sponsors: Sponsor[] = [
 
 export const schedule: ScheduleEvent[] = [
     { id: '1', time: 'Day 1 - 09:00 AM', sortTime: 'day1-0900', title: 'Registration & Breakfast', description: 'Check-in, grab your swag, and fuel up for the day.', type: 'default', icon: Coffee },
-    { id: '2', time: 'Day 1 - 10:00 AM', sortTime: 'day1-1000', title: 'Opening Ceremony', description: 'Kick-off speeches and introduction to the hackathon theme.', type: 'milestone', icon: Milestone },
-    { id: '3', time: 'Day 1 - 11:00 AM', sortTime: 'day1-1100', title: 'Hacking Begins', description: 'Start your engines! Let the coding commence.', type: 'flag', icon: Flag },
+    { id: '2', time: 'Day 1 - 09:30 AM', sortTime: 'day1-0930', title: 'Opening Ceremony', description: 'Kick-off speeches and introduction to the hackathon theme.', type: 'milestone', icon: Milestone },
+    { id: '3', time: 'Day 1 - 10:00 AM', sortTime: 'day1-1000', title: 'Hacking Begins', description: 'Start your engines! Let the coding commence.', type: 'flag', icon: Flag },
     { id: '4', time: 'Day 1 - 01:00 PM', sortTime: 'day1-1300', title: 'Lunch', description: 'Refuel and connect with fellow hackers.', type: 'social', icon: Pizza },
     { id: '5', time: 'Day 1 - 02:00 PM', sortTime: 'day1-1400', title: 'Workshop: Intro to Genkit', description: 'Learn the basics of building AI-powered apps with Genkit.', type: 'workshop', icon: Wrench },
     { id: '6', time: 'Day 1 - 04:00 PM', sortTime: 'day1-1600', title: 'Tech Talk: Scaling with Firebase', description: 'Discover how to build scalable applications with Firebase.', type: 'talk', icon: Mic },
     { id: '7', time: 'Day 1 - 07:00 PM', sortTime: 'day1-1900', title: 'Dinner', description: 'Enjoy a delicious dinner on us.', type: 'social', icon: Pizza },
     { id: '10', time: 'Day 2 - 08:00 AM', sortTime: 'day2-0800', title: 'Breakfast', description: 'Good morning! Time for the final push.', type: 'default', icon: Coffee },
-    { id: '11', time: 'Day 2 - 11:00 AM', sortTime: 'day2-1100', title: 'Hacking Ends', description: 'Pencils down! Submit your projects.', type: 'flag', icon: Flag },
-    { id: '12', time: 'Day 2 - 11:30 AM', sortTime: 'day2-1130', title: 'Project Expo & Judging', description: 'Showcase your project to judges and attendees.', type: 'presentation', icon: Presentation },
+    { id: '11', time: 'Day 2 - 10:00 AM', sortTime: 'day2-1000', title: 'Hacking Ends', description: 'Pencils down! Submit your projects.', type: 'flag', icon: Flag },
+    { id: '12', time: 'Day 2 - 10:30 AM', sortTime: 'day2-1030', title: 'Project Expo & Judging', description: 'Showcase your project to judges and attendees.', type: 'presentation', icon: Presentation },
     { id: '13', time: 'Day 2 - 01:00 PM', sortTime: 'day2-1300', title: 'Lunch', description: 'Celebrate your hard work with a final meal together.', type: 'social', icon: Pizza },
-    { id: '14', time: 'Day 2 - 02:30 PM', sortTime: 'day2-1430', title: 'Closing Ceremony & Awards', description: 'Announcing the winners and closing remarks.', type: 'milestone', icon: Trophy },
+    { id: '14', time: 'Day 2 - 02:00 PM', sortTime: 'day2-1400', title: 'Closing Ceremony & Awards', description: 'Announcing the winners and closing remarks.', type: 'milestone', icon: Trophy },
 ];
 
 
