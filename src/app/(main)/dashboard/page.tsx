@@ -3,7 +3,7 @@
 import React from 'react';
 import { useUser, useFirestore, useMemoFirebase, useDoc, useAuth } from '@/firebase';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -89,9 +89,9 @@ const hackathonTips = [
     }
 ]
 
+const deadline = new Date('2026-04-18T11:00:00');
 
 function Countdown() {
-    const deadline = new Date('2026-04-18T11:00:00');
     const [timeLeft, setTimeLeft] = useState<{
         days: number;
         hours: number;
@@ -123,7 +123,7 @@ function Countdown() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [deadline]);
+    }, []);
 
     const renderTimeValue = (value: number | undefined) => {
         if (value === undefined || timeLeft === null) {
