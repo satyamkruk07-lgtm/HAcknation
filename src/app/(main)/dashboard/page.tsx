@@ -70,7 +70,7 @@ const hackathonTips = [
     {
         icon: Zap,
         title: "Keep Your Idea Simple",
-        description: "Focus on a core feature. It's better to have one polished feature than five buggy ones. You only have 48 hours!"
+        description: "Focus on a core feature. It's better to have one polished feature than five buggy ones. You only have 36 hours!"
     },
     {
         icon: MessageSquare,
@@ -89,7 +89,7 @@ const hackathonTips = [
     }
 ]
 
-const deadline = new Date('2026-04-18T11:00:00');
+const deadline = new Date('2026-04-17T00:00:00');
 
 function Countdown() {
     const [timeLeft, setTimeLeft] = useState<{
@@ -116,13 +116,15 @@ function Countdown() {
         };
         
         // Run only on client
-        setTimeLeft(calculateTimeLeft());
-
-        const timer = setInterval(() => {
+        if (typeof window !== 'undefined') {
             setTimeLeft(calculateTimeLeft());
-        }, 1000);
 
-        return () => clearInterval(timer);
+            const timer = setInterval(() => {
+                setTimeLeft(calculateTimeLeft());
+            }, 1000);
+
+            return () => clearInterval(timer);
+        }
     }, []);
 
     const renderTimeValue = (value: number | undefined) => {
