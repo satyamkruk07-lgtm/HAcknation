@@ -11,7 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Mail, Linkedin, BookOpen } from 'lucide-react';
+import { Mail, Linkedin, BookOpen, Phone } from 'lucide-react';
 import { conductors } from '@/lib/data';
 import type { Conductor } from '@/lib/types';
 
@@ -37,7 +37,15 @@ export function ConductedBy() {
   return (
     <>
       <div className="mt-12">
-        <h2 className="mb-8 font-headline text-2xl font-bold text-center">Conducted By</h2>
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <h2 className="font-headline text-2xl font-bold text-center">Conducted By</h2>
+          <Button asChild>
+            <a href="tel:7060550243">
+              <Phone className="mr-2 h-4 w-4" />
+              Help
+            </a>
+          </Button>
+        </div>
         <div className="flex flex-col items-center gap-12">
           {mainConductor && (
             <div className="flex justify-center">
@@ -49,9 +57,9 @@ export function ConductedBy() {
                   <Image
                     src={mainConductor.imageUrl || `https://picsum.photos/seed/${mainConductor.id}/128/128`}
                     alt={`Portrait of ${mainConductor.name}`}
-                    width={128}
-                    height={128}
-                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-32 w-32"
+                    width={112}
+                    height={112}
+                    className="rounded-full border-4 border-background shadow-lg transition-transform hover:scale-105 object-cover h-28 w-28"
                     data-ai-hint="person portrait"
                   />
                 </button>
