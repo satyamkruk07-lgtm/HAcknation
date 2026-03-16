@@ -1,24 +1,38 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import {
   Lightbulb,
-  Megaphone,
   Rocket,
   Users,
   Code,
   Calendar,
   MapPin,
+  Check,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { sponsors } from '@/lib/data.tsx';
-import { Badge } from '@/components/ui/badge';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { MainNav } from '@/components/main-nav';
 import { Footer } from '@/components/footer';
 import { ConductedBy } from '@/components/conducted-by';
 
-const heroImage = PlaceHolderImages.find(p => p.id === "hero");
+const heroImage = PlaceHolderImages.find(p => p.id === 'hero');
 
 export default function Home() {
   return (
@@ -30,7 +44,7 @@ export default function Home() {
       </header>
       <main className="flex-1">
         <section className="relative py-20 md:py-32 bg-background">
-        {heroImage && (
+          {heroImage && (
             <Image
               src={heroImage.imageUrl}
               alt={heroImage.description}
@@ -49,19 +63,102 @@ export default function Home() {
               Innovate. Collaborate. Create. The future is in your hands.
             </p>
             <div className="mt-6 flex items-center justify-center gap-6 text-lg text-primary-foreground">
-                <div className='flex items-center gap-2'>
-                    <Calendar className='h-5 w-5 text-destructive' />
-                    <span>17ᵗʰ & 18ᵗʰ April,2026</span>
-                </div>
-                <div className='flex items-center gap-2'>
-                    <MapPin className='h-5 w-5 text-destructive' />
-                    <span>Shivalik College of Engineering,Dehradun</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-destructive" />
+                <span>17ᵗʰ & 18ᵗʰ April,2026</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-destructive" />
+                <span>Shivalik College of Engineering,Dehradun</span>
+              </div>
             </div>
             <div className="mt-8 flex justify-center gap-4">
-              <Button asChild size="lg">
-                <Link href="/register">Register Now</Link>
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="lg">Register Now</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-4xl">
+                  <DialogHeader>
+                    <DialogTitle className="text-center font-headline text-3xl">
+                      Choose Your Plan
+                    </DialogTitle>
+                    <DialogDescription className="text-center text-lg">
+                      Select the registration type that suits you best.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8">
+                    <Card className="flex flex-col border-primary border-2 shadow-lg shadow-primary/20">
+                      <CardHeader>
+                        <CardTitle className="text-2xl">With Kit</CardTitle>
+                        <CardDescription>
+                          Get the full hackathon experience with exclusive
+                          goodies.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex-1 space-y-4">
+                        <p className="text-4xl font-bold">₹250</p>
+                        <ul className="space-y-2 text-muted-foreground">
+                          <li className="flex items-start gap-3">
+                            <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                            <span>Official Hackathon T-Shirt</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                            <span>Exclusive Sticker Pack & Goodies</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                            <span>Meals & Snacks (2 Days)</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                            <span>Participation Certificate</span>
+                          </li>
+                        </ul>
+                      </CardContent>
+                      <CardFooter>
+                        <Button asChild className="w-full">
+                          <Link href="/register?plan=with-kit">
+                            Register With Kit
+                          </Link>
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                    <Card className="flex flex-col">
+                      <CardHeader>
+                        <CardTitle className="text-2xl">Without Kit</CardTitle>
+                        <CardDescription>
+                          Just the essentials for a great hackathon.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex-1 space-y-4">
+                        <p className="text-4xl font-bold">₹0</p>
+                        <ul className="space-y-2 text-muted-foreground">
+                          <li className="flex items-start gap-3">
+                            <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                            <span>Meals & Snacks (2 Days)</span>
+                          </li>
+                          <li className="flex items-start gap-3">
+                            <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                            <span>Participation Certificate</span>
+                          </li>
+                        </ul>
+                      </CardContent>
+                      <CardFooter>
+                        <Button
+                          asChild
+                          className="w-full"
+                          variant="secondary"
+                        >
+                          <Link href="/register?plan=without-kit">
+                            Register Without Kit
+                          </Link>
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </section>
@@ -127,10 +224,15 @@ export default function Home() {
               Our Sponsors
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-10 gap-x-6 items-center justify-items-center">
-              {sponsors.map((sponsor) => (
-                <div key={sponsor.name} className="flex flex-col items-center justify-center text-center gap-3">
+              {sponsors.map(sponsor => (
+                <div
+                  key={sponsor.name}
+                  className="flex flex-col items-center justify-center text-center gap-3"
+                >
                   {sponsor.icon}
-                  <span className="text-base font-semibold text-muted-foreground">{sponsor.name}</span>
+                  <span className="text-base font-semibold text-muted-foreground">
+                    {sponsor.name}
+                  </span>
                 </div>
               ))}
             </div>
@@ -142,7 +244,6 @@ export default function Home() {
             <ConductedBy />
           </div>
         </section>
-
       </main>
       <Footer />
     </div>
