@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   createUserWithEmailAndPassword,
   updateProfile,
@@ -12,7 +12,7 @@ import {
   signOut,
 } from 'firebase/auth';
 import { useAuth, useFirestore } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 
 import {
@@ -50,7 +50,12 @@ const formSchema = z
     }),
     leaderName: z.string().optional(),
     teamName: z.string().optional(),
-    teamMembers: z.string().optional(),
+    teamMember1: z.string().optional(),
+    teamMember2: z.string().optional(),
+    teamMember3: z.string().optional(),
+    teamMember4: z.string().optional(),
+    teamMember5: z.string().optional(),
+    teamMember6: z.string().optional(),
     password: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string(),
   })
@@ -75,6 +80,22 @@ const formSchema = z
   }, {
     message: 'Team name is required when registering as a team.',
     path: ['teamName'],
+  })
+  .superRefine((data, ctx) => {
+    if (data.registrationType === 'team') {
+      if (!data.teamMember1 || data.teamMember1.trim().length === 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Member name is required.", path: ['teamMember1'] });
+      }
+      if (!data.teamMember2 || data.teamMember2.trim().length === 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Member name is required.", path: ['teamMember2'] });
+      }
+      if (!data.teamMember3 || data.teamMember3.trim().length === 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Member name is required.", path: ['teamMember3'] });
+      }
+      if (!data.teamMember4 || data.teamMember4.trim().length === 0) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Member name is required.", path: ['teamMember4'] });
+      }
+    }
   });
 
 
@@ -84,9 +105,12 @@ export default function RegisterPage() {
   const auth = useAuth();
   const firestore = useFirestore();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const plan = searchParams.get('plan');
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -99,11 +123,36 @@ export default function RegisterPage() {
       registrationType: 'individual',
       leaderName: '',
       teamName: '',
-      teamMembers: '',
+      teamMember1: '',
+      teamMember2: '',
+      teamMember3: '',
+      teamMember4: '',
+      teamMember5: '',
+      teamMember6: '',
     },
   });
 
   const registrationType = form.watch('registrationType');
+  const teamMemberFields = [
+    form.watch('teamMember1'),
+    form.watch('teamMember2'),
+    form.watch('teamMember3'),
+    form.watch('teamMember4'),
+    form.watch('teamMember5'),
+    form.watch('teamMember6'),
+  ];
+
+  const [memberCount, setMemberCount] = useState(1);
+  const [totalAmount, setTotalAmount] = useState(250);
+
+  useEffect(() => {
+    let count = 1; // Default for individual
+    if (registrationType === 'team') {
+        count = teamMemberFields.filter(m => m && m.trim().length > 0).length;
+    }
+    setMemberCount(count);
+    setTotalAmount(count * 250);
+  }, [registrationType, ...teamMemberFields]);
   
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
@@ -113,6 +162,24 @@ export default function RegisterPage() {
         setIsSubmitting(false);
         return;
     }
+
+    // Check for duplicate team name
+    if (data.registrationType === 'team' && data.teamName) {
+      const usersRef = collection(firestore, 'users');
+      // Case-sensitive check for simplicity. For case-insensitivity, would need a separate lowercase field.
+      const q = query(usersRef, where("teamName", "==", data.teamName.trim()));
+      const querySnapshot = await getDocs(q);
+
+      if (!querySnapshot.empty) {
+        form.setError("teamName", {
+          type: "manual",
+          message: "Team name already taken.",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
 
     try {
       // Step 1: Create user in Firebase Auth
@@ -126,6 +193,15 @@ export default function RegisterPage() {
       // Step 2: Update their Auth profile with their name
       await updateProfile(user, { displayName: data.name });
       
+      const teamMembersList = [
+        data.teamMember1,
+        data.teamMember2,
+        data.teamMember3,
+        data.teamMember4,
+        data.teamMember5,
+        data.teamMember6,
+      ].filter((m): m is string => !!m && m.trim().length > 0);
+
       // Step 3: Create a corresponding user document in Firestore
       const userDocRef = doc(firestore, 'users', user.uid);
       await setDoc(userDocRef, {
@@ -134,10 +210,11 @@ export default function RegisterPage() {
           mentorName: data.mentorName || '',
           registrationType: data.registrationType,
           leaderName: data.leaderName || '',
-          teamName: data.teamName || '',
-          teamMembers: data.teamMembers ? data.teamMembers.split(',').map(s => s.trim()) : [],
+          teamName: data.teamName ? data.teamName.trim() : '',
+          teamMembers: teamMembersList,
           registrationDate: new Date().toISOString(),
           emailVerified: false, // Explicitly set to false initially
+          plan: plan,
       });
 
       // Step 4: Send the verification email
@@ -298,22 +375,80 @@ export default function RegisterPage() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="teamMembers"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Team Members' Names</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John Doe, Jane Smith..." {...field} />
-                        </FormControl>
-                        <FormDescription>
-                          Enter names separated by commas.
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  
+                  <div className="space-y-4 rounded-md border p-4">
+                    <FormLabel>Team Members (min 4, max 6) <span className="text-destructive">*</span></FormLabel>
+                    <FormDescription>
+                        Enter the full name for each team member. The first 4 are required.
+                    </FormDescription>
+                    <FormField
+                        control={form.control}
+                        name="teamMember1"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-xs">Member 1 <span className="text-destructive">*</span></FormLabel>
+                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="teamMember2"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-xs">Member 2 <span className="text-destructive">*</span></FormLabel>
+                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="teamMember3"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-xs">Member 3 <span className="text-destructive">*</span></FormLabel>
+                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="teamMember4"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-xs">Member 4 <span className="text-destructive">*</span></FormLabel>
+                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="teamMember5"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-xs">Member 5 (Optional)</FormLabel>
+                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="teamMember6"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel className="text-xs">Member 6 (Optional)</FormLabel>
+                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
+
                 </>
               )}
               <FormField
@@ -343,10 +478,36 @@ export default function RegisterPage() {
                 )}
               />
             </CardContent>
+            
+            {plan === 'with-kit' && (
+                <CardContent className="border-t pt-6">
+                    <div className="space-y-4">
+                        <h3 className="font-semibold text-lg text-center">Payment Information</h3>
+                        <Card className="bg-muted/50 p-4 space-y-2">
+                           <div className="flex justify-between items-center text-sm">
+                                <span className="text-muted-foreground">Price per person</span>
+                                <span className="font-semibold">₹250.00</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-muted-foreground">Number of members</span>
+                                <span className="font-semibold">x {memberCount}</span>
+                            </div>
+                            <div className="flex justify-between items-center mt-2 font-bold text-lg border-t pt-2">
+                                <span>Total Amount</span>
+                                <span>₹{totalAmount.toFixed(2)}</span>
+                            </div>
+                        </Card>
+                         <p className="text-xs text-center text-muted-foreground pt-2">
+                            You will be redirected to our secure payment partner after clicking the button below.
+                        </p>
+                    </div>
+                </CardContent>
+            )}
+
             <CardFooter className="flex flex-col items-stretch gap-4">
               <Button type="submit" disabled={isSubmitting} className="w-full">
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Create Account
+                {plan === 'with-kit' ? 'Create Account & Proceed to Payment' : 'Create Account'}
               </Button>
             </CardFooter>
           </form>
@@ -367,3 +528,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+    
