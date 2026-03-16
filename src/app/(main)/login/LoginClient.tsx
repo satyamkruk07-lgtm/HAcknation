@@ -50,6 +50,7 @@ export default function LoginClient() {
   const { toast } = useToast();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showVerificationInfo, setShowVerificationInfo] = useState(false);
 
   useEffect(() => {
     const showVerificationToast = () => {
@@ -63,6 +64,7 @@ export default function LoginClient() {
 
     if (searchParams.get('registered') === 'true' || searchParams.get('reason') === 'unverified') {
         showVerificationToast();
+        setShowVerificationInfo(true);
     }
   }, [searchParams, toast, router]);
 
@@ -84,6 +86,7 @@ export default function LoginClient() {
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     setError(null);
+    setShowVerificationInfo(false);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
       
@@ -137,17 +140,23 @@ export default function LoginClient() {
             Log in to your HackNation account to continue.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardContent className="space-y-4">
+              {showVerificationInfo && (
+                <Alert>
+                  <AlertTitle>Action Required</AlertTitle>
+                  <AlertDescription>
+                    Check your spam box to verify your email.
+                  </AlertDescription>
+                </Alert>
+              )}
               {error && (
                 <Alert variant="destructive">
                   <AlertTitle>Login Failed</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
-        </CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <CardContent className="space-y-4">
               
               <FormField
                 control={form.control}
