@@ -65,6 +65,7 @@ export type UserAccount = {
   mentorName?: string;
   department?: string;
   leaderName?: string;
+  plan?: 'with-kit' | 'without-kit';
 };
 
 export type ProjectIdea = {
