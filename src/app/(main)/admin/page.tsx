@@ -60,6 +60,31 @@ import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { useToast } from '@/hooks/use-toast';
 
+function toDateSafe(value: unknown): Date | null {
+  if (!value) return null;
+  if (value instanceof Date) return value;
+
+  // Firestore Timestamp (has toDate)
+  if (typeof value === 'object' && value !== null && 'toDate' in value) {
+    const maybe = value as { toDate?: () => Date };
+    if (typeof maybe.toDate === 'function') return maybe.toDate();
+  }
+
+  // Timestamp-like object
+  if (typeof value === 'object' && value !== null && 'seconds' in value) {
+    const maybe = value as { seconds?: number };
+    if (typeof maybe.seconds === 'number') return new Date(maybe.seconds * 1000);
+  }
+
+  if (typeof value === 'number') return new Date(value);
+  if (typeof value === 'string') {
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  return null;
+}
+
 
 function CreateAnnouncementForm() {
   const firestore = useFirestore();
@@ -217,11 +242,34 @@ function UserManagementTab() {
         setLastVisibleUser(querySnapshot.docs[querySnapshot.docs.length - 1]);
       }
     } catch(err) {
-        const permissionError = new FirestorePermissionError({
-            path: 'users',
-            operation: 'list',
+        const code = (err as any)?.code as string | undefined;
+        const message = (err as any)?.message as string | undefined;
+
+        // Firestore frequently throws "failed-precondition" when an index is missing.
+        if (code === 'failed-precondition' || (typeof message === 'string' && message.toLowerCase().includes('index'))) {
+          toast({
+            title: 'Firestore index required',
+            description: 'This query needs an index (users ordered by registrationDate). Open the Firebase console link shown in the error details to create the index, then refresh.',
+            variant: 'destructive',
+          });
+          setHasMoreUsers(false);
+          return;
+        }
+
+        if (code === 'permission-denied') {
+          const permissionError = new FirestorePermissionError({
+              path: 'users',
+              operation: 'list',
+          });
+          errorEmitter.emit('permission-error', permissionError);
+          return;
+        }
+
+        toast({
+          title: 'Failed to load users',
+          description: typeof message === 'string' ? message : 'Unknown error',
+          variant: 'destructive',
         });
-        errorEmitter.emit('permission-error', permissionError);
     } finally {
       setIsLoadingUsers(false);
     }
@@ -279,7 +327,10 @@ function UserManagementTab() {
         `"${item.phoneNumber || ''}"`,
         `"${(item.skills || []).join('; ')}"`,
         `"${(item.bio || '').replace(/"/g, '""')}"`,
-        `"${item.registrationDate ? format(new Date(item.registrationDate), 'PPp') : ''}"`,
+        `"${(() => {
+          const d = toDateSafe((item as any).registrationDate);
+          return d ? format(d, 'PPp') : '';
+        })()}"`,
       ].join(','))
     ].join('\n');
 
@@ -339,9 +390,10 @@ function UserManagementTab() {
                       <TableCell className="font-medium">{user.name}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
-                        {user.registrationDate
-                          ? format(new Date(user.registrationDate), 'PP')
-                          : 'N/A'}
+                        {(() => {
+                          const d = toDateSafe((user as any).registrationDate);
+                          return d ? format(d, 'PP') : 'N/A';
+                        })()}
                       </TableCell>
                       <TableCell className="text-right space-x-2">
                         <Button variant="outline" size="sm" onClick={() => setSelectedUser(user)}>
@@ -412,7 +464,10 @@ function UserManagementTab() {
               <div className="grid grid-cols-3 items-center gap-4">
                 <Label className="text-right font-semibold">Registered</Label>
                 <span className="col-span-2">
-                    {selectedUser.registrationDate ? format(new Date(selectedUser.registrationDate), 'PPP') : 'N/A'}
+                    {(() => {
+                      const d = toDateSafe((selectedUser as any).registrationDate);
+                      return d ? format(d, 'PPP') : 'N/A';
+                    })()}
                 </span>
               </div>
               <div className="grid grid-cols-3 items-start gap-4">
