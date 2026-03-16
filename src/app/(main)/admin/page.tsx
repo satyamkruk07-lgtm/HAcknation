@@ -204,7 +204,7 @@ function CreateAnnouncementForm() {
   );
 }
 
-function UserManagementTab() {
+function ParticipantManagementTab() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const { user: authUser, isUserLoading } = useUser();
@@ -273,7 +273,7 @@ function UserManagementTab() {
     } finally {
       setIsLoadingUsers(false);
     }
-  }, [firestore, hasMoreUsers, lastVisibleUser]);
+  }, [firestore, hasMoreUsers, lastVisibleUser, toast]);
   
   // For the initial load of users
   useEffect(() => {
@@ -352,10 +352,10 @@ function UserManagementTab() {
       <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="font-headline text-2xl">User Management</CardTitle>
-            <CardDescription>View and manage registered users.</CardDescription>
+            <CardTitle className="font-headline text-2xl">Participant Management</CardTitle>
+            <CardDescription>View and manage registered participants.</CardDescription>
           </div>
-          <Button onClick={() => downloadCSV(users || [], 'users.csv')} disabled={!users || users.length === 0}>
+          <Button onClick={() => downloadCSV(users || [], 'participants.csv')} disabled={!users || users.length === 0}>
             <Download className="mr-2 h-4 w-4" />
             Download CSV
           </Button>
@@ -409,7 +409,7 @@ function UserManagementTab() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center">
-                    {!isAdmin && !isUserLoading ? "You don't have permission to view users." : "No users found."}
+                    {!isAdmin && !isUserLoading ? "You don't have permission to view participants." : "No participants found."}
                   </TableCell>
                 </TableRow>
               )}
@@ -534,6 +534,126 @@ function UserManagementTab() {
     </>
   );
 }
+
+function PlanManagementTab() {
+  const firestore = useFirestore();
+  const [users, setUsers] = useState<UserAccount[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!firestore) return;
+    setIsLoading(true);
+    const usersCollection = collection(firestore, 'users');
+    const q = query(usersCollection, orderBy('registrationDate', 'desc'));
+
+    getDocs(q)
+      .then((querySnapshot) => {
+        const usersData = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as UserAccount));
+        setUsers(usersData);
+      })
+      .catch((err) => {
+        const permissionError = new FirestorePermissionError({
+          path: 'users',
+          operation: 'list',
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [firestore]);
+
+  const downloadCSV = (data: UserAccount[], filename: string) => {
+    if (!data || data.length === 0) {
+      alert('No data to download.');
+      return;
+    }
+    const headers = ['Name', 'Email', 'College', 'Team Name', 'Plan'];
+    const csvContent = [
+      headers.join(','),
+      ...data.map(item => [
+        `"${item.name || ''}"`,
+        `"${item.email || ''}"`,
+        `"${item.college || ''}"`,
+        `"${item.teamName || ''}"`,
+        `"${item.plan ? (item.plan === 'with-kit' ? 'With Kit' : 'Without Kit') : 'N/A'}"`
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-1">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle className="font-headline text-2xl">Registration Plans</CardTitle>
+          <CardDescription>View which plan each participant has chosen.</CardDescription>
+        </div>
+        <Button onClick={() => downloadCSV(users, 'participant-plans.csv')} disabled={users.length === 0}>
+          <Download className="mr-2 h-4 w-4" />
+          Download CSV
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Team Name</TableHead>
+              <TableHead>Plan</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-48" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-32" /></TableCell>
+                  <TableCell><Skeleton className="h-5 w-24" /></TableCell>
+                </TableRow>
+              ))
+            ) : users.length > 0 ? (
+              users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.teamName || 'N/A'}</TableCell>
+                  <TableCell>
+                    {user.plan ? (
+                      <Badge variant={user.plan === 'with-kit' ? 'default' : 'secondary'}>
+                        {user.plan === 'with-kit' ? 'With Kit' : 'Without Kit'}
+                      </Badge>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center">
+                  No participant data found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+}
+
 
 function ProjectManagementTab() {
   const firestore = useFirestore();
@@ -1048,23 +1168,27 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="announcements" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-background/50 border shadow-inner">
+            <TabsList className="grid w-full grid-cols-5 bg-background/50 border shadow-inner">
               <TabsTrigger value="announcements" className="data-[state=active]:shadow-inner">Announcements</TabsTrigger>
-              <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Users</TabsTrigger>
+              <TabsTrigger value="users" className="data-[state=active]:shadow-inner">Participants</TabsTrigger>
               <TabsTrigger value="projects" className="data-[state=active]:shadow-inner">Projects</TabsTrigger>
               <TabsTrigger value="judging" className="data-[state=active]:shadow-inner">Judging</TabsTrigger>
+              <TabsTrigger value="plans" className="data-[state=active]:shadow-inner">Plans</TabsTrigger>
             </TabsList>
             <TabsContent value="announcements" className="mt-6">
               <CreateAnnouncementForm />
             </TabsContent>
             <TabsContent value="users" className="mt-6">
-              <UserManagementTab />
+              <ParticipantManagementTab />
             </TabsContent>
             <TabsContent value="projects" className="mt-6">
               <ProjectManagementTab />
             </TabsContent>
             <TabsContent value="judging" className="mt-6">
                 <JudgingTab />
+            </TabsContent>
+             <TabsContent value="plans" className="mt-6">
+                <PlanManagementTab />
             </TabsContent>
           </Tabs>
         </div>
