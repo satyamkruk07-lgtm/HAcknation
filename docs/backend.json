@@ -130,6 +130,14 @@
         "leaderName": {
           "type": "string",
           "description": "The name of the team leader, if applicable."
+        },
+        "plan": {
+          "type": "string",
+          "description": "The registration plan chosen by the user.",
+          "enum": [
+            "with-kit",
+            "without-kit"
+          ]
         }
       },
       "required": [
