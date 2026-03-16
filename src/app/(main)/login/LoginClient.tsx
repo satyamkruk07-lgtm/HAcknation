@@ -58,7 +58,7 @@ useEffect(() => {
 const reason = searchParams.get('reason');
 const registered = searchParams.get('registered');
 
-```
+
 if (reason === 'unverified' || registered === 'true') {
   toast({
     title: 'Verification Required',
@@ -70,7 +70,7 @@ if (reason === 'unverified' || registered === 'true') {
   // remove params to avoid loop
   router.replace('/login');
 }
-```
+
 
 }, []);
 
@@ -93,7 +93,7 @@ const onSubmit = async (data: FormData) => {
 setIsSubmitting(true);
 setError(null);
 
-```
+
 try {
   const userCredential = await signInWithEmailAndPassword(
     auth,
@@ -137,7 +137,7 @@ try {
 } finally {
   setIsSubmitting(false);
 }
-```
+
 
 };
 
@@ -145,7 +145,7 @@ return ( <div className="flex min-h-[calc(100vh-11rem)] items-center justify-cen
 Welcome Back </CardTitle> <CardDescription>
 Log in to your HackNation account to continue. </CardDescription> </CardHeader>
 
-```
+
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <CardContent className="space-y-4">
@@ -234,7 +234,7 @@ Log in to your HackNation account to continue. </CardDescription> </CardHeader>
     </CardFooter>
   </Card>
 </div>
-```
+
 
 );
 }
