@@ -189,7 +189,7 @@ export function MainNav() {
                   </DialogDescription>
                 </DialogHeader>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-6 max-h-[70vh] overflow-y-auto">
 
                   <div className="border rounded-xl p-6 shadow-lg">
 
