@@ -86,7 +86,7 @@ export default function Home() {
                       Select the registration type that suits you best.
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8 max-h-[70vh] overflow-y-auto">
                     <Card className="flex flex-col border-primary border-2 shadow-lg shadow-primary/20">
                       <CardHeader>
                         <CardTitle className="text-2xl">With Kit</CardTitle>
