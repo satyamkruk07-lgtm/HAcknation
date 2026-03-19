@@ -90,7 +90,7 @@ const hackathonTips = [
     }
 ]
 
-const deadline = new Date('2026-04-17T00:00:00');
+const deadline = new Date('2026-04-16T00:00:00');
 
 function Countdown() {
     const [daysLeft, setDaysLeft] = useState<number | null>(null);
