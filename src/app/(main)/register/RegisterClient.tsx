@@ -42,24 +42,31 @@ const formSchema = z
   .object({
     name: z.string().min(1, 'Name is required'),
     email: z.string().email('Invalid email address'),
+    phoneNumber: z.string().min(1, 'Phone number is required').refine(
+      (val) => /^\d{10}$/.test(val),
+      {
+        message: 'Phone number must be 10 digits.',
+      }
+    ),
     mentorName: z.string().optional(),
     registrationType: z.enum(['individual', 'team'], {
       required_error: 'You need to select a registration type.',
     }),
     leaderName: z.string().optional(),
+    leaderCourse: z.string().optional(),
     teamName: z.string().optional(),
     teamMember1: z.string().optional(),
+    teamMember1Course: z.string().optional(),
     teamMember2: z.string().optional(),
+    teamMember2Course: z.string().optional(),
     teamMember3: z.string().optional(),
+    teamMember3Course: z.string().optional(),
     teamMember4: z.string().optional(),
+    teamMember4Course: z.string().optional(),
     teamMember5: z.string().optional(),
+    teamMember5Course: z.string().optional(),
     teamMember6: z.string().optional(),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
+    teamMember6Course: z.string().optional(),
   })
   .refine((data) => {
     if (data.registrationType === 'team') {
@@ -72,6 +79,15 @@ const formSchema = z
   })
   .refine((data) => {
     if (data.registrationType === 'team') {
+      return !!data.leaderCourse && data.leaderCourse.length > 0;
+    }
+    return true;
+  }, {
+    message: "Team Leader's course is required for team registration.",
+    path: ['leaderCourse'],
+  })
+  .refine((data) => {
+    if (data.registrationType === 'team') {
       return !!data.teamName && data.teamName.length > 0;
     }
     return true;
@@ -81,18 +97,32 @@ const formSchema = z
   })
   .superRefine((data, ctx) => {
     if (data.registrationType === 'team') {
-      if (!data.teamMember1 || data.teamMember1.trim().length === 0) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Member name is required.", path: ['teamMember1'] });
-      }
-      if (!data.teamMember2 || data.teamMember2.trim().length === 0) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Member name is required.", path: ['teamMember2'] });
-      }
-      if (!data.teamMember3 || data.teamMember3.trim().length === 0) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Member name is required.", path: ['teamMember3'] });
-      }
-      if (!data.teamMember4 || data.teamMember4.trim().length === 0) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Member name is required.", path: ['teamMember4'] });
-      }
+      const requiredMembers = [
+        { name: data.teamMember1, namePath: 'teamMember1', course: data.teamMember1Course, coursePath: 'teamMember1Course' },
+        { name: data.teamMember2, namePath: 'teamMember2', course: data.teamMember2Course, coursePath: 'teamMember2Course' },
+        { name: data.teamMember3, namePath: 'teamMember3', course: data.teamMember3Course, coursePath: 'teamMember3Course' },
+        { name: data.teamMember4, namePath: 'teamMember4', course: data.teamMember4Course, coursePath: 'teamMember4Course' },
+      ];
+
+      requiredMembers.forEach(member => {
+        if (!member.name || member.name.trim().length === 0) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Member name is required.", path: [member.namePath as 'teamMember1'] });
+        }
+        if (!member.course || member.course.trim().length === 0) {
+          ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Course is required.", path: [member.coursePath as 'teamMember1Course'] });
+        }
+      });
+      
+      const optionalMembers = [
+          { name: data.teamMember5, namePath: 'teamMember5', course: data.teamMember5Course, coursePath: 'teamMember5Course' },
+          { name: data.teamMember6, namePath: 'teamMember6', course: data.teamMember6Course, coursePath: 'teamMember6Course' },
+      ];
+      
+      optionalMembers.forEach(member => {
+          if (member.name && member.name.trim().length > 0 && (!member.course || member.course.trim().length === 0)) {
+               ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Course is required if name is provided.", path: [member.coursePath as 'teamMember5Course'] });
+          }
+      });
     }
   });
 
@@ -115,18 +145,24 @@ export default function RegisterPage() {
     defaultValues: {
       name: '',
       email: '',
+      phoneNumber: '',
       mentorName: '',
-      password: '',
-      confirmPassword: '',
       registrationType: 'individual',
       leaderName: '',
+      leaderCourse: '',
       teamName: '',
       teamMember1: '',
+      teamMember1Course: '',
       teamMember2: '',
+      teamMember2Course: '',
       teamMember3: '',
+      teamMember3Course: '',
       teamMember4: '',
+      teamMember4Course: '',
       teamMember5: '',
+      teamMember5Course: '',
       teamMember6: '',
+      teamMember6Course: '',
     },
   });
 
@@ -178,36 +214,46 @@ export default function RegisterPage() {
       }
     }
 
+    // This creates a secure, random password for the user account.
+    // The student does not need this password, but it allows an account to be created.
+    const randomPassword = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
 
     try {
       // Step 1: Create user in Firebase Auth
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         data.email,
-        data.password
+        randomPassword
       );
       const user = userCredential.user;
       
       // Step 2: Update their Auth profile with their name
       await updateProfile(user, { displayName: data.name });
       
+      const leaderWithCourse = data.leaderName && data.leaderCourse 
+        ? `${data.leaderName.trim()} (${data.leaderCourse.trim()})`
+        : data.leaderName || '';
+
       const teamMembersList = [
-        data.teamMember1,
-        data.teamMember2,
-        data.teamMember3,
-        data.teamMember4,
-        data.teamMember5,
-        data.teamMember6,
-      ].filter((m): m is string => !!m && m.trim().length > 0);
+        { name: data.teamMember1, course: data.teamMember1Course },
+        { name: data.teamMember2, course: data.teamMember2Course },
+        { name: data.teamMember3, course: data.teamMember3Course },
+        { name: data.teamMember4, course: data.teamMember4Course },
+        { name: data.teamMember5, course: data.teamMember5Course },
+        { name: data.teamMember6, course: data.teamMember6Course },
+      ]
+      .filter(m => m.name && m.name.trim().length > 0)
+      .map(m => `${m.name!.trim()} (${m.course ? m.course.trim() : 'N/A'})`);
 
       // Step 3: Create a corresponding user document in Firestore
       const userDocRef = doc(firestore, 'users', user.uid);
       await setDoc(userDocRef, {
           name: data.name,
           email: data.email,
+          phoneNumber: data.phoneNumber,
           mentorName: data.mentorName || '',
           registrationType: data.registrationType,
-          leaderName: data.leaderName || '',
+          leaderName: leaderWithCourse,
           teamName: data.teamName ? data.teamName.trim() : '',
           teamMembers: teamMembersList,
           registrationDate: new Date().toISOString(),
@@ -297,6 +343,19 @@ export default function RegisterPage() {
               />
               <FormField
                 control={form.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number <span className="text-destructive">*</span></FormLabel>
+                    <FormControl>
+                      <Input type="tel" placeholder="9876543210" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="mentorName"
                 render={({ field }) => (
                   <FormItem>
@@ -357,121 +416,194 @@ export default function RegisterPage() {
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={form.control}
-                    name="leaderName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Team Leader's Name <span className="text-destructive">*</span></FormLabel>
-                        <FormControl>
-                          <Input placeholder="e.g., Ada Lovelace" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="leaderName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Team Leader's Name <span className="text-destructive">*</span></FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., Ada Lovelace" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                     <FormField
+                      control={form.control}
+                      name="leaderCourse"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Leader's Course <span className="text-destructive">*</span></FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g., B.Tech CSE" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   
                   <div className="space-y-4 rounded-md border p-4">
                     <FormLabel>Team Members (min 4, max 6) <span className="text-destructive">*</span></FormLabel>
                     <FormDescription>
-                        Enter the full name for each team member. The first 4 are required.
+                        Enter the full name and course for each team member. The first 4 are required.
                     </FormDescription>
-                    <FormField
-                        control={form.control}
-                        name="teamMember1"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-xs">Member 1 <span className="text-destructive">*</span></FormLabel>
-                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="teamMember2"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-xs">Member 2 <span className="text-destructive">*</span></FormLabel>
-                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="teamMember3"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-xs">Member 3 <span className="text-destructive">*</span></FormLabel>
-                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="teamMember4"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-xs">Member 4 <span className="text-destructive">*</span></FormLabel>
-                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="teamMember5"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-xs">Member 5 (Optional)</FormLabel>
-                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="teamMember6"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel className="text-xs">Member 6 (Optional)</FormLabel>
-                                <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                          control={form.control}
+                          name="teamMember1"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel className="text-xs">Member 1 Name<span className="text-destructive">*</span></FormLabel>
+                                  <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                       <FormField
+                          control={form.control}
+                          name="teamMember1Course"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel className="text-xs">Course <span className="text-destructive">*</span></FormLabel>
+                                  <FormControl><Input placeholder="e.g., B.Tech IT" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                          control={form.control}
+                          name="teamMember2"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel className="text-xs">Member 2 Name<span className="text-destructive">*</span></FormLabel>
+                                  <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                      <FormField
+                          control={form.control}
+                          name="teamMember2Course"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel className="text-xs">Course <span className="text-destructive">*</span></FormLabel>
+                                  <FormControl><Input placeholder="e.g., B.Tech IT" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                       <FormField
+                          control={form.control}
+                          name="teamMember3"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel className="text-xs">Member 3 Name <span className="text-destructive">*</span></FormLabel>
+                                  <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                       <FormField
+                          control={form.control}
+                          name="teamMember3Course"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel className="text-xs">Course <span className="text-destructive">*</span></FormLabel>
+                                  <FormControl><Input placeholder="e.g., B.Tech IT" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                       <FormField
+                          control={form.control}
+                          name="teamMember4"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel className="text-xs">Member 4 Name <span className="text-destructive">*</span></FormLabel>
+                                  <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                      <FormField
+                          control={form.control}
+                          name="teamMember4Course"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel className="text-xs">Course <span className="text-destructive">*</span></FormLabel>
+                                  <FormControl><Input placeholder="e.g., B.Tech IT" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                            control={form.control}
+                            name="teamMember5"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-xs">Member 5 Name (Optional)</FormLabel>
+                                    <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="teamMember5Course"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel className="text-xs">Course (Optional)</FormLabel>
+                                    <FormControl><Input placeholder="e.g., B.Tech IT" {...field} /></FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                          control={form.control}
+                          name="teamMember6"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel className="text-xs">Member 6 Name (Optional)</FormLabel>
+                                  <FormControl><Input placeholder="Full Name" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                      <FormField
+                          control={form.control}
+                          name="teamMember6Course"
+                          render={({ field }) => (
+                              <FormItem>
+                                  <FormLabel className="text-xs">Course (Optional)</FormLabel>
+                                  <FormControl><Input placeholder="e.g., B.Tech IT" {...field} /></FormControl>
+                                  <FormMessage />
+                              </FormItem>
+                          )}
+                      />
+                    </div>
                 </div>
 
                 </>
               )}
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password <span className="text-destructive">*</span></FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password <span className="text-destructive">*</span></FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </CardContent>
             
             {plan === 'with-kit' && (
