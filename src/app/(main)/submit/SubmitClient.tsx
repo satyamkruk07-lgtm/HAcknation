@@ -20,15 +20,25 @@ import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { UserAccount } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { signOut } from 'firebase/auth';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 export default function SubmitClient() {
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
-  const auth = useAuth();
+  const { isAdmin, isAdminLoading } = useAdminStatus();
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const isLoading = isUserLoading || isAdminLoading;
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user || !isAdmin) {
+        router.push('/');
+      }
+    }
+  }, [user, isAdmin, isLoading, router]);
 
   const userDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null;
@@ -42,17 +52,6 @@ export default function SubmitClient() {
   const [description, setDescription] = useState('');
   const [demoUrl, setDemoUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (isUserLoading) return;
-    if (!user) {
-      router.push('/login');
-    } else if (!user.emailVerified) {
-      signOut(auth).then(() => {
-        router.push('/login?reason=unverified');
-      });
-    }
-  }, [user, isUserLoading, router, auth]);
 
   useEffect(() => {
     // Pre-fill form from URL query parameters
@@ -84,21 +83,11 @@ export default function SubmitClient() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) {
+    if (!user || !isAdmin) {
       toast({
         variant: 'destructive',
         title: 'Authentication Error',
-        description: 'You must be logged in to submit a project.',
-      });
-      router.push('/login');
-      return;
-    }
-    
-    if (!user.emailVerified) {
-      toast({
-        variant: 'destructive',
-        title: 'Verification Required',
-        description: 'Please verify your email before submitting a project.',
+        description: 'You must be an admin to submit a project.',
       });
       return;
     }
@@ -164,27 +153,12 @@ export default function SubmitClient() {
     }
   };
   
-  const isLoading = isUserLoading || isProfileLoading;
+  const isContentLoading = isLoading || isProfileLoading;
 
-  if (isLoading || !user) {
+  if (isContentLoading || !user || !isAdmin) {
     return (
-        <div className="container py-12">
-            <Card className="w-full max-w-2xl mx-auto">
-                <CardHeader>
-                    <Skeleton className="h-8 w-1/2" />
-                    <Skeleton className="h-4 w-3/4" />
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-10 w-full" />
-                    <Skeleton className="h-10 w-full" />
-                </CardContent>
-                <CardFooter>
-                    <Skeleton className="h-10 w-36" />
-                </CardFooter>
-            </Card>
+        <div className="flex h-screen items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
     );
   }
