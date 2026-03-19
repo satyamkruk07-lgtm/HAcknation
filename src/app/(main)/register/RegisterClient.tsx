@@ -8,8 +8,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   createUserWithEmailAndPassword,
   updateProfile,
-  sendEmailVerification,
-  signOut,
 } from 'firebase/auth';
 import { useAuth, useFirestore } from '@/firebase';
 import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
@@ -152,7 +150,7 @@ export default function RegisterPage() {
     }
     setMemberCount(count);
     setTotalAmount(count * 250);
-  }, [registrationType, ...teamMemberFields]);
+  }, [registrationType, teamMemberFields]);
   
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
@@ -213,18 +211,15 @@ export default function RegisterPage() {
           teamName: data.teamName ? data.teamName.trim() : '',
           teamMembers: teamMembersList,
           registrationDate: new Date().toISOString(),
-          emailVerified: false, // Explicitly set to false initially
           plan: plan,
       });
 
-      // Step 4: Send the verification email
-      await sendEmailVerification(user);
-
-      // Step 5: Sign the user out to force them to log in after verifying
-      await signOut(auth);
-
-      // Step 6: Redirect to login page with a success message
-      router.push('/login?registered=true');
+      // Step 4: Redirect to payment or success page
+      if (plan === 'with-kit') {
+        router.push(`/payment?amount=${totalAmount}&name=${data.name}&email=${data.email}&userId=${user.uid}`);
+      } else {
+        router.push('/registration-success');
+      }
 
     } catch (error: any) {
       let errorMessage = 'An unknown error occurred. Please try again.';
@@ -512,21 +507,7 @@ export default function RegisterPage() {
             </CardFooter>
           </form>
         </Form>
-
-        <CardFooter className="flex flex-col items-stretch gap-4 pt-4">
-            <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
-            <Link
-                href="/login"
-                className="font-medium text-primary hover:underline"
-            >
-                Log in
-            </Link>
-            </p>
-        </CardFooter>
       </Card>
     </div>
   );
 }
-
-    
