@@ -512,7 +512,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Conducted By Section */}
+        {/* Managed by Section */}
         <ConductedBy />
       </div>
     </div>
