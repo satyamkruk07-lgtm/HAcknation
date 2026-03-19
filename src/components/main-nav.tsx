@@ -26,6 +26,15 @@ import {
   DialogDescription,
 } from '@/components/ui/dialog';
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 import {
@@ -35,7 +44,9 @@ import {
   Shield,
   FileText,
   Code,
+  Check,
 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 import { useToast } from '@/hooks/use-toast';
 
@@ -80,11 +91,9 @@ export function MainNav() {
       <div className="flex items-center gap-4">
 
         {isLoading ? (
-          <div className="h-10 w-24 animate-pulse rounded-md bg-muted" />
-        ) : user ? (
-
+          <Skeleton className="h-10 w-24" />
+        ) : user && isAdmin ? (
           <DropdownMenu>
-
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar className="h-10 w-10">
@@ -98,9 +107,7 @@ export function MainNav() {
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
-
             <DropdownMenuContent className="w-56" align="end" forceMount>
-
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium">
@@ -111,142 +118,131 @@ export function MainNav() {
                   </p>
                 </div>
               </DropdownMenuLabel>
-
               <DropdownMenuSeparator />
-
               <DropdownMenuItem asChild>
                 <Link href="/dashboard">
                   <LayoutGrid className="mr-2 h-4 w-4" />
                   Dashboard
                 </Link>
               </DropdownMenuItem>
-
               <DropdownMenuItem asChild>
                 <Link href="/profile">
                   <UserIcon className="mr-2 h-4 w-4" />
                   Profile
                 </Link>
               </DropdownMenuItem>
-
-              {isAdmin ? (
-                <>
-                  <DropdownMenuItem asChild>
-                    <Link href="/judging">
-                      <Code className="mr-2 h-4 w-4" />
-                      Judging
-                    </Link>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuItem asChild>
-                    <Link href="/admin">
-                      <Shield className="mr-2 h-4 w-4" />
-                      Admin
-                    </Link>
-                  </DropdownMenuItem>
-                </>
-              ) : (
-                <DropdownMenuItem asChild>
-                  <Link href="/submit">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Submit Project
-                  </Link>
-                </DropdownMenuItem>
-              )}
-
+              <DropdownMenuItem asChild>
+                <Link href="/judging">
+                  <Code className="mr-2 h-4 w-4" />
+                  Judging
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/admin">
+                  <Shield className="mr-2 h-4 w-4" />
+                  Admin
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out
               </DropdownMenuItem>
-
             </DropdownMenuContent>
-
           </DropdownMenu>
-
         ) : (
-
-          <>
-            <Button asChild variant="ghost">
-              <Link href="/login">Log In</Link>
+          <div className="flex items-center gap-2">
+            <Button asChild variant="outline">
+                <Link href="/login">Login</Link>
             </Button>
-
             <Dialog>
-
-              <DialogTrigger asChild>
+                <DialogTrigger asChild>
                 <Button>Register</Button>
-              </DialogTrigger>
-
-              <DialogContent className="sm:max-w-4xl">
-
-                <DialogHeader>
-                  <DialogTitle className="text-center text-3xl font-bold">
-                    Choose Your Plan
-                  </DialogTitle>
-
-                  <DialogDescription className="text-center text-lg">
-                    Select the registration type that suits you best.
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-6 max-h-[70vh] overflow-y-auto">
-
-                  <div className="border rounded-xl p-6 shadow-lg">
-
-                    <h3 className="text-2xl font-bold mb-2">
-                      With Kit
-                    </h3>
-
-                    <p className="text-4xl font-bold mb-4">
-                      ₹250
-                    </p>
-
-                    <ul className="space-y-2 text-muted-foreground mb-6">
-                      <li>✔ Official Hackathon T-Shirt</li>
-                      <li>✔ Sticker Pack & Goodies</li>
-                      <li>✔ Meals & Snacks (2 Days)</li>
-                      <li>✔ Participation Certificate</li>
-                    </ul>
-
-                    <Button asChild className="w-full">
-                      <Link href="/register?plan=with-kit">
-                        Register With Kit
-                      </Link>
-                    </Button>
-
-                  </div>
-
-                  <div className="border rounded-xl p-6">
-
-                    <h3 className="text-2xl font-bold mb-2">
-                      Without Kit
-                    </h3>
-
-                    <p className="text-4xl font-bold mb-4">
-                      Free
-                    </p>
-
-                    <ul className="space-y-2 text-muted-foreground mb-6">
-                      <li>✔ Meals & Snacks (2 Days)</li>
-                      <li>✔ Participation Certificate</li>
-                    </ul>
-
-                    <Button asChild variant="secondary" className="w-full">
-                      <Link href="/register?plan=without-kit">
-                        Register Without Kit
-                      </Link>
-                    </Button>
-
-                  </div>
-
-                </div>
-
-              </DialogContent>
-
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle className="text-center font-headline text-3xl">
+                        Choose Your Plan
+                        </DialogTitle>
+                        <DialogDescription className="text-center text-lg">
+                        Select the registration type that suits you best.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8 overflow-y-auto">
+                        <Card className="flex flex-col border-primary border-2 shadow-lg shadow-primary/20">
+                        <CardHeader>
+                            <CardTitle className="text-2xl">With Kit</CardTitle>
+                            <CardDescription>
+                            Get the full hackathon experience with exclusive
+                            goodies.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex-1 space-y-4">
+                            <p className="text-4xl font-bold">₹250</p>
+                            <ul className="space-y-2 text-muted-foreground">
+                            <li className="flex items-start gap-3">
+                                <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                                <span>Official Hackathon T-Shirt</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                                <span>Exclusive Sticker Pack & Goodies</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                                <span>Meals & Snacks (2 Days)</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                                <span>Participation Certificate</span>
+                            </li>
+                            </ul>
+                        </CardContent>
+                        <CardFooter>
+                            <Button asChild className="w-full">
+                            <Link href="/register?plan=with-kit">
+                                Register With Kit
+                            </Link>
+                            </Button>
+                        </CardFooter>
+                        </Card>
+                        <Card className="flex flex-col">
+                        <CardHeader>
+                            <CardTitle className="text-2xl">Without Kit</CardTitle>
+                            <CardDescription>
+                            Just the essentials for a great hackathon.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex-1 space-y-4">
+                            <p className="text-4xl font-bold">₹0</p>
+                            <ul className="space-y-2 text-muted-foreground">
+                            <li className="flex items-start gap-3">
+                                <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                                <span>Meals & Snacks (2 Days)</span>
+                            </li>
+                            <li className="flex items-start gap-3">
+                                <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
+                                <span>Participation Certificate</span>
+                            </li>
+                            </ul>
+                        </CardContent>
+                        <CardFooter>
+                            <Button
+                            asChild
+                            className="w-full"
+                            variant="secondary"
+                            >
+                            <Link href="/register?plan=without-kit">
+                                Register Without Kit
+                            </Link>
+                            </Button>
+                        </CardFooter>
+                        </Card>
+                    </div>
+                </DialogContent>
             </Dialog>
-          </>
+          </div>
         )}
-
       </div>
     </div>
   );
