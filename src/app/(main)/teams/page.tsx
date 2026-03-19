@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -19,7 +18,9 @@ import { collection, query, orderBy, getDocs, limit, startAfter, type QueryDocum
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { signOut } from 'firebase/auth';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 function ProfileCardSkeleton() {
     return (
@@ -48,29 +49,28 @@ function ProfileCardSkeleton() {
 export default function TeamsPage() {
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
-  const auth = useAuth();
+  const { isAdmin, isAdminLoading } = useAdminStatus();
   const router = useRouter();
 
   // Pagination State
   const [teamProfiles, setTeamProfiles] = useState<UserAccount[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingProfiles, setIsLoadingProfiles] = useState(true);
   const [lastVisibleProfile, setLastVisibleProfile] = useState<QueryDocumentSnapshot | null>(null);
   const [hasMore, setHasMore] = useState(true);
+  
+  const isLoading = isUserLoading || isAdminLoading;
 
   useEffect(() => {
-    if (isUserLoading) return;
-    if (!user) {
-      router.push('/login');
-    } else if (!user.emailVerified) {
-      signOut(auth).then(() => {
-        router.push('/login?reason=unverified');
-      });
+    if (!isLoading) {
+      if (!user || !isAdmin) {
+        router.push('/');
+      }
     }
-  }, [user, isUserLoading, router, auth]);
+  }, [user, isAdmin, isLoading, router]);
 
   const loadMoreProfiles = useCallback(async () => {
     if (!firestore || !hasMore) return;
-    setIsLoading(true);
+    setIsLoadingProfiles(true);
 
     let q = query(collection(firestore, 'users'), orderBy('registrationDate', 'desc'), limit(9));
     if (lastVisibleProfile) {
@@ -89,37 +89,30 @@ export default function TeamsPage() {
             setLastVisibleProfile(querySnapshot.docs[querySnapshot.docs.length - 1]);
         }
     } catch(err) {
-        console.error(err);
+        const permissionError = new FirestorePermissionError({
+            path: 'users',
+            operation: 'list',
+        });
+        errorEmitter.emit('permission-error', permissionError);
     } finally {
-        setIsLoading(false);
+        setIsLoadingProfiles(false);
     }
   }, [firestore, hasMore, lastVisibleProfile]);
   
   useEffect(() => {
-    // Initial fetch if user is logged in and verified
-    if(user && user.emailVerified) {
+    if(user && isAdmin) {
       loadMoreProfiles();
-    } else if (!isUserLoading) {
-      // If user is not verified or not logged in, don't load anything.
-      setIsLoading(false);
+    } else if (!isLoading) {
+      setIsLoadingProfiles(false);
     }
-  }, [user, isUserLoading, loadMoreProfiles]);
+  }, [user, isAdmin, isLoading, loadMoreProfiles]);
 
-  const showSkeletons = isLoading && teamProfiles.length === 0;
+  const showSkeletons = isLoadingProfiles && teamProfiles.length === 0;
 
-  if (isUserLoading || !user) {
+  if (isLoading || !user || !isAdmin) {
      return (
-        <div className="container py-12">
-            <div className="text-center">
-                <Skeleton className="h-10 w-1/2 mx-auto" />
-                <Skeleton className="h-6 w-3/4 mx-auto mt-4" />
-            </div>
-            <div className="mt-12">
-                <Skeleton className="h-8 w-1/4 mb-6" />
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {Array.from({length: 6}).map((_, i) => <ProfileCardSkeleton key={i} />)}
-                </div>
-            </div>
+        <div className="flex h-screen items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
     )
   }
@@ -211,8 +204,8 @@ export default function TeamsPage() {
 
         {hasMore && (
             <div className="mt-8 flex justify-center">
-                <Button onClick={loadMoreProfiles} disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button onClick={loadMoreProfiles} disabled={isLoadingProfiles}>
+                    {isLoadingProfiles && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Load More
                 </Button>
             </div>
