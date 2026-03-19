@@ -112,11 +112,11 @@ export default function Home() {
                         <ul className="space-y-2 text-muted-foreground">
                           <li className="flex items-start gap-3">
                             <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
-                            <span>Official Hackathon T-Shirt</span>
+                            <span>Official Hackathon Kit</span>
                           </li>
                           <li className="flex items-start gap-3">
                             <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
-                            <span>Exclusive Sticker Pack & Goodies</span>
+                            <span>Exclusive Pass For Comedy Night</span>
                           </li>
                           <li className="flex items-start gap-3">
                             <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
