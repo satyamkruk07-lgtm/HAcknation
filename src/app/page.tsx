@@ -89,19 +89,19 @@ export default function Home() {
                 <DialogTrigger asChild>
                   <Button size="lg">Register Now</Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
+                <DialogContent className="sm:max-w-md">
                   <DialogHeader>
                     <DialogTitle className="text-center font-headline text-3xl">
-                      Choose Your Plan
+                      Registration Details
                     </DialogTitle>
                     <DialogDescription className="text-center text-lg">
-                      Select the registration type that suits you best.
+                      All registrations include the official hackathon kit.
                     </DialogDescription>
                   </DialogHeader>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-8 overflow-y-auto">
-                    <Card className="flex flex-col border-primary border-2 shadow-lg shadow-primary/20">
+                  <div className="flex justify-center py-8">
+                    <Card className="w-full flex flex-col border-primary border-2 shadow-lg shadow-primary/20">
                       <CardHeader>
-                        <CardTitle className="text-2xl">With Kit</CardTitle>
+                        <CardTitle className="text-2xl">With Kit Registration</CardTitle>
                         <CardDescription>
                           Get the full hackathon experience with exclusive
                           goodies.
@@ -131,39 +131,7 @@ export default function Home() {
                       <CardFooter>
                         <Button asChild className="w-full">
                           <Link href="/register?plan=with-kit">
-                            Register With Kit
-                          </Link>
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                    <Card className="flex flex-col">
-                      <CardHeader>
-                        <CardTitle className="text-2xl">Without Kit</CardTitle>
-                        <CardDescription>
-                          Just the essentials for a great hackathon.
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="flex-1 space-y-4">
-                        <p className="text-4xl font-bold">₹0</p>
-                        <ul className="space-y-2 text-muted-foreground">
-                          <li className="flex items-start gap-3">
-                            <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
-                            <span>Meals & Snacks (2 Days)</span>
-                          </li>
-                          <li className="flex items-start gap-3">
-                            <Check className="h-5 w-5 text-green-500 mt-1 shrink-0" />
-                            <span>Participation Certificate</span>
-                          </li>
-                        </ul>
-                      </CardContent>
-                      <CardFooter>
-                        <Button
-                          asChild
-                          className="w-full"
-                          variant="secondary"
-                        >
-                          <Link href="/register?plan=without-kit">
-                            Register Without Kit
+                            Proceed to Register
                           </Link>
                         </Button>
                       </CardFooter>
