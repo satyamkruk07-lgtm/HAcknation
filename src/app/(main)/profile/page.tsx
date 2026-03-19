@@ -285,7 +285,7 @@ export default function ProfilePage() {
                         alt={userProfile?.name || user.displayName || 'User Avatar'}
                         width={128}
                         height={128}
-                        className="rounded-full border-4 border-background object-cover h-32 w-32"
+                        className="rounded-full border-4 border-background shadow-lg object-cover h-32 w-32"
                         data-ai-hint="person portrait"
                     />
                      <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
