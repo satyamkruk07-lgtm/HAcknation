@@ -16,6 +16,13 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/carousel"
+import {
   Lightbulb,
   Rocket,
   Users,
@@ -23,16 +30,21 @@ import {
   Calendar,
   MapPin,
   Check,
+  Trophy,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { sponsors } from '@/lib/data.tsx';
+import { sponsors, previousParticipants, topStatesData, topCollegesData } from '@/lib/data.tsx';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { MainNav } from '@/components/main-nav';
 import { Footer } from '@/components/footer';
 import { ConductedBy } from '@/components/conducted-by';
+import { PerformanceChart } from '@/components/performance-charts';
+import { CountdownCard } from '@/components/countdown-card';
+import { RegistrationCountCard } from '@/components/registration-count-card';
 
 const heroImage = PlaceHolderImages.find(p => p.id === 'hero');
+const galleryImages = PlaceHolderImages.filter(p => p.id.startsWith('gallery-'));
 
 export default function Home() {
   return (
@@ -65,7 +77,7 @@ export default function Home() {
             <div className="mt-6 flex items-center justify-center gap-6 text-lg text-primary-foreground">
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-destructive" />
-                <span>16ᵗʰ & 17ᵗʰ April,2026</span>
+                <span>17ᵗʰ & 18ᵗʰ April,2026</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-destructive" />
@@ -218,6 +230,99 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="live-stats" className="py-20 bg-muted/40">
+          <div className="container">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+              <CountdownCard />
+              <RegistrationCountCard />
+            </div>
+          </div>
+        </section>
+
+        <section id="gallery" className="py-20 bg-background">
+          <div className="container">
+            <h2 className="text-center text-3xl font-headline font-bold mb-12">
+              Glimpses of HackNation 2025
+            </h2>
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full max-w-4xl mx-auto"
+            >
+              <CarouselContent>
+                {galleryImages.map((image) => (
+                  <CarouselItem key={image.id} className="md:basis-1/2 lg:basis-1/3">
+                    <div className="p-1">
+                      <Card className="overflow-hidden group">
+                        <CardContent className="flex aspect-video items-center justify-center p-0">
+                          <Image
+                              src={image.imageUrl}
+                              alt={image.description}
+                              width={600}
+                              height={400}
+                              className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+                              data-ai-hint={image.imageHint}
+                            />
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          </div>
+        </section>
+
+        <section id="best-performers" className="py-20">
+          <div className="container">
+            <h2 className="text-center text-3xl font-headline font-bold mb-12">
+              Best Performers in Hackathon 2025
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
+              {previousParticipants.map((participant) => (
+                <Card key={participant.id} className="text-center transition-all duration-300 ease-in-out transform hover:-translate-y-2 hover:shadow-2xl">
+                  <CardContent className="p-6">
+                    <Image
+                      src={participant.imageUrl}
+                      alt={participant.name}
+                      width={128}
+                      height={128}
+                      className="rounded-full mx-auto mb-4 border-4 border-primary/20 object-cover h-32 w-32"
+                      data-ai-hint={participant.imageHint}
+                    />
+                    <h3 className="font-semibold text-lg">{participant.name}</h3>
+                    <p className="text-sm text-muted-foreground">{participant.college}</p>
+                  </CardContent>
+                  <CardFooter className="flex-col items-center justify-center p-4 border-t">
+                      <p className="text-sm font-semibold flex items-center gap-2 text-accent"><Trophy className="h-4 w-4"/> Winner</p>
+                      <p className="text-xs text-muted-foreground mt-1 text-center">{participant.project}</p>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <PerformanceChart 
+                    data={topStatesData} 
+                    title="Top 5 States"
+                    description="States with the highest number of participants in previous editions."
+                    barColor="hsl(var(--primary))"
+                />
+                <PerformanceChart 
+                    data={topCollegesData} 
+                    title="Top 5 Colleges"
+                    description="Colleges that have consistently shown outstanding participation."
+                    barColor="hsl(var(--accent))"
+                />
+            </div>
+          </div>
+        </section>
+
         <section id="sponsors" className="py-16 bg-background">
           <div className="container">
             <h2 className="text-center text-3xl font-headline font-bold mb-12">
@@ -227,7 +332,7 @@ export default function Home() {
               {sponsors.map(sponsor => (
                 <div
                   key={sponsor.name}
-                  className="flex flex-col items-center justify-center text-center gap-3"
+                  className="flex flex-col items-center justify-center text-center gap-3 transition-transform duration-300 hover:scale-110"
                 >
                   {sponsor.icon}
                   <span className="text-base font-semibold text-muted-foreground">
