@@ -10,13 +10,12 @@ import {
   CardContent
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Github, QrCode } from 'lucide-react';
+import { ArrowRight, Github, QrCode, Loader2 } from 'lucide-react';
 import { useCollection, useFirestore, useMemoFirebase, useAuth, useUser } from '@/firebase';
 import { collection, query, orderBy } from 'firebase/firestore';
 import type { SubmittedProject } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
-import { signInAnonymously } from 'firebase/auth';
 import {
   Dialog,
   DialogContent,
@@ -28,6 +27,8 @@ import {
 import QRCode from 'qrcode.react';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 
 function ProjectCardSkeleton() {
@@ -103,29 +104,36 @@ function QRCodeGenerator() {
 
 export default function JudgingPage() {
   const firestore = useFirestore();
-  const auth = useAuth();
   const { user, isUserLoading } = useUser();
+  const { isAdmin, isAdminLoading } = useAdminStatus();
+  const router = useRouter();
+
+  const isLoading = isUserLoading || isAdminLoading;
 
   useEffect(() => {
-    // This effect ensures that any visitor to this page who is not already
-    // logged in will be seamlessly signed in as an anonymous user. This is crucial
-    // for judges who access the page via a QR code.
-    if (auth && !isUserLoading && !user) {
-      signInAnonymously(auth).catch((error) => {
-        // This is a critical error to log if it happens.
-        console.error("Critical: Anonymous sign-in failed for judging page:", error);
-      });
+    if (!isLoading) {
+      if (!user || !isAdmin) {
+        router.push('/');
+      }
     }
-  }, [auth, isUserLoading, user]);
+  }, [user, isAdmin, isLoading, router]);
 
   const projectsQuery = useMemoFirebase(() => {
-    if (!firestore) return null;
+    if (!firestore || !isAdmin) return null;
     return query(collection(firestore, 'projects'), orderBy('submissionDate', 'desc'));
-  }, [firestore]);
+  }, [firestore, isAdmin]);
 
-  const { data: projects, isLoading } = useCollection<SubmittedProject>(projectsQuery);
+  const { data: projects, isLoading: areProjectsLoading } = useCollection<SubmittedProject>(projectsQuery);
 
-  const isContentLoading = isLoading || isUserLoading;
+  const isContentLoading = areProjectsLoading || isLoading;
+  
+  if (isContentLoading || !isAdmin) {
+    return (
+        <div className="flex h-screen items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+    );
+  }
 
   return (
     <div className="container py-12">
