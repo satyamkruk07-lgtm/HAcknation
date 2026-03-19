@@ -96,3 +96,12 @@ export type Judgment = {
     feedback: string;
     submittedAt: Timestamp;
 };
+
+export type PreviousParticipant = {
+  id: string;
+  name: string;
+  college: string;
+  project: string;
+  imageUrl: string;
+  imageHint: string;
+};
