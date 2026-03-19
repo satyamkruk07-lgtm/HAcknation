@@ -27,45 +27,44 @@ import {
   AlertDialogFooter,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import { Lightbulb, Sparkles, Send, Lock } from 'lucide-react';
+import { Lightbulb, Sparkles, Send, Lock, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { projectIdeas } from '@/lib/data';
 import type { ProjectIdea, SubmittedProject } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { useCollection, useFirestore, useMemoFirebase, useUser, useAuth } from '@/firebase';
+import { useCollection, useFirestore, useMemoFirebase, useUser } from '@/firebase';
 import { collection, query } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
-import { signOut } from 'firebase/auth';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 export default function AiDiscussionPage() {
   const ideas: ProjectIdea[] = projectIdeas;
   const router = useRouter();
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
-  const auth = useAuth();
+  const { isAdmin, isAdminLoading } = useAdminStatus();
 
   const [selectedIdea, setSelectedIdea] = useState<ProjectIdea | null>(null);
   const [takenIdeas, setTakenIdeas] = useState<Set<string>>(new Set());
   const [showTakenAlert, setShowTakenAlert] = useState(false);
 
+  const isLoading = isUserLoading || isAdminLoading;
+
   useEffect(() => {
-    if (isUserLoading) return;
-    if (!user) {
-      router.push('/login');
-    } else if (!user.emailVerified) {
-      signOut(auth).then(() => {
-        router.push('/login?reason=unverified');
-      });
+    if (!isLoading) {
+      if (!user || !isAdmin) {
+        router.push('/');
+      }
     }
-  }, [user, isUserLoading, router, auth]);
+  }, [user, isAdmin, isLoading, router]);
 
   // Fetch all submitted projects to check for taken ideas
   const projectsQuery = useMemoFirebase(() => {
-    if (!firestore || !user?.emailVerified) return null;
+    if (!firestore || !isAdmin) return null;
     return query(collection(firestore, 'projects'));
-  }, [firestore, user?.emailVerified]);
+  }, [firestore, isAdmin]);
 
-  const { data: submittedProjects, isLoading } = useCollection<SubmittedProject>(projectsQuery);
+  const { data: submittedProjects, isLoading: areProjectsLoading } = useCollection<SubmittedProject>(projectsQuery);
 
   useEffect(() => {
     if (submittedProjects) {
@@ -104,7 +103,15 @@ export default function AiDiscussionPage() {
     }
   };
 
-  const pageLoading = isLoading || isUserLoading;
+  const pageLoading = areProjectsLoading || isLoading;
+
+  if (pageLoading || !isAdmin) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <>
