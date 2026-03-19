@@ -27,6 +27,7 @@ import {
   Linkedin,
   AlertCircle,
   Globe,
+  Loader2,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { sponsors } from '@/lib/data';
@@ -37,7 +38,7 @@ import { formatDistanceToNow } from 'date-fns';
 import Image from 'next/image';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ConductedBy } from '@/components/conducted-by';
-import { signOut } from 'firebase/auth';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 const features = [
   {
@@ -182,12 +183,22 @@ function AnnouncementSkeleton() {
 
 export default function DashboardPage() {
   const { user, isUserLoading } = useUser();
-  const auth = useAuth();
+  const { isAdmin, isAdminLoading } = useAdminStatus();
   const firestore = useFirestore();
   const router = useRouter();
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [areAnnouncementsLoading, setAreAnnouncementsLoading] = useState(true);
+  
+  const isLoading = isUserLoading || isAdminLoading;
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user || !isAdmin) {
+        router.push('/');
+      }
+    }
+  }, [user, isAdmin, isLoading, router]);
 
   const fetchAnnouncements = useCallback(async () => {
     if (!firestore || !user) {
@@ -208,21 +219,10 @@ export default function DashboardPage() {
   }, [firestore, user]);
 
   useEffect(() => {
-    if (isUserLoading) return;
-    if (!user) {
-      router.push('/login');
-    } else if (!user.emailVerified) {
-      signOut(auth).then(() => {
-        router.push('/login?reason=unverified');
-      });
-    }
-  }, [user, isUserLoading, router, auth]);
-
-  useEffect(() => {
-    if (user) {
+    if (user && isAdmin) {
         fetchAnnouncements();
     }
-  }, [user, fetchAnnouncements]);
+  }, [user, isAdmin, fetchAnnouncements]);
   
   const userDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null;
@@ -231,25 +231,12 @@ export default function DashboardPage() {
 
   const { data: userProfile, isLoading: isProfileLoading } = useDoc<UserAccount>(userDocRef);
 
-  const isContentLoading = isUserLoading || isProfileLoading;
+  const isContentLoading = isLoading || isProfileLoading;
 
-  if (isContentLoading || !user) {
+  if (isContentLoading || !user || !isAdmin) {
     return (
-      <div className="container py-12">
-        <div className="space-y-4">
-          <Skeleton className="h-10 w-1/2" />
-          <Skeleton className="h-6 w-3/4" />
-        </div>
-        <div className="mt-8 grid gap-8 md:grid-cols-3">
-          <Skeleton className="h-48 w-full md:col-span-2" />
-          <Skeleton className="h-48 w-full" />
-        </div>
-        <div className="mt-8 grid gap-8 md:grid-cols-2">
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -298,7 +285,7 @@ export default function DashboardPage() {
                               className="w-[90px] h-[90px] object-contain"
                           />
                           <Image
-                              src="https://image2url.com/r2/default/images/1771394043806-0d318ac1-2aae-4c91-8ca3-63e2058328b0.png"
+                              src="https://image2url.com/r2/default/images/1773730181857-87a78391-1fdf-40db-bde8-f576b5697e18.jpeg"
                               alt="ACM Logo"
                               width={80}
                               height={80}
