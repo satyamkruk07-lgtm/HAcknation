@@ -38,7 +38,7 @@ export function ConductedBy() {
     <>
       <div className="mt-12">
         <div className="flex items-center justify-center gap-4 mb-8">
-          <h2 className="font-headline text-2xl font-bold text-center">Conducted By</h2>
+          <h2 className="font-headline text-2xl font-bold text-center">Managed by</h2>
           <Button asChild>
             <a href="tel:7060550243">
               <Phone className="mr-2 h-4 w-4" />
