@@ -18,7 +18,7 @@ export function RegistrationCountCard() {
         // A production app would use a Cloud Function to write this count to a public document.
         if (!firestore) {
             setIsLoading(false);
-            setCount(10); // Fallback if firestore is not available
+            setCount(150); // Fallback if firestore is not available
             return;
         };
 
@@ -62,7 +62,7 @@ export function RegistrationCountCard() {
                         <Skeleton className="h-20 w-36 mx-auto" />
                     ) : (
                         <div className="text-7xl font-bold font-mono text-primary [text-shadow:_2px_2px_4px_hsl(var(--primary)/0.2)]">
-                            {(count && count > 150 ? count : 150)}+
+                            {(count && count > 150 ? count : 10)}+
                         </div>
                     )}
                      <p className="text-muted-foreground mt-2 font-semibold tracking-widest">INNOVATORS</p>
