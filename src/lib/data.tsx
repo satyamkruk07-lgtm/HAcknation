@@ -1,5 +1,5 @@
 import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
-import type { Sponsor, Project, ProjectIdea, ScheduleEvent, Conductor } from './types';
+import type { Sponsor, Project, ProjectIdea, ScheduleEvent, Conductor, PreviousParticipant } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
 export const sponsors: Sponsor[] = [
@@ -386,6 +386,56 @@ export const conductors: Conductor[] = [
     }
 ];
 
+export const previousParticipants: PreviousParticipant[] = [
+  {
+    id: '1',
+    name: 'Priya Sharma',
+    college: 'IIT Delhi',
+    project: 'AI-Powered Health Diagnosis',
+    imageUrl: PlaceHolderImages.find(p => p.id === 'participant-1')?.imageUrl || 'https://picsum.photos/seed/p1/400/400',
+    imageHint: 'person portrait'
+  },
+  {
+    id: '2',
+    name: 'Rohan Gupta',
+    college: 'VIT Vellore',
+    project: 'Blockchain-based Voting System',
+    imageUrl: PlaceHolderImages.find(p => p.id === 'participant-2')?.imageUrl || 'https://picsum.photos/seed/p2/400/400',
+    imageHint: 'person portrait'
+  },
+  {
+    id: '3',
+    name: 'Anjali Mehta',
+    college: 'NIT Trichy',
+    project: 'AR Navigation for Smart Cities',
+    imageUrl: PlaceHolderImages.find(p => p.id === 'participant-3')?.imageUrl || 'https://picsum.photos/seed/p3/400/400',
+    imageHint: 'person portrait'
+  },
+    {
+    id: '4',
+    name: 'Vikram Singh',
+    college: 'BITS Pilani',
+    project: 'Decentralized Social Media',
+    imageUrl: PlaceHolderImages.find(p => p.id === 'participant-4')?.imageUrl || 'https://picsum.photos/seed/p4/400/400',
+    imageHint: 'person portrait'
+  },
+];
+
+export const topStatesData = [
+    { name: 'Maharashtra', participants: 450 },
+    { name: 'Karnataka', participants: 380 },
+    { name: 'Delhi', participants: 320 },
+    { name: 'Tamil Nadu', participants: 280 },
+    { name: 'Uttar Pradesh', participants: 250 },
+];
+
+export const topCollegesData = [
+    { name: 'IIT Bombay', participants: 95 },
+    { name: 'VIT Vellore', participants: 80 },
+    { name: 'IIT Delhi', participants: 75 },
+    { name: 'NIT Trichy', participants: 60 },
+    { name: 'SRM University', participants: 55 },
+];
     
 
 
