@@ -33,10 +33,11 @@ import { Loader2, Cpu, Upload } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import type { UserAccount } from '@/lib/types';
-import { updateProfile, signOut } from 'firebase/auth';
+import { updateProfile } from 'firebase/auth';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 const profileFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -87,7 +88,7 @@ type ProfileFormData = z.infer<typeof profileFormSchema>;
 
 export default function ProfilePage() {
   const { user, isUserLoading, mutate: mutateUser } = useUserAndMutate();
-  const auth = useAuth();
+  const { isAdmin, isAdminLoading } = useAdminStatus();
   const firestore = useFirestore();
   const storage = useStorage();
   const router = useRouter();
@@ -95,6 +96,16 @@ export default function ProfilePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isLoading = isUserLoading || isAdminLoading;
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user || !isAdmin) {
+        router.push('/');
+      }
+    }
+  }, [user, isAdmin, isLoading, router]);
   
   const userDocRef = useMemoFirebase(() => {
     if (!firestore || !user?.uid) return null;
@@ -121,17 +132,6 @@ export default function ProfilePage() {
   });
 
   const registrationType = form.watch('registrationType');
-
-  useEffect(() => {
-    if (isUserLoading) return;
-    if (!user) {
-      router.push('/login');
-    } else if (!user.emailVerified) {
-      signOut(auth).then(() => {
-        router.push('/login?reason=unverified');
-      });
-    }
-  }, [user, isUserLoading, router, auth]);
 
   useEffect(() => {
     if (userProfile) {
@@ -168,15 +168,6 @@ export default function ProfilePage() {
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user || !userDocRef) return;
-
-    if (!user.emailVerified) {
-      toast({
-        variant: 'destructive',
-        title: 'Verification Required',
-        description: 'You must verify your email before uploading an image.',
-      });
-      return;
-    }
 
     if (file.size > 2 * 1024 * 1024) { // 2MB limit
       toast({
@@ -222,15 +213,6 @@ export default function ProfilePage() {
         variant: 'destructive',
         title: 'Error',
         description: 'You must be logged in to update your profile.',
-      });
-      return;
-    }
-
-    if (!user.emailVerified) {
-      toast({
-        variant: 'destructive',
-        title: 'Verification Required',
-        description: 'You must verify your email before updating your profile.',
       });
       return;
     }
@@ -284,30 +266,10 @@ export default function ProfilePage() {
     }
   };
 
-  if (isUserLoading || isProfileLoading || !user) {
+  if (isLoading || isProfileLoading || !user || !isAdmin) {
     return (
-      <div className="bg-muted/40 min-h-[calc(100vh-3.5rem)]">
-        <div className="container py-12">
-          <Card className="mx-auto max-w-3xl">
-            <CardHeader>
-              <Skeleton className="h-8 w-48" />
-              <Skeleton className="h-4 w-64" />
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex items-center gap-4">
-                <Skeleton className="h-20 w-20 rounded-full" />
-                <div className="space-y-2">
-                  <Skeleton className="h-6 w-32" />
-                  <Skeleton className="h-4 w-48" />
-                </div>
-              </div>
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-24 w-full" />
-              <Skeleton className="h-10 w-32" />
-            </CardContent>
-          </Card>
-        </div>
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
