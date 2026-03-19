@@ -90,50 +90,30 @@ const hackathonTips = [
     }
 ]
 
-const deadline = new Date('2026-04-16T00:00:00');
+const deadline = new Date('2026-04-17T00:00:00');
 
 function Countdown() {
-    const [timeLeft, setTimeLeft] = useState<{
-        days: number;
-        hours: number;
-        minutes: number;
-        seconds: number;
-    } | null>(null);
+    const [daysLeft, setDaysLeft] = useState<number | null>(null);
 
     useEffect(() => {
-        const calculateTimeLeft = () => {
+        const calculateDaysLeft = () => {
             const now = new Date();
             const difference = deadline.getTime() - now.getTime();
 
             if (difference > 0) {
-                return {
-                    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-                    hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-                    minutes: Math.floor((difference / 1000 / 60) % 60),
-                    seconds: Math.floor((difference / 1000) % 60),
-                };
+                return Math.ceil(difference / (1000 * 60 * 60 * 24));
             }
-            return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+            return 0;
         };
-        
-        // Run only on client
-        if (typeof window !== 'undefined') {
-            setTimeLeft(calculateTimeLeft());
 
-            const timer = setInterval(() => {
-                setTimeLeft(calculateTimeLeft());
-            }, 1000);
+        setDaysLeft(calculateDaysLeft());
 
-            return () => clearInterval(timer);
-        }
+        const timer = setInterval(() => {
+            setDaysLeft(calculateDaysLeft());
+        }, 1000 * 60 * 60); // Update once an hour is enough
+
+        return () => clearInterval(timer);
     }, []);
-
-    const renderTimeValue = (value: number | undefined) => {
-        if (value === undefined || timeLeft === null) {
-            return <Skeleton className="h-8 w-12" />;
-        }
-        return <div className="text-3xl font-bold font-mono">{String(value).padStart(2, '0')}</div>;
-    }
 
     return (
         <Card className="transition-all duration-300 ease-in-out hover:shadow-2xl hover:-translate-y-2">
@@ -143,24 +123,16 @@ function Countdown() {
                     <span>Submission Deadline</span>
                 </CardTitle>
             </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-4 gap-2 text-center">
-                    <div>
-                        {renderTimeValue(timeLeft?.days)}
-                        <div className="text-xs text-muted-foreground">DAYS</div>
+            <CardContent className="text-center pt-6">
+                {daysLeft === null ? (
+                    <Skeleton className="h-16 w-24 mx-auto" />
+                ) : (
+                    <div className="text-6xl font-bold font-mono text-primary">
+                        {daysLeft}
                     </div>
-                    <div>
-                        {renderTimeValue(timeLeft?.hours)}
-                        <div className="text-xs text-muted-foreground">HOURS</div>
-                    </div>
-                    <div>
-                        {renderTimeValue(timeLeft?.minutes)}
-                        <div className="text-xs text-muted-foreground">MINUTES</div>
-                    </div>
-                    <div>
-                        {renderTimeValue(timeLeft?.seconds)}
-                        <div className="text-xs text-muted-foreground">SECONDS</div>
-                    </div>
+                )}
+                <div className="text-sm text-muted-foreground mt-1">
+                    {daysLeft === 1 ? 'DAY REMAINING' : 'DAYS REMAINING'}
                 </div>
             </CardContent>
         </Card>
