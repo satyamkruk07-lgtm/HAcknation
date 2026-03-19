@@ -10,24 +10,26 @@ import type { SubmittedProject } from '@/lib/types';
 import { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
-import { signInAnonymously } from 'firebase/auth';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 export default function ProjectJudgingPage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
-  const auth = useAuth();
+  const { isAdmin, isAdminLoading } = useAdminStatus();
   const router = useRouter();
 
+  const isLoading = isUserLoading || isAdminLoading;
+
   useEffect(() => {
-    if (auth && !isUserLoading && !user) {
-      signInAnonymously(auth).catch((error) => {
-        console.error("Anonymous sign-in failed:", error);
-      });
+    if (!isLoading) {
+      if (!user || !isAdmin) {
+        router.push('/');
+      }
     }
-  }, [auth, isUserLoading, user]);
-  
+  }, [user, isAdmin, isLoading, router]);
+
   const projectRef = useMemoFirebase(() => {
     if (!firestore || !id) return null;
     return doc(firestore, 'projects', id);
@@ -35,24 +37,12 @@ export default function ProjectJudgingPage() {
 
   const { data: project, isLoading: isProjectLoading, error } = useDoc<SubmittedProject>(projectRef);
   
-  const isContentLoading = isProjectLoading || isUserLoading;
+  const isContentLoading = isProjectLoading || isLoading;
 
-  if (isContentLoading) {
+  if (isContentLoading || !isAdmin) {
     return (
-        <div className="container py-12">
-            <div className="mx-auto max-w-4xl">
-                <div className="mb-8 space-y-4">
-                    <Skeleton className="h-10 w-3/4" />
-                    <Skeleton className="h-6 w-1/2" />
-                    <Skeleton className="h-5 w-full mt-4" />
-                    <Skeleton className="h-5 w-5/6" />
-                    <div className="mt-6 flex gap-4">
-                        <Skeleton className="h-10 w-36" />
-                        <Skeleton className="h-10 w-32" />
-                    </div>
-                </div>
-                <Skeleton className="h-[400px] w-full" />
-            </div>
+        <div className="flex h-screen items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
     );
   }
