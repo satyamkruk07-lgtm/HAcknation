@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -83,7 +84,9 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-destructive" />
-                <span>Shivalik College of Engineering,Dehradun</span>
+                <a href="https://shivalikcollege.edu.in/" target="_blank" rel="noopener noreferrer" className="hover:underline">
+                    Shivalik College of Engineering,Dehradun
+                </a>
               </div>
             </div>
             <div className="mt-8 flex justify-center gap-4">
