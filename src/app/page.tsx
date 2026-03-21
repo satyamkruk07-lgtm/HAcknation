@@ -1,3 +1,5 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -22,6 +24,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/carousel"
+import Autoplay from "embla-carousel-autoplay"
 import {
   Lightbulb,
   Rocket,
@@ -30,18 +33,17 @@ import {
   Calendar,
   MapPin,
   Check,
-  Trophy,
 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { sponsors, previousParticipants, topStatesData, topCollegesData } from '@/lib/data.tsx';
+import { sponsors } from '@/lib/data';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { MainNav } from '@/components/main-nav';
 import { Footer } from '@/components/footer';
 import { ConductedBy } from '@/components/conducted-by';
-import { PerformanceChart } from '@/components/performance-charts';
 import { CountdownCard } from '@/components/countdown-card';
 import { RegistrationCountCard } from '@/components/registration-count-card';
+import { PastPerformanceSection } from '@/components/past-performance-section';
 
 const heroImage = PlaceHolderImages.find(p => p.id === 'hero');
 const galleryImages = PlaceHolderImages.filter(p => p.id.startsWith('gallery-'));
@@ -69,10 +71,10 @@ export default function Home() {
           <div className="absolute inset-0 bg-black/80" />
           <div className="container text-center relative">
             <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl text-primary-foreground">
-              HackNation
+              HackNation 1.0
             </h1>
             <p className="mx-auto mt-4 max-w-[700px] text-lg md:text-xl text-primary-foreground/80">
-              Innovate. Collaborate. Create. The future is in your hands.
+            Innovate with AI. Build for Bharat. Impact the Future.
             </p>
             <div className="mt-6 flex items-center justify-center gap-6 text-lg text-primary-foreground">
               <div className="flex items-center gap-2">
@@ -147,7 +149,7 @@ export default function Home() {
           <div className="container grid gap-12 md:grid-cols-2">
             <div>
               <h2 className="font-headline text-3xl font-bold">
-                About HackNation
+                About HackNation 1.0
               </h2>
               <p className="mt-4 text-muted-foreground text-lg">
                 HackNation is the country's most prestigious hackathon, bringing
@@ -210,9 +212,15 @@ export default function Home() {
         <section id="gallery" className="py-20 bg-background">
           <div className="container">
             <h2 className="text-center text-3xl font-headline font-bold mb-12">
-              Glimpses of HackNation 2025
+              Glimpses of Hackathon 2025
             </h2>
             <Carousel
+              plugins={[
+                Autoplay({
+                  delay: 5000,
+                  stopOnInteraction: true,
+                }),
+              ]}
               opts={{
                 align: "start",
                 loop: true,
@@ -245,51 +253,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="best-performers" className="py-20">
-          <div className="container">
-            <h2 className="text-center text-3xl font-headline font-bold mb-12">
-              Best Performers in Hackathon 2025
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
-              {previousParticipants.map((participant) => (
-                <Card key={participant.id} className="text-center transition-all duration-300 ease-in-out transform hover:-translate-y-2 hover:shadow-2xl">
-                  <CardContent className="p-6">
-                    <Image
-                      src={participant.imageUrl}
-                      alt={participant.name}
-                      width={128}
-                      height={128}
-                      className="rounded-full mx-auto mb-4 border-4 border-primary/20 object-cover h-32 w-32"
-                      data-ai-hint={participant.imageHint}
-                    />
-                    <h3 className="font-semibold text-lg">{participant.name}</h3>
-                    <p className="text-sm text-muted-foreground">{participant.college}</p>
-                  </CardContent>
-                  <CardFooter className="flex-col items-center justify-center p-4 border-t">
-                      <p className="text-sm font-semibold flex items-center gap-2 text-accent"><Trophy className="h-4 w-4"/> Winner</p>
-                      <p className="text-xs text-muted-foreground mt-1 text-center">{participant.project}</p>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <PerformanceChart 
-                    data={topStatesData} 
-                    title="Top 5 States"
-                    description="States with the highest number of participants in previous editions."
-                    barColor="hsl(var(--primary))"
-                />
-                <PerformanceChart 
-                    data={topCollegesData} 
-                    title="Top 5 Colleges"
-                    description="Colleges that have consistently shown outstanding participation."
-                    barColor="hsl(var(--accent))"
-                />
-            </div>
-          </div>
-        </section>
+        <PastPerformanceSection />
 
         <section id="sponsors" className="py-16 bg-background">
           <div className="container">
