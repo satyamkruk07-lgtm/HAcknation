@@ -43,14 +43,13 @@ export function PastPerformanceSection() {
                           {topStatesData.map((state) => (
                                 <CarouselItem key={state.name} className="basis-1/1 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
                                 <div className="p-1">
-                                    <Card className="flex flex-col items-center justify-center p-6 text-center h-40 transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
-                                        <div className="relative h-20 w-20 mb-4">
+                                    <Card className="flex flex-col items-center p-6 text-center transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
+                                        <div className="relative h-20 w-20 mb-4 overflow-hidden rounded-full">
                                             <Image
                                                 src={state.imageUrl}
                                                 alt={state.name}
-                                                width={80}
-                                                height={80}
-                                                className="rounded-full object-cover"
+                                                fill
+                                                className="object-cover"
                                                 data-ai-hint={state.imageHint}
                                             />
                                         </div>
