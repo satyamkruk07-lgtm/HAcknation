@@ -1,5 +1,5 @@
-import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Trophy, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit } from 'lucide-react';
-import type { Sponsor, Project, ProjectIdea, ScheduleEvent, Conductor, PreviousParticipant } from './types';
+import { Briefcase, Code, Coffee, Flag, GitFork, GraduationCap, HardHat, Megaphone, Mic, Milestone, Pizza, Presentation, Users, Wrench, Database, Server, Cloud, Atom, FlaskConical, TestTube, BrainCircuit, Mountain, Landmark, Castle, Sailboat, DraftingCompass, Pyramid, Building2, Hand, Bird, Building, Feather, Tractor, Disc3 } from 'lucide-react';
+import type { Sponsor, Project, ProjectIdea, ScheduleEvent, Conductor } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
 export const sponsors: Sponsor[] = [
@@ -29,7 +29,7 @@ export const schedule: ScheduleEvent[] = [
     { id: '11', time: 'Day 2 - 10:00 AM', sortTime: 'day2-1000', title: 'Hacking Ends', description: 'Pencils down! Submit your projects.', type: 'flag', icon: Flag },
     { id: '12', time: 'Day 2 - 10:30 AM', sortTime: 'day2-1030', title: 'Project Expo & Judging', description: 'Showcase your project to judges and attendees.', type: 'presentation', icon: Presentation },
     { id: '13', time: 'Day 2 - 01:00 PM', sortTime: 'day2-1300', title: 'Lunch', description: 'Celebrate your hard work with a final meal together.', type: 'social', icon: Pizza },
-    { id: '14', time: 'Day 2 - 02:00 PM', sortTime: 'day2-1400', title: 'Closing Ceremony & Awards', description: 'Announcing the winners and closing remarks.', type: 'milestone', icon: Trophy },
+    { id: '14', time: 'Day 2 - 02:00 PM', sortTime: 'day2-1400', title: 'Closing Ceremony & Awards', description: 'Announcing the winners and closing remarks.', type: 'milestone', icon: Milestone },
 ];
 
 
@@ -386,55 +386,38 @@ export const conductors: Conductor[] = [
     }
 ];
 
-export const previousParticipants: PreviousParticipant[] = [
-  {
-    id: '1',
-    name: 'Priya Sharma',
-    college: 'IIT Delhi',
-    project: 'AI-Powered Health Diagnosis',
-    imageUrl: PlaceHolderImages.find(p => p.id === 'participant-1')?.imageUrl || 'https://picsum.photos/seed/p1/400/400',
-    imageHint: 'person portrait'
-  },
-  {
-    id: '2',
-    name: 'Rohan Gupta',
-    college: 'VIT Vellore',
-    project: 'Blockchain-based Voting System',
-    imageUrl: PlaceHolderImages.find(p => p.id === 'participant-2')?.imageUrl || 'https://picsum.photos/seed/p2/400/400',
-    imageHint: 'person portrait'
-  },
-  {
-    id: '3',
-    name: 'Anjali Mehta',
-    college: 'NIT Trichy',
-    project: 'AR Navigation for Smart Cities',
-    imageUrl: PlaceHolderImages.find(p => p.id === 'participant-3')?.imageUrl || 'https://picsum.photos/seed/p3/400/400',
-    imageHint: 'person portrait'
-  },
-    {
-    id: '4',
-    name: 'Vikram Singh',
-    college: 'BITS Pilani',
-    project: 'Decentralized Social Media',
-    imageUrl: PlaceHolderImages.find(p => p.id === 'participant-4')?.imageUrl || 'https://picsum.photos/seed/p4/400/400',
-    imageHint: 'person portrait'
-  },
-];
+export type TopState = {
+    name: string;
+    imageUrl: string;
+    imageHint: string;
+    seed: number;
+};
 
-export const topStatesData = [
-    { name: 'Maharashtra', participants: 450 },
-    { name: 'Karnataka', participants: 380 },
-    { name: 'Delhi', participants: 320 },
-    { name: 'Tamil Nadu', participants: 280 },
-    { name: 'Uttar Pradesh', participants: 250 },
+export const topStatesData: TopState[] = [
+    { name: 'Uttarakhand', imageUrl: 'https://travelogyindia.b-cdn.net/storage/app/upload/mountains-of-uttarakhand.jpg', imageHint: 'Himalayan Mountains', seed: 101 },
+    { name: 'Uttar Pradesh', imageUrl: `https://cdn.pixabay.com/photo/2022/06/13/21/06/taj-mahal-7260693_1280.jpg`, imageHint: 'Taj Mahal', seed: 102 },
+    { name: 'Rajasthan', imageUrl: `https://cdn.pixabay.com/photo/2021/04/06/11/22/hawa-mahal-6156123_1280.jpg`, imageHint: 'Hawa Mahal', seed: 103 },
+    { name: 'Delhi', imageUrl: `https://cdn.pixabay.com/photo/2020/02/02/17/24/travel-4813658_1280.jpg`, imageHint: 'India Gate', seed: 104 },
+    { name: 'Madhya Pradesh', imageUrl: `https://cdn.pixabay.com/photo/2023/05/14/13/28/sanchi-7992913_960_720.jpg`, imageHint: 'Sanchi Stupa', seed: 105 },
+    { name: 'Maharashtra', imageUrl: `https://cdn.pixabay.com/photo/2014/07/11/23/03/gateway-of-india-390768_1280.jpg`, imageHint: 'Gateway India', seed: 106 },
+    { name: 'Tamil Nadu', imageUrl: `https://thearchitectsdiary.com/wp-content/uploads/2023/11/Gopuram-12-jpg.webp`, imageHint: 'Temple Gopuram', seed: 107 },
+    { name: 'Kerala', imageUrl: `https://img.freepik.com/premium-photo/boat-with-houseboat-water-palm-trees-background_979520-96612.jpg?w=2000`, imageHint: 'Kerala Houseboat', seed: 108 },
+    { name: 'Haryana', imageUrl: `https://cdn.pixabay.com/photo/2024/03/05/09/25/ai-generated-8614213_640.png`, imageHint: 'Tractor Agriculture', seed: 109 },
+    { name: 'Bihar', imageUrl: `https://img.freepik.com/premium-photo/mahabodhi-temple-bodhgaya_78361-2548.jpg?w=2000`, imageHint: 'Mahabodhi Temple', seed: 110 },
+    { name: 'Gujarat', imageUrl: `https://img.freepik.com/premium-photo/somnath-temple-facade-gujarat-stock-photo_911060-52643.jpg`, imageHint: 'Somnath Temple', seed: 111 },
+    { name: 'Punjab', imageUrl: `https://img.freepik.com/premium-photo/golden-temple-punjab-sacred-sikh-shrine-stunningly-gilded-offering-sanctuary-spiritual_921026-36768.jpg?w=2000`, imageHint: 'Golden Temple', seed: 112 },
+    { name: 'Andhra Pradesh', imageUrl: `https://tse4.mm.bing.net/th/id/OIP._5V-2uNBkX6KNchbWTuVuQAAAA?rs=1&pid=ImgDetMain&o=7&rm=3`, imageHint: 'Tirupati Temple', seed: 113 },
+    { name: 'Tripura', imageUrl: `https://img.freepik.com/premium-psd/tribal-thatched-house-isolated-transparent-background_220739-124149.jpg`, imageHint: 'Tribal Hut', seed: 114 },
+    { name: 'Chandigarh', imageUrl: `https://th.bing.com/th/id/R.cda8423a0911aa7275f5bef8ed6e33a9?rik=UTRDNpSAk70fIA&riu=http%3a%2f%2fwww.chandigarhcity.com%2fwp-content%2fuploads%2fsites%2f1%2fnggallery%2fopen-hand-monument%2f2.jpg&ehk=h5agGaWjSSnKA0fAozjhTXqozmv8C6M4ck9SEt3ODVQ%3d&risl=&pid=ImgRaw&r=0`, imageHint: 'Open Hand', seed: 115 },
+    { name: 'Jammu & Kashmir', imageUrl: `https://img.freepik.com/premium-photo/boats-lake-with-mountains-background_865967-232355.jpg`, imageHint: 'Shikara boat', seed: 116 },
 ];
 
 export const topCollegesData = [
-    { name: 'IIT Bombay', participants: 95 },
-    { name: 'VIT Vellore', participants: 80 },
-    { name: 'IIT Delhi', participants: 75 },
-    { name: 'NIT Trichy', participants: 60 },
-    { name: 'SRM University', participants: 55 },
+    { name: 'IIT Bombay' },
+    { name: 'VIT Vellore' },
+    { name: 'IIT Delhi' },
+    { name: 'NIT Trichy' },
+    { name: 'SRM University' },
 ];
     
 
@@ -511,3 +494,9 @@ export const topCollegesData = [
     
 
     
+
+
+
+
+
+
