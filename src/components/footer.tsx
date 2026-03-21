@@ -12,7 +12,7 @@ export function Footer() {
           © {new Date().getFullYear()} HackNation. Designed and Developed by ACM Student Chapter
         </p>
         <div className="text-sm">
-          <h4 className="font-semibold mb-1">Contact ACM Co-ordinator</h4>
+          <h4 className="font-semibold mb-1">Contact ACM Co-ordinators</h4>
           <ul className="space-y-0 text-muted-foreground">
             <li>Kumar Satyam - <a href="tel:7060550243" className="hover:text-foreground">7060550243</a></li>
             <li>Shivam Kumar - <a href="tel:9693561946" className="hover:text-foreground">9693561946</a></li>
