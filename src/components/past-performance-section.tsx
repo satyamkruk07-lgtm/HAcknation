@@ -65,7 +65,7 @@ export function PastPerformanceSection() {
                       </Carousel>
                   </div>
                   <div>
-                      <h3 className="text-center text-2xl font-headline font-semibold mb-8">Top Participating Colleges</h3>
+                      <h3 className="text-center text-2xl font-headline font-semibold mb-8">Participating Colleges</h3>
                       <Carousel
                         plugins={[
                             Autoplay({
