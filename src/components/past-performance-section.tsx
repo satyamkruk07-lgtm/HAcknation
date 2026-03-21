@@ -21,7 +21,7 @@ export function PastPerformanceSection() {
         <section id="past-performance" className="py-20">
           <div className="container">
               <h2 className="text-center text-3xl font-headline font-bold mb-12">
-              Past Performance
+              Past Performances
               </h2>
               <div className="space-y-16">
                   <div>
@@ -65,7 +65,7 @@ export function PastPerformanceSection() {
                       </Carousel>
                   </div>
                   <div>
-                      <h3 className="text-center text-2xl font-headline font-semibold mb-8">Participating Colleges</h3>
+                      <h3 className="text-center text-2xl font-headline font-semibold mb-8"> Participating Colleges</h3>
                       <Carousel
                         plugins={[
                             Autoplay({
